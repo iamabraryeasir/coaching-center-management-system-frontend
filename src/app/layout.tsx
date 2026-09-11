@@ -21,6 +21,7 @@ const geistMono = Geist_Mono({
 });
 
 import { siteConfig } from "@/config/site";
+import AppProviders from "@/providers";
 
 export const metadata: Metadata = {
   title: {
@@ -52,7 +53,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         robotoHeading.variable,
       )}
     >
-      <body>{children}</body>
+      <AppProviders>
+        <body>{children}</body>
+      </AppProviders>
     </html>
   );
 }
