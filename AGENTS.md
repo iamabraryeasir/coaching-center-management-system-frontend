@@ -8,128 +8,120 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 <!-- END:nextjs-agent-rules -->
 
-# Agent Memory & Development Guide: Coaching Management System Frontend
+# Agent Memory & Engineering Guidelines: Coaching Management System Frontend
 
-This document serves as the persistent memory, architectural specification, and coding standard for all AI agents working on this repository.
+This document serves as the persistent memory, architectural blueprint, and engineering standard for all AI agents and developers working on this codebase.
 
 ---
 
-## 1. Project Overview
+## 1. System Overview & Core Stack
 
-- **Project Name**: `coaching-management-system-frontend`
-- **Domain**: Coaching Center Management Application (Student Onboarding, Authentication, Marketing, Administration Dashboard).
-- **Package Manager**: `bun` (`bun@1.4.2`). Always prefer `bun` for package management and running scripts.
-- **Core Stack**:
-  - **Framework**: Next.js 16.3.4 (App Router) + React 19.2.8
+- **Application Domain**: Coaching Management System (Multi-tenant coaching center administration, onboarding, authentication, and marketing).
+- **Package Manager & Runtime**: `bun` (`bun@1.4.2`). Always use `bun` for installing packages and executing scripts.
+- **Core Technology Matrix**:
+  - **Framework**: Next.js 16 (App Router) + React 19
   - **Compiler**: React Compiler enabled (`reactCompiler: true` in `next.config.ts`)
-  - **Styling**: Tailwind CSS v4 + `tw-animate-css` + OKLCH design tokens
+  - **Styling**: Tailwind CSS v4 + `tw-animate-css` + Semantic OKLCH design tokens
   - **UI Primitives**: Base UI (`@base-ui/react`) + Shadcn (`base-nova` style) + Lucide Icons
-  - **State & Data Fetching**: TanStack Query v5 (`@tanstack/react-query`) + `ofetch`
-  - **Forms & Validation**: `@tanstack/react-form` + `zod` (v4)
+  - **Data Fetching & Server State**: TanStack Query v5 (`@tanstack/react-query`) + `ofetch`
+  - **Forms & Schema Validation**: `@tanstack/react-form` + `zod` (v4)
   - **Linter & Formatter**: Biome 2.4.2 (`biome.json`)
 
 ---
 
-## 2. Directory Structure & Responsibilities
+## 2. Architectural Blueprint & Directory Taxonomy
 
-All application source code lives inside `src/`. Follow the strict separation of concerns below:
+All application code resides within `src/` and strictly adheres to the following separation of concerns:
 
 ```plaintext
 src/
-├── api/                  # HTTP client (ofetch) instances, API service functions, endpoint definitions
-├── app/                  # Next.js App Router (pages, layouts, route handlers)
-│   ├── (public)/         # Route group for unauthenticated/public-facing routes
-│   │   ├── (auth)/       # Auth screens (/login, /forgot-password, /onboard-student)
-│   │   └── (marketing)/  # Marketing pages (/ with Header & Footer layout)
-│   ├── dashboard/        # Authenticated coaching center management dashboard
-│   ├── globals.css       # Tailwind v4 theme, OKLCH variables, light/dark mode tokens
-│   └── layout.tsx        # Root HTML layout with Google Fonts (Geist, Inter, Roboto)
-├── assets/               # Static icons, vector graphics, and SVG components
-│   └── svg/              # Reusable React SVG components (e.g., logo.tsx)
-├── components/           # Component hierarchy
-│   ├── forms/            # Form components powered by @tanstack/react-form and Zod
-│   ├── layouts/          # Layout shells (e.g. public/header.tsx, public/footer.tsx, dashboard/sidebar.tsx)
-│   ├── modules/          # Domain-specific feature modules (e.g. home-page/hero-section.tsx)
-│   └── ui/               # Low-level reusable UI primitives (e.g. button.tsx with @base-ui/react)
-├── constants/            # App-wide constants, navigation links, route mappings
-├── hooks/                # Custom reusable React hooks
-├── lib/                  # Utilities (e.g. utils.ts with cn helper)
-├── providers/            # Client context providers (QueryClientProvider, ThemeProvider, etc.)
-├── types/                # TypeScript interfaces, DTOs, API response types
-└── validators/           # Zod validation schemas
+├── api/                  # HTTP client instances (ofetch), centralized endpoint services, and API contracts
+├── app/                  # Next.js App Router (route groups, layouts, pages, route handlers)
+│   ├── (public)/         # Unauthenticated route groups
+│   │   ├── (auth)/       # Authentication & credential recovery flows
+│   │   └── (marketing)/  # Marketing, landing, and public-facing content
+│   ├── dashboard/        # Authenticated management & administrative portal
+│   ├── globals.css       # Tailwind v4 engine, semantic OKLCH tokens, dark theme variables
+│   └── layout.tsx        # Root HTML shell injecting font variables and global providers
+├── assets/               # Static icons, vector graphics, and reusable SVG components
+├── components/           # 5-Tier Component Composition Hierarchy (see DESIGN.md)
+│   ├── forms/            # Reusable form field controls and form containers
+│   ├── layouts/          # Global layout shells (headers, navigation bars, sidebars, footers)
+│   ├── modules/          # Domain-bounded feature modules (cohesive business logic slices)
+│   └── ui/               # Atomic, headless UI primitives built on Base UI + CVA
+├── constants/            # Application-wide constants, navigation schemes, route enumerations
+├── hooks/                # Custom, reusable React hooks
+├── lib/                  # Universal utility functions (e.g., class name merger cn)
+├── providers/            # React Context & Client state providers (QueryClientProvider, Theme, Auth)
+├── types/                # Domain models, TypeScript interfaces, DTOs, and API responses
+└── validators/           # Zod validation schemas and schema-inferred types
 ```
 
 ---
 
-## 3. Architecture & Coding Patterns
+## 3. Design System & UI Architecture Reference
 
-### 3.1 Next.js 16 & React 19 Conventions
+For detailed specifications on visual tokens, typography, component composition tiers, and layout archetypes, **always refer to [`DESIGN.md`](./DESIGN.md)**.
 
-- **Server-First Principle**: Keep components as React Server Components (RSC) by default. Only add `"use client"` when using hooks, browser APIs, or interactive event listeners.
-- **React Compiler Active**: Because `reactCompiler: true` is enabled, avoid manually wrapping callbacks in `useCallback` or computations in `useMemo` unless dealing with external imperative references.
-- **Async Page & Layout Params**: In Next.js 15/16, `params` and `searchParams` in pages, layouts, and route handlers are Promises. Always await them:
+Key principles to uphold:
+
+- **Token Exclusivity**: Use semantic CSS tokens (`bg-primary`, `text-foreground`, `border-border`, etc.) instead of hardcoded hex colors or arbitrary arbitrary values.
+- **Component Layering**: Maintain clear boundaries between atomic UI primitives (`components/ui`), validated form controls (`components/forms`), layout frames (`components/layouts`), and feature modules (`components/modules/<feature-domain>`).
+- **Dark Mode & Contrast**: All components must provide first-class dark mode support using defined semantic tokens and OKLCH color dynamics.
+
+---
+
+## 4. Universal Development & Coding Standards
+
+### 4.1 Next.js 16 & React 19 Paradigms
+
+- **Server-First Execution**: Default to React Server Components (`RSC`). Add `"use client"` only when components require browser APIs, local state, effects, or user event listeners.
+- **React Compiler Optimization**: With `reactCompiler: true` active, do not manually wrap calculations in `useMemo` or handlers in `useCallback` unless handling external non-reactive imperative references.
+- **Async Page & Layout Parameters**: `params` and `searchParams` in Next.js 16 pages, layouts, and route handlers are Promises. Always await them:
   ```tsx
   export default async function Page({
     params,
     searchParams,
   }: {
-    params: Promise<{ id: string }>;
+    params: Promise<{ slug: string }>;
     searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
   }) {
-    const { id } = await params;
+    const { slug } = await params;
     const query = await searchParams;
     // ...
   }
   ```
-- **Thin Route Pages**: Page files (`page.tsx`) must remain minimal wrappers that fetch data or assemble feature modules from `src/components/modules/<feature-name>/`.
+- **Thin Route Pages**: Route page files (`page.tsx`) must serve purely as thin orchestrators that fetch data or assemble feature modules from `src/components/modules/<feature-domain>/`.
 
-### 3.2 UI Components & Styling (Tailwind v4 + Base UI)
+### 4.2 Data Fetching & API Layer
 
-- **Base UI Primitives**: Reusable UI components in `src/components/ui/` should build upon `@base-ui/react` primitives and `class-variance-authority` (`cva`).
-- **Design Tokens & OKLCH**: Use the defined semantic theme variables in `src/app/globals.css` (`bg-primary`, `text-primary-foreground`, `bg-secondary`, `bg-card`, `border-border`, etc.).
-- **Dark Mode**: Configured via `@custom-variant dark (&:is(.dark *));` and `.dark` CSS class tokens. Ensure all UI components support dark mode cleanly.
-- **Class Merging**: Always use `cn(...)` from `@/lib/utils` (or `cn`) for merging dynamic Tailwind classes.
+- **HTTP Client**: Use `ofetch` for API interaction with centralized base configuration, token management, and error handling.
+- **Server State Management**: Handle all client-side querying, caching, and mutations via `@tanstack/react-query`.
+- **Query Key Factories**: Centralize query key factories in `src/constants/` or co-locate with query hooks to prevent stale cache discrepancies.
 
-### 3.3 Data Fetching & API Layer
+### 4.3 Form State & Validation
 
-- **HTTP Client**: Use `ofetch` for API communication. Set up a base client with interceptors for authentication tokens and base URLs (`NEXT_PUBLIC_BASE_URL`).
-- **Server State**: Use `@tanstack/react-query` for all client-side querying, caching, and mutations.
-- **Query Keys**: Centralize query key factories in `src/constants/` or co-locate with query hooks to prevent stale cache bugs.
+- **Form State**: Manage interactive forms using `@tanstack/react-form`.
+- **Schema Validation**: Define all schemas in `src/validators/` with `zod` (v4).
+- **Type Derivation**: Infer TypeScript DTOs from schemas (`z.infer<typeof schema>`) and export them for cross-tier consumption.
 
-### 3.4 Form Handling & Validation
+### 4.4 TypeScript & Code Quality
 
-- **Form State**: Use `@tanstack/react-form` for form state management.
-- **Schema Validation**: Define all schemas in `src/validators/` using `zod` (v4).
-- **Type Inference**: Infer TypeScript types directly from schemas using `z.infer<typeof schema>` and export them from `src/types/` or the validator file.
-
----
-
-## 4. Code Quality & Tooling Rules
-
-- **Biome (Linter & Formatter)**:
-  - Do NOT add ESLint or Prettier configs. Biome manages all linting and formatting.
-  - Tab/Indent: 2 spaces.
-  - Quotes: Double quotes for JS/TS/JSON.
-- **Path Aliases**: Always use `@/*` alias pointing to `src/*` (configured in `tsconfig.json` and `components.json`):
-  - `@/components`
-  - `@/components/ui`
-  - `@/lib/utils`
-  - `@/hooks`
-  - `@/types`
-  - `@/validators`
-  - `@/constants`
-  - `@/api`
-  - `@/providers`
-- **TypeScript Strict Mode**: Keep code 100% strictly typed. Never use `any` without documented necessity.
+- **Strict Type Safety**: Maintain 100% strict typing. Never introduce `any` types.
+- **Module Aliases**: Always use `@/*` path aliases pointing to `src/*` (e.g., `@/components/ui`, `@/lib/utils`, `@/types`, `@/api`).
+- **Single Tooling System (Biome)**: Never add ESLint, Prettier, or conflicting config files. Biome is the sole linter and formatter.
 
 ---
 
-## 5. Agent Workflow & Operational Instructions
+## 5. Agent Operational Workflow & Quality Pipeline
 
-1. **Check Existing Dependencies**: Before suggesting or installing new packages, verify if an existing tool in `package.json` already fulfills the requirement (`ofetch`, `@tanstack/react-query`, `@tanstack/react-form`, `zod`, `@base-ui/react`, `lucide-react`, `cva`).
-2. **Preserve Next.js Agent Header**: Never delete or tamper with the `<!-- BEGIN:nextjs-agent-rules --> ... <!-- END:nextjs-agent-rules -->` block at the top of this file.
-3. **Keep Modules Cohesive**: Place feature-specific UI inside `src/components/modules/<feature-slug>/` rather than cluttering `src/components/ui/` or `src/app/`.
-4. **Mandatory Post-Task Code Quality Pipeline**: Whenever the agent writes, edits, or adds code to the codebase, it **MUST** run the following 3 commands in order to ensure clean, valid, and formatted code:
+Whenever working on tasks in this repository, all agents **MUST** adhere to the following sequence:
+
+1. **Dependency Verification**: Check `package.json` before adding any new libraries. Always utilize existing dependencies (`ofetch`, `@tanstack/react-query`, `@tanstack/react-form`, `zod`, `@base-ui/react`, `lucide-react`, `cva`).
+2. **Next.js Header Preservation**: Never remove or alter the `<!-- BEGIN:nextjs-agent-rules --> ... <!-- END:nextjs-agent-rules -->` block at the top of this file.
+3. **Feature Encapsulation**: Keep feature-specific logic within `src/components/modules/<feature-domain>/` to preserve a clean and scalable component hierarchy.
+4. **Mandatory Post-Task Code Quality Pipeline**:
+   After writing, modifying, or refactoring any code, the agent **MUST** execute the following 3 commands in order:
    - **Step 1: Check Linter**: `bun run lint` (runs `biome check` to detect issues)
    - **Step 2: Auto-fix Issues**: `bun run lint:write` (runs `biome check --write` to auto-fix linter and import sorting issues)
    - **Step 3: Format Code**: `bun run format` (runs `biome format --write` to apply consistent code formatting)
