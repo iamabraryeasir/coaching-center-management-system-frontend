@@ -8,6 +8,7 @@ This document defines the generic design system, token architecture, component c
 
 - **Token-Driven Architecture**: All visual properties (colors, radiuses, shadows, typography) are derived from semantic CSS custom properties rather than hardcoded utility classes.
 - **Perceptual Color Precision (OKLCH)**: Utilizes the OKLCH color space for consistent lightness, uniform contrast ratios, and seamless light/dark mode transitions.
+- **Centralized Brand Decoupling (White-Labeling)**: All identity strings, logos, titles, and metadata are centralized in `src/config/site.ts`, allowing instant rebranding across all pages and deployments without code modifications.
 - **Headless Primitives + Deterministic Styling**: UI primitives are built upon unstyled, accessible foundation components (`@base-ui/react`) and styled using `class-variance-authority` (`cva`).
 - **Composition Over Inheritance**: Complex UI patterns are assembled by composing atomic primitives, headless form handlers, and domain-bounded feature modules.
 - **Accessibility (a11y) First**: WAI-ARIA compliance, visible focus indicators (`ring`), keyboard navigation, and semantic HTML elements across all components.
@@ -70,7 +71,24 @@ Typography is managed through Next.js Font Optimization and mapped to CSS variab
 
 ---
 
-## 4. Component Layering & Composition Model
+## 4. Centralized Brand Configuration (White-Label Standard)
+
+All consumer components across the application must consume brand identity through `src/config/site.ts`:
+
+```typescript
+// Example usage in navigation, headers, and dashboard shells:
+import { siteConfig } from "@/config/site";
+
+// Display brand name dynamically
+const brandTitle = siteConfig.name;
+const logoUrl = siteConfig.logo.src;
+```
+
+**Rule for Developers & Agents**: Never hardcode client or coaching center names in JSX. Always reference `siteConfig` to guarantee multi-deployment compatibility.
+
+---
+
+## 5. Component Layering & Composition Model
 
 The codebase enforces a strict 5-tier component composition hierarchy:
 
@@ -90,52 +108,52 @@ flowchart TD
     Tier1 --> Tier0
 ```
 
-### 4.1 Tier 0: UI Primitives (`src/components/ui/`)
+### 5.1 Tier 0: UI Primitives (`src/components/ui/`)
 
 - Atomic, generic, domain-agnostic UI building blocks (buttons, dialogs, dropdowns, inputs, badges).
 - Built on unstyled `@base-ui/react` primitives.
 - Exposes clean variant APIs via `class-variance-authority` (`cva`).
 - Merges dynamic class names strictly via `cn(...)` utility.
 
-### 4.2 Tier 1: Forms & Controls (`src/components/forms/`)
+### 5.2 Tier 1: Forms & Controls (`src/components/forms/`)
 
 - Reusable form fields, input groups, and composite form components.
 - Powered by `@tanstack/react-form` for state and validated against `zod` schemas.
 - Integrates error messaging, dirty state tracking, and accessible field labels.
 
-### 4.3 Tier 2: Layout Shells (`src/components/layouts/`)
+### 5.3 Tier 2: Layout Shells (`src/components/layouts/`)
 
 - Macro-structural containers providing navigation headers, sidebars, footers, and app framing.
 - Encapsulates responsive drawer toggles, breadcrumb bars, and user menu dropdowns.
 
-### 4.4 Tier 3: Feature Modules (`src/components/modules/<feature-domain>/`)
+### 5.4 Tier 3: Feature Modules (`src/components/modules/<feature-domain>/`)
 
 - Business-logic-rich, domain-specific UI sections (e.g., dashboard data tables, landing sections, onboarding workflows).
 - Assembles primitives, forms, and layout components into cohesive functional blocks.
 
-### 4.5 Tier 4: Route Pages (`src/app/**`)
+### 5.5 Tier 4: Route Pages (`src/app/**`)
 
 - Thin page orchestrators responsible for data prefetching, route parameter resolution, and rendering Tier 3 feature modules.
 
 ---
 
-## 5. Generic Layout Archetypes
+## 6. Generic Layout Archetypes
 
 The application supports three structural page archetypes:
 
-### 5.1 Public Marketing Archetype
+### 6.1 Public Marketing Archetype
 
 - **Structure**: Full-height vertical flow (`min-h-screen flex flex-col`).
 - **Composition**: Global Navigation Header $\rightarrow$ Fluid Content Area (`<main className="flex-1">`) $\rightarrow$ Global Footer.
 - **Context**: Marketing pages, product information, public documentation.
 
-### 5.2 Minimal / Conversion Archetype (Auth & Onboarding)
+### 6.2 Minimal / Conversion Archetype (Auth & Onboarding)
 
 - **Structure**: Centered, distraction-free container with constrained max-width (`max-w-md` to `max-w-lg`).
 - **Composition**: Centered Card Surface $\rightarrow$ Accessible Form Fields $\rightarrow$ Secondary Action Links.
 - **Context**: Login, registration, password recovery, multi-step onboarding flows.
 
-### 5.3 Administrative Dashboard Archetype
+### 6.3 Administrative Dashboard Archetype
 
 - **Structure**: Two-column responsive app shell with persistent or collapsible navigation.
 - **Composition**: Sidebar Navigation $\rightarrow$ Top Utility Bar $\rightarrow$ Scrollable Data Viewport.
@@ -143,7 +161,7 @@ The application supports three structural page archetypes:
 
 ---
 
-## 6. Interaction & State Conventions
+## 7. Interaction & State Conventions
 
 1. **State Feedback**: Interactive elements must support explicit `hover`, `active`, `focus-visible`, `disabled`, and `aria-invalid` states.
 2. **Skeleton & Loading States**: Asynchronous data views must render layout-matching skeleton placeholders rather than generic spinners.

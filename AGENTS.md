@@ -16,7 +16,7 @@ This document serves as the persistent memory, architectural blueprint, and engi
 
 ## 1. System Overview & Core Stack
 
-- **Application Domain**: Coaching Management System (Multi-tenant coaching center administration, onboarding, authentication, and marketing).
+- **Application Domain**: Coaching Management System (Multi-tenant/multi-instance coaching center administration, onboarding, authentication, and marketing).
 - **Package Manager & Runtime**: `bun` (`bun@1.4.2`). Always use `bun` for installing packages and executing scripts.
 - **Core Technology Matrix**:
   - **Framework**: Next.js 16 (App Router) + React 19
@@ -42,13 +42,14 @@ src/
 │   │   └── (marketing)/  # Marketing, landing, and public-facing content
 │   ├── dashboard/        # Authenticated management & administrative portal
 │   ├── globals.css       # Tailwind v4 engine, semantic OKLCH tokens, dark theme variables
-│   └── layout.tsx        # Root HTML shell injecting font variables and global providers
+│   └── layout.tsx        # Root HTML shell injecting font variables, site metadata, and global providers
 ├── assets/               # Static icons, vector graphics, and reusable SVG components
 ├── components/           # 5-Tier Component Composition Hierarchy (see DESIGN.md)
 │   ├── forms/            # Reusable form field controls and form containers
 │   ├── layouts/          # Global layout shells (headers, navigation bars, sidebars, footers)
 │   ├── modules/          # Domain-bounded feature modules (cohesive business logic slices)
 │   └── ui/               # Atomic, headless UI primitives built on Base UI + CVA
+├── config/               # Centralized configuration (site identity, branding, white-label settings)
 ├── constants/            # Application-wide constants, navigation schemes, route enumerations
 ├── hooks/                # Custom, reusable React hooks
 ├── lib/                  # Universal utility functions (e.g., class name merger cn)
@@ -65,7 +66,7 @@ For detailed specifications on visual tokens, typography, component composition 
 
 Key principles to uphold:
 
-- **Token Exclusivity**: Use semantic CSS tokens (`bg-primary`, `text-foreground`, `border-border`, etc.) instead of hardcoded hex colors or arbitrary arbitrary values.
+- **Token Exclusivity**: Use semantic CSS tokens (`bg-primary`, `text-foreground`, `border-border`, etc.) instead of hardcoded hex colors or arbitrary values.
 - **Component Layering**: Maintain clear boundaries between atomic UI primitives (`components/ui`), validated form controls (`components/forms`), layout frames (`components/layouts`), and feature modules (`components/modules/<feature-domain>`).
 - **Dark Mode & Contrast**: All components must provide first-class dark mode support using defined semantic tokens and OKLCH color dynamics.
 
@@ -93,22 +94,36 @@ Key principles to uphold:
   ```
 - **Thin Route Pages**: Route page files (`page.tsx`) must serve purely as thin orchestrators that fetch data or assemble feature modules from `src/components/modules/<feature-domain>/`.
 
-### 4.2 Data Fetching & API Layer
+### 4.2 Centralized Branding & Multi-Deployment (White-Label) Architecture
+
+- **Single Source of Truth**: All application identity strings (center name, short name, tagline, description, logo URL, support email) are centralized in `src/config/site.ts`.
+- **Zero Hardcoded Branding**: Never hardcode brand names, titles, or logo paths inside components, layouts, or pages. Always import `siteConfig` from `@/config/site`:
+
+  ```tsx
+  import { siteConfig } from "@/config/site";
+
+  // Use in headers, sidebars, footers, auth titles, and metadata
+  <span>{siteConfig.name}</span>;
+  ```
+
+- **Multi-Deployment Customization**: When deploying for different coaching centers, brand properties can be overridden via `NEXT_PUBLIC_*` environment variables (`NEXT_PUBLIC_APP_NAME`, `NEXT_PUBLIC_LOGO_URL`, `NEXT_PUBLIC_SUPPORT_EMAIL`) without code changes.
+
+### 4.3 Data Fetching & API Layer
 
 - **HTTP Client**: Use `ofetch` for API interaction with centralized base configuration, token management, and error handling.
 - **Server State Management**: Handle all client-side querying, caching, and mutations via `@tanstack/react-query`.
 - **Query Key Factories**: Centralize query key factories in `src/constants/` or co-locate with query hooks to prevent stale cache discrepancies.
 
-### 4.3 Form State & Validation
+### 4.4 Form State & Validation
 
 - **Form State**: Manage interactive forms using `@tanstack/react-form`.
 - **Schema Validation**: Define all schemas in `src/validators/` with `zod` (v4).
 - **Type Derivation**: Infer TypeScript DTOs from schemas (`z.infer<typeof schema>`) and export them for cross-tier consumption.
 
-### 4.4 TypeScript & Code Quality
+### 4.5 TypeScript & Code Quality
 
 - **Strict Type Safety**: Maintain 100% strict typing. Never introduce `any` types.
-- **Module Aliases**: Always use `@/*` path aliases pointing to `src/*` (e.g., `@/components/ui`, `@/lib/utils`, `@/types`, `@/api`).
+- **Module Aliases**: Always use `@/*` path aliases pointing to `src/*` (e.g., `@/components/ui`, `@/config/site`, `@/lib/utils`, `@/types`, `@/api`).
 - **Single Tooling System (Biome)**: Never add ESLint, Prettier, or conflicting config files. Biome is the sole linter and formatter.
 
 ---
