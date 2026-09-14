@@ -53,9 +53,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         robotoHeading.variable,
       )}
     >
-      <AppProviders>
-        <body>{children}</body>
-      </AppProviders>
+      <body>
+        <AppProviders>{children}</AppProviders>
+      </body>
     </html>
   );
 }

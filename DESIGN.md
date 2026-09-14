@@ -161,9 +161,10 @@ The application supports three structural page archetypes:
 
 ---
 
-## 7. Interaction & State Conventions
+## 7. Interaction, Feedback & State Conventions
 
 1. **State Feedback**: Interactive elements must support explicit `hover`, `active`, `focus-visible`, `disabled`, and `aria-invalid` states.
-2. **Skeleton & Loading States**: Asynchronous data views must render layout-matching skeleton placeholders rather than generic spinners.
-3. **Empty & Error States**: Data collections must provide clear, actionable fallback interfaces for empty datasets and network failures.
-4. **Responsive Strategy**: Mobile-first layout progression using standard responsive breakpoints (`sm:`, `md:`, `lg:`, `xl:`, `2xl:`).
+2. **Toast Notifications**: System feedback for async operations (loading, success, error) is presented via `react-hot-toast`, styled with semantic OKLCH variables (`--card`, `--border`, `--destructive`, `--primary`).
+3. **Skeleton & Loading States**: Asynchronous data views must render layout-matching skeleton placeholders rather than generic spinners.
+4. **Empty & Error States**: Data collections must provide clear, actionable fallback interfaces for empty datasets and network failures.
+5. **Responsive Strategy**: Mobile-first layout progression using standard responsive breakpoints (`sm:`, `md:`, `lg:`, `xl:`, `2xl:`).

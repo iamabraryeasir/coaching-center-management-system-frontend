@@ -25,6 +25,7 @@ This document serves as the persistent memory, architectural blueprint, and engi
   - **UI Primitives**: Base UI (`@base-ui/react`) + Shadcn (`base-nova` style) + Lucide Icons
   - **Data Fetching & Server State**: TanStack Query v5 (`@tanstack/react-query`) + `ofetch`
   - **Forms & Schema Validation**: `@tanstack/react-form` + `zod` (v4)
+  - **Feedback & Notifications**: `react-hot-toast` + OKLCH token styling
   - **Linter & Formatter**: Biome 2.4.2 (`biome.json`)
 
 ---
@@ -52,8 +53,8 @@ src/
 ├── config/               # Centralized configuration (site identity, branding, white-label settings)
 ├── constants/            # Application-wide constants, navigation schemes, route enumerations
 ├── hooks/                # Custom, reusable React hooks
-├── lib/                  # Universal utility functions (e.g., class name merger cn)
-├── providers/            # React Context & Client state providers (QueryClientProvider, Theme, Auth)
+├── lib/                  # Universal utility functions (e.g., class name merger cn, ofetch apiClient)
+├── providers/            # React Context & Client state providers (QueryClientProvider, ToastProvider, Auth)
 ├── types/                # Domain models, TypeScript interfaces, DTOs, and API responses
 └── validators/           # Zod validation schemas and schema-inferred types
 ```
@@ -120,7 +121,13 @@ Key principles to uphold:
 - **Schema Validation**: Define all schemas in `src/validators/` with `zod` (v4).
 - **Type Derivation**: Infer TypeScript DTOs from schemas (`z.infer<typeof schema>`) and export them for cross-tier consumption.
 
-### 4.5 TypeScript & Code Quality
+### 4.5 Notifications & User Feedback
+
+- **Toast Engine**: Use `react-hot-toast` for all status notifications and action feedback.
+- **Global Provider**: Rendered globally via `src/providers/toast-provider.tsx` inside `AppProviders`.
+- **Async Action Pattern**: When executing async mutations or form submits, use `toast.loading(...)` with an ID, then update the same toast with `toast.success(..., { id: toastId })` or `toast.error(..., { id: toastId })`.
+
+### 4.6 TypeScript & Code Quality
 
 - **Strict Type Safety**: Maintain 100% strict typing. Never introduce `any` types.
 - **Module Aliases**: Always use `@/*` path aliases pointing to `src/*` (e.g., `@/components/ui`, `@/config/site`, `@/lib/utils`, `@/types`, `@/api`).
@@ -132,7 +139,7 @@ Key principles to uphold:
 
 Whenever working on tasks in this repository, all agents **MUST** adhere to the following sequence:
 
-1. **Dependency Verification**: Check `package.json` before adding any new libraries. Always utilize existing dependencies (`ofetch`, `@tanstack/react-query`, `@tanstack/react-form`, `zod`, `@base-ui/react`, `lucide-react`, `cva`).
+1. **Dependency Verification**: Check `package.json` before adding any new libraries. Always utilize existing dependencies (`ofetch`, `@tanstack/react-query`, `@tanstack/react-form`, `zod`, `@base-ui/react`, `react-hot-toast`, `lucide-react`, `cva`).
 2. **Next.js Header Preservation**: Never remove or alter the `<!-- BEGIN:nextjs-agent-rules --> ... <!-- END:nextjs-agent-rules -->` block at the top of this file.
 3. **Feature Encapsulation**: Keep feature-specific logic within `src/components/modules/<feature-domain>/` to preserve a clean and scalable component hierarchy.
 4. **Mandatory Post-Task Code Quality Pipeline**:

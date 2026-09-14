@@ -13,6 +13,7 @@ A modern, scalable frontend application for managing coaching centers, student a
 - **UI Primitives**: [Base UI](https://base-ui.com/) (`@base-ui/react`) + Shadcn (`base-nova`) + Lucide Icons
 - **Server State & Data Fetching**: [TanStack Query v5](https://tanstack.com/query/latest) + [ofetch](https://github.com/unjs/ofetch)
 - **Forms & Validation**: [TanStack Form](https://tanstack.com/form/latest) + [Zod](https://zod.dev/)
+- **Notifications**: [React Hot Toast](https://react-hot-toast.com/)
 - **Linter & Formatter**: [Biome](https://biomejs.dev/)
 
 ---
@@ -22,6 +23,7 @@ A modern, scalable frontend application for managing coaching centers, student a
 - **Multi-Instance White-Label Ready**: Centralized branding in `src/config/site.ts` with zero-code environment variable overrides (`NEXT_PUBLIC_APP_NAME`, `NEXT_PUBLIC_LOGO_URL`, etc.).
 - **Modular Component Taxonomy**: Structured separation of concerns between UI primitives (`src/components/ui`), form controls (`src/components/forms`), layout frames (`src/components/layouts`), and feature modules (`src/components/modules`).
 - **Modern Routing Architecture**: Grouped routing for marketing pages `(marketing)`, authentication flows `(auth)`, and protected management dashboards `dashboard`.
+- **Toast Notification Layer**: Unified async status feedback (loading, success, error) styled via OKLCH design tokens.
 - **High-Performance Tooling**: Ultra-fast linting and formatting via Biome.
 
 ---
