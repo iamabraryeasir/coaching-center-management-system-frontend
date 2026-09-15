@@ -1,12 +1,31 @@
 import Image from "next/image";
 
-export default function AppLogo({ size = 0 }: { size?: number }) {
+interface AppLogoProps {
+  size?: number;
+  width?: number;
+  height?: number;
+  className?: string;
+  priority?: boolean;
+}
+
+export default function AppLogo({
+  size = 1,
+  width,
+  height,
+  className,
+  priority,
+}: AppLogoProps) {
+  const calculatedWidth = width ?? (size ? Math.round(size * 37) : 37);
+  const calculatedHeight = height ?? (size ? Math.round(size * 41) : 41);
+
   return (
     <Image
       src="/app-logo.svg"
       alt="Application Logo"
-      width={size * 37}
-      height={size * 41}
+      width={calculatedWidth}
+      height={calculatedHeight}
+      className={className}
+      priority={priority}
     />
   );
 }
