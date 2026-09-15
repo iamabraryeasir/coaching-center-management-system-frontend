@@ -1,13 +1,13 @@
 "use client";
 
 import { useForm } from "@tanstack/react-form";
+import { useQueryClient } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import toast from "react-hot-toast";
-
 import { loginUser } from "@/api";
 import { Button } from "@/components/ui/button";
 import {
@@ -26,6 +26,7 @@ import {
   FieldSeparator,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { authKeys } from "@/constants/query-keys";
 import { cn } from "@/lib/utils";
 import { loginSchema } from "@/validators";
 
@@ -34,6 +35,7 @@ export function LoginForm({
   ...props
 }: React.ComponentProps<"div">) {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [serverError, setServerError] = useState<string | null>(null);
 
   const form = useForm({
@@ -50,6 +52,9 @@ export function LoginForm({
 
       try {
         const response = await loginUser(value);
+        if (response?.data?.user) {
+          queryClient.setQueryData(authKeys.currentUser(), response.data.user);
+        }
         toast.success(response?.message || "Login successful! Redirecting...", {
           id: toastId,
         });

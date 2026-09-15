@@ -1,18 +1,20 @@
 "use client";
 
-import { LogIn, Menu, X } from "lucide-react";
+import { LayoutDashboard, LogIn, LogOut, Menu, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import AppLogo from "@/assets/svg/logo";
-import { buttonVariants } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { siteConfig } from "@/config/site";
 import { PUBLIC_NAV_ITEMS } from "@/constants";
+import { useAuth } from "@/hooks";
 import { cn } from "@/lib/utils";
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const pathname = usePathname();
+  const { user, isAuthenticated, isLoading, logout, isLoggingOut } = useAuth();
 
   // Close mobile menu on route changes
   useEffect(() => {
@@ -102,18 +104,38 @@ export default function Header() {
         </nav>
 
         {/* Right: Actions & Mobile Menu Toggle */}
-        <div className="flex items-center gap-3">
-          {/* Desktop Login Button */}
-          <Link
-            href="/login"
-            className={cn(
-              buttonVariants({ variant: "default", size: "sm" }),
-              "hidden md:inline-flex items-center gap-1.5 shadow-sm",
+        <div className="flex items-center gap-2 sm:gap-3">
+          {/* Desktop Authentication State Actions */}
+          <div className="hidden md:flex items-center gap-2.5">
+            {isLoading ? (
+              <div className="h-8 w-24 animate-pulse rounded-lg bg-muted" />
+            ) : isAuthenticated && user ? (
+              <>
+                {/* Dashboard Button */}
+                <Link
+                  href="/dashboard"
+                  className={cn(
+                    buttonVariants({ variant: "default", size: "sm" }),
+                    "items-center gap-1.5 shadow-sm font-medium",
+                  )}
+                >
+                  <LayoutDashboard className="size-4" />
+                  <span>Dashboard</span>
+                </Link>
+              </>
+            ) : (
+              <Link
+                href="/login"
+                className={cn(
+                  buttonVariants({ variant: "default", size: "sm" }),
+                  "items-center gap-1.5 shadow-sm font-medium",
+                )}
+              >
+                <LogIn className="size-4" />
+                <span>Login</span>
+              </Link>
             )}
-          >
-            <LogIn className="size-4" />
-            <span>Login</span>
-          </Link>
+          </div>
 
           {/* Mobile Menu Hamburger Toggle Button */}
           <button
@@ -153,6 +175,28 @@ export default function Header() {
             aria-modal="true"
             aria-label="Mobile Navigation Menu"
           >
+            {/* Authenticated User Banner on Mobile */}
+            {isAuthenticated && user && (
+              <div className="mb-4 flex items-center justify-between rounded-xl border border-border/80 bg-muted/40 p-3">
+                <div className="flex items-center gap-3">
+                  <div className="flex size-9 items-center justify-center rounded-full bg-primary font-bold text-primary-foreground">
+                    {user.name.charAt(0).toUpperCase()}
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-sm font-semibold text-foreground">
+                      {user.name}
+                    </span>
+                    <span className="text-xs text-muted-foreground">
+                      {user.email}
+                    </span>
+                  </div>
+                </div>
+                <span className="rounded-md bg-primary/10 px-2 py-0.5 text-xs font-semibold text-primary">
+                  {user.role}
+                </span>
+              </div>
+            )}
+
             {/* Mobile Nav Links */}
             <div className="flex flex-col space-y-1">
               {PUBLIC_NAV_ITEMS.map((item) => {
@@ -185,19 +229,50 @@ export default function Header() {
               })}
             </div>
 
-            {/* Mobile Action Divider & Login Button */}
-            <div className="mt-6 border-t border-border pt-6">
-              <Link
-                href="/login"
-                onClick={() => setMobileMenuOpen(false)}
-                className={cn(
-                  buttonVariants({ variant: "default", size: "lg" }),
-                  "w-full justify-center gap-2 shadow-sm font-semibold",
-                )}
-              >
-                <LogIn className="size-4" />
-                <span>Login to Portal</span>
-              </Link>
+            {/* Mobile Action Area */}
+            <div className="mt-6 border-t border-border pt-6 flex flex-col gap-2.5">
+              {isLoading ? (
+                <div className="h-10 w-full animate-pulse rounded-lg bg-muted" />
+              ) : isAuthenticated && user ? (
+                <>
+                  <Link
+                    href="/dashboard"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={cn(
+                      buttonVariants({ variant: "default", size: "lg" }),
+                      "w-full justify-center gap-2 shadow-sm font-semibold",
+                    )}
+                  >
+                    <LayoutDashboard className="size-4" />
+                    <span>Go to Dashboard</span>
+                  </Link>
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      logout();
+                    }}
+                    disabled={isLoggingOut}
+                    className="w-full justify-center gap-2 text-destructive hover:bg-destructive/10"
+                  >
+                    <LogOut className="size-4" />
+                    <span>Sign Out</span>
+                  </Button>
+                </>
+              ) : (
+                <Link
+                  href="/login"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={cn(
+                    buttonVariants({ variant: "default", size: "lg" }),
+                    "w-full justify-center gap-2 shadow-sm font-semibold",
+                  )}
+                >
+                  <LogIn className="size-4" />
+                  <span>Login to Portal</span>
+                </Link>
+              )}
             </div>
 
             {/* Mobile Footer Info */}
