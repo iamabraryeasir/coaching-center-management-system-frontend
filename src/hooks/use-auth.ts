@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 
 import { getCurrentUser, logoutAllDevices, logoutUser } from "@/api/auth";
 import { authKeys } from "@/constants/query-keys";
+import { authChannel } from "@/lib/auth-channel";
 import type { TeacherPermission, User } from "@/types";
 
 /**
@@ -41,6 +42,8 @@ export function useAuth() {
     onMutate: async () => {
       // Optimistically clear current user from cache
       queryClient.setQueryData(authKeys.currentUser(), null);
+      // Synchronize logout across all open browser tabs
+      authChannel.postMessage({ type: "LOGOUT" });
     },
     onSuccess: () => {
       // Invalidate and purge all auth-related cache tags
@@ -61,6 +64,10 @@ export function useAuth() {
   // Logout all sessions mutation
   const logoutAllMutation = useMutation({
     mutationFn: logoutAllDevices,
+    onMutate: async () => {
+      queryClient.setQueryData(authKeys.currentUser(), null);
+      authChannel.postMessage({ type: "LOGOUT" });
+    },
     onSuccess: () => {
       queryClient.removeQueries({ queryKey: authKeys.all });
       toast.success("Logged out from all devices");

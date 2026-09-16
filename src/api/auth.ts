@@ -3,7 +3,7 @@ import type { ApiResponse, AuthTokens, LoginResponse, User } from "@/types";
 import type { LoginInput } from "@/validators";
 
 /**
- * Log in with user credentials
+ * Log in with user credentials (backend sets HttpOnly session cookies)
  */
 export async function loginUser(data: LoginInput): Promise<LoginResponse> {
   return await apiClient<LoginResponse>("/auth/login", {
@@ -13,7 +13,9 @@ export async function loginUser(data: LoginInput): Promise<LoginResponse> {
 }
 
 /**
- * Fetch current authenticated user's full profile
+ * Fetch current authenticated user's profile using HttpOnly cookie.
+ * If the 15-minute access token is expired, apiClient will automatically
+ * refresh it using the 30-day HttpOnly refresh token cookie.
  */
 export async function getCurrentUser(): Promise<User | null> {
   try {
@@ -27,7 +29,7 @@ export async function getCurrentUser(): Promise<User | null> {
 }
 
 /**
- * Log out current session
+ * Log out current session (backend clears HttpOnly session cookies)
  */
 export async function logoutUser(): Promise<ApiResponse<null>> {
   return await apiClient<ApiResponse<null>>("/auth/logout", {
@@ -45,7 +47,7 @@ export async function logoutAllDevices(): Promise<ApiResponse<null>> {
 }
 
 /**
- * Refresh authentication access token
+ * Refresh authentication access token via HttpOnly refresh cookie
  */
 export async function refreshToken(): Promise<ApiResponse<AuthTokens>> {
   return await apiClient<ApiResponse<AuthTokens>>("/auth/refresh-token", {

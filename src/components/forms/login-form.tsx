@@ -5,7 +5,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { loginUser } from "@/api";
@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { authKeys } from "@/constants/query-keys";
+import { authChannel } from "@/lib/auth-channel";
 import { cn } from "@/lib/utils";
 import { loginSchema } from "@/validators";
 
@@ -35,6 +36,7 @@ export function LoginForm({
   ...props
 }: React.ComponentProps<"div">) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const queryClient = useQueryClient();
   const [serverError, setServerError] = useState<string | null>(null);
 
@@ -55,10 +57,22 @@ export function LoginForm({
         if (response?.data?.user) {
           queryClient.setQueryData(authKeys.currentUser(), response.data.user);
         }
+
+        // Notify other browser tabs that a session has started
+        authChannel.postMessage({ type: "LOGIN" });
+
         toast.success(response?.message || "Login successful! Redirecting...", {
           id: toastId,
         });
-        router.push("/dashboard");
+
+        // Determine destination URL preserving original query context
+        const redirectParam = searchParams.get("redirect");
+        const safeDestination =
+          redirectParam?.startsWith("/") && !redirectParam.startsWith("//")
+            ? redirectParam
+            : "/dashboard";
+
+        router.push(safeDestination);
       } catch (error: unknown) {
         const message =
           error instanceof Error

@@ -133,6 +133,15 @@ Key principles to uphold:
 - **Module Aliases**: Always use `@/*` path aliases pointing to `src/*` (e.g., `@/components/ui`, `@/config/site`, `@/lib/utils`, `@/types`, `@/api`).
 - **Single Tooling System (Biome)**: Never add ESLint, Prettier, or conflicting config files. Biome is the sole linter and formatter.
 
+### 4.7 Next.js 16 Routing Proxy (`src/proxy.ts`) & Production Auth Architecture
+
+- **Next.js 16 `src/proxy.ts` Convention**: In Next.js 16, `middleware.ts` is deprecated and replaced by `src/proxy.ts`. It executes on the server before routes are rendered for zero-flash route protection and redirection (e.g., `/dashboard/:path*`, `/login`).
+- **Secure HttpOnly Cookie Model**: Authentication tokens (`accessToken` 15m, `refreshToken` 30d) are stored exclusively in HttpOnly cookies and sent via `credentials: "include"`. Zero tokens in `localStorage`.
+- **Silent Refresh & Concurrency Queuing**: When access tokens expire, `apiClient` (`src/lib/api-client.ts`) initiates a single atomic call to `POST /auth/refresh-token`, queuing concurrent requests in `failedQueue` and seamlessly replaying them upon refresh.
+- **Network Error Resilience**: Never log the user out on network drops, offline status, or 5xx errors. Only explicit HTTP 401 or 403 responses from the refresh endpoint trigger `auth:session-expired`.
+- **Multi-Tab Synchronization**: Uses `BroadcastChannel` (`src/lib/auth-channel.ts`) to immediately synchronize `LOGIN`, `LOGOUT`, and `SESSION_EXPIRED` events across all open browser tabs without manual page reloads.
+- **Context Preservation**: Unauthenticated and expired session redirects must preserve the intended destination URL via `?redirect=...`.
+
 ---
 
 ## 5. Agent Operational Workflow & Quality Pipeline

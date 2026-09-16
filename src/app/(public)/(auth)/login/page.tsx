@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Suspense } from "react";
 import AppLogo from "@/assets/svg/logo";
 import { LoginForm } from "@/components/forms/login-form";
 import { siteConfig } from "@/config/site";
@@ -14,7 +15,13 @@ export default function LoginPage() {
           <AppLogo size={0.5} />
           {siteConfig.name}
         </Link>
-        <LoginForm />
+        <Suspense
+          fallback={
+            <div className="h-96 w-full animate-pulse rounded-xl bg-card" />
+          }
+        >
+          <LoginForm />
+        </Suspense>
       </div>
     </div>
   );
