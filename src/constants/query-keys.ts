@@ -20,6 +20,18 @@ export const userKeys = {
   detail: (id: string) => [...userKeys.details(), id] as const,
 } as const;
 
+export const studentKeys = {
+  all: ["students"] as const,
+  lists: () => [...studentKeys.all, "list"] as const,
+  list: (params?: Record<string, unknown>) =>
+    [...studentKeys.lists(), params] as const,
+  details: () => [...studentKeys.all, "detail"] as const,
+  detail: (id: string) => [...studentKeys.details(), id] as const,
+  pendingLists: () => [...studentKeys.all, "pending"] as const,
+  pendingList: (params?: Record<string, unknown>) =>
+    [...studentKeys.pendingLists(), params] as const,
+} as const;
+
 export const batchKeys = {
   all: ["batches"] as const,
   lists: () => [...batchKeys.all, "list"] as const,

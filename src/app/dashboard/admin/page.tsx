@@ -3,17 +3,13 @@
 import {
   CreditCard,
   Layers,
-  Plus,
   ShieldCheck,
   TrendingUp,
   Users,
 } from "lucide-react";
-import Link from "next/link";
-import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { siteConfig } from "@/config/site";
 import { useAuth } from "@/hooks";
-import { cn } from "@/lib/utils";
 
 export default function AdminDashboardPage() {
   const { user } = useAuth();
@@ -29,30 +25,6 @@ export default function AdminDashboardPage() {
           <p className="text-sm text-muted-foreground">
             Here is what is happening across {siteConfig.name} today.
           </p>
-        </div>
-
-        <div className="flex items-center gap-2.5">
-          <Link
-            href="/dashboard/admin/batches"
-            className={cn(
-              buttonVariants({ variant: "default", size: "sm" }),
-              "gap-1.5 shadow-sm font-medium",
-            )}
-          >
-            <Plus className="size-4" />
-            <span>New Batch</span>
-          </Link>
-
-          <Link
-            href="/dashboard/admin/students"
-            className={cn(
-              buttonVariants({ variant: "outline", size: "sm" }),
-              "gap-1.5 font-medium",
-            )}
-          >
-            <Users className="size-4" />
-            <span>Admit Student</span>
-          </Link>
         </div>
       </div>
 

@@ -145,6 +145,7 @@ Key principles to uphold:
 ### 4.8 Dashboard Layout & Multi-Persona Architecture
 
 The platform supports three distinct role personas with tailored dashboard experiences:
+
 1. **Student Dashboard (Mobile-First)**:
    - Designed mobile-first for high accessibility on smartphones.
    - Streamlined bottom navigation or touch-first drawer, rapid access to schedules, attendance records, exam scores, and fee payments.
@@ -162,9 +163,10 @@ The platform supports three distinct role personas with tailored dashboard exper
 Whenever working on tasks in this repository, all agents **MUST** adhere to the following sequence:
 
 1. **Dependency Verification**: Check `package.json` before adding any new libraries. Always utilize existing dependencies (`ofetch`, `@tanstack/react-query`, `@tanstack/react-form`, `zod`, `@base-ui/react`, `react-hot-toast`, `lucide-react`, `cva`).
-2. **Next.js Header Preservation**: Never remove or alter the `<!-- BEGIN:nextjs-agent-rules --> ... <!-- END:nextjs-agent-rules -->` block at the top of this file.
-3. **Feature Encapsulation**: Keep feature-specific logic within `src/components/modules/<feature-domain>/` to preserve a clean and scalable component hierarchy.
-4. **Mandatory Post-Task Code Quality Pipeline**:
+2. **Zero Manual Shadcn Generation**: Never create or generate shadcn UI primitive files in `src/components/ui/` manually. Always request the user to install them via the official shadcn CLI by providing the exact component name(s) (e.g., `table`, `dropdown-menu`, `dialog`, `select`, `badge`).
+3. **Next.js Header Preservation**: Never remove or alter the `<!-- BEGIN:nextjs-agent-rules --> ... <!-- END:nextjs-agent-rules -->` block at the top of this file.
+4. **Feature Encapsulation**: Keep feature-specific logic within `src/components/modules/<feature-domain>/` to preserve a clean and scalable component hierarchy.
+5. **Mandatory Post-Task Code Quality Pipeline**:
    After writing, modifying, or refactoring any code, the agent **MUST** execute the following 3 commands in order:
    - **Step 1: Check Linter**: `bun run lint` (runs `biome check` to detect issues)
    - **Step 2: Auto-fix Issues**: `bun run lint:write` (runs `biome check --write` to auto-fix linter and import sorting issues)

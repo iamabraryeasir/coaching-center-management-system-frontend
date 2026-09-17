@@ -39,7 +39,9 @@ export function RoleGuard({
     if (!isLoading) {
       // 1. Unauthenticated -> Redirect to login with redirect param
       if (!isAuthenticated || !user) {
-        const destination = pathname ? encodeURIComponent(pathname) : "%2Fdashboard";
+        const destination = pathname
+          ? encodeURIComponent(pathname)
+          : "%2Fdashboard";
         router.replace(`/login?redirect=${destination}`);
         return;
       }
@@ -86,4 +88,3 @@ export function RoleGuard({
   // Authorized user: render protected content
   return <>{children}</>;
 }
-
