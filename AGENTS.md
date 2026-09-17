@@ -142,6 +142,19 @@ Key principles to uphold:
 - **Multi-Tab Synchronization**: Uses `BroadcastChannel` (`src/lib/auth-channel.ts`) to immediately synchronize `LOGIN`, `LOGOUT`, and `SESSION_EXPIRED` events across all open browser tabs without manual page reloads.
 - **Context Preservation**: Unauthenticated and expired session redirects must preserve the intended destination URL via `?redirect=...`.
 
+### 4.8 Dashboard Layout & Multi-Persona Architecture
+
+The platform supports three distinct role personas with tailored dashboard experiences:
+1. **Student Dashboard (Mobile-First)**:
+   - Designed mobile-first for high accessibility on smartphones.
+   - Streamlined bottom navigation or touch-first drawer, rapid access to schedules, attendance records, exam scores, and fee payments.
+2. **Admin & Teacher Dashboards (Unified Reusable Shell)**:
+   - Desktop-first, fully responsive macro-shell sharing the same structural framework.
+   - **Left Sidebar**: Collapsible navigation rail powered by semantic `--sidebar*` tokens, supporting expanded, collapsed (icon-only), and mobile drawer states.
+   - **Top Utility Header**: Breadcrumbs, current route context, quick search/actions, user avatar with status indicator, and mobile menu trigger.
+   - **Main Content Viewport**: Fluid, scrollable workspace hosting domain feature modules (data tables, analytics, forms).
+   - **Reusable Sidebar Standard**: The sidebar (`src/components/layouts/dashboard/sidebar.tsx`) must be 100% unified and reusable between Admin and Teacher roles, driving navigation via strongly-typed config arrays filtered by `user.role` and `user.permissions` (`hasPermission`).
+
 ---
 
 ## 5. Agent Operational Workflow & Quality Pipeline

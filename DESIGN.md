@@ -153,11 +153,24 @@ The application supports three structural page archetypes:
 - **Composition**: Centered Card Surface $\rightarrow$ Accessible Form Fields $\rightarrow$ Secondary Action Links.
 - **Context**: Login, registration, password recovery, multi-step onboarding flows.
 
-### 6.3 Administrative Dashboard Archetype
+### 6.3 Administrative & Teacher Dashboard Archetype (Unified Shell)
 
-- **Structure**: Two-column responsive app shell with persistent or collapsible navigation.
-- **Composition**: Sidebar Navigation $\rightarrow$ Top Utility Bar $\rightarrow$ Scrollable Data Viewport.
-- **Context**: Management panels, data grids, analytics dashboards, configuration settings.
+- **Structure**: Two-tier responsive layout with a persistent/collapsible left sidebar, top utility bar, and scrollable content canvas.
+- **Left Sidebar Navigation**:
+  - Semantic `--sidebar*` tokens for background, border, active state, and text.
+  - Supports 3 responsive modes: Full expanded, collapsed icon-only rail, and slide-in mobile drawer.
+  - Reusable between Admin and Teacher roles with dynamic navigation filtering based on role and permissions.
+- **Top Utility Header**:
+  - Fixed or sticky bar containing breadcrumbs, sidebar collapse toggle, quick search, notification trigger, and user profile/status pill.
+- **Scrollable Data Viewport**:
+  - Fluid `<main>` area hosting Tier 3 feature modules (data grids, metrics cards, filter bars, mutation modals).
+- **Context**: Admin management operations, teacher academic routines, grading, attendance tracking.
+
+### 6.4 Student Portal Archetype (Mobile-First)
+
+- **Structure**: Highly responsive, touch-first mobile layout with optional bottom navigation tab bar or quick-access drawer.
+- **Focus**: Instant glanceability of upcoming batches, class routines, attendance summary, exam results, and fee payment receipts.
+- **Context**: Student self-service and guardian monitoring.
 
 ---
 
