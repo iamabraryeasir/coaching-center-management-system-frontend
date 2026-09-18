@@ -61,6 +61,7 @@ export interface User {
   teacherProfile?: TeacherProfile;
   studentProfile?: StudentProfile;
   permissions?: TeacherPermission[];
+  teacherPermissions?: TeacherPermission[];
   institution?: InstitutionSummary;
 }
 

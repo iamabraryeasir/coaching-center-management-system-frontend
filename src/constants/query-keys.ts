@@ -32,6 +32,16 @@ export const studentKeys = {
     [...studentKeys.pendingLists(), params] as const,
 } as const;
 
+export const teacherKeys = {
+  all: ["teachers"] as const,
+  lists: () => [...teacherKeys.all, "list"] as const,
+  list: (params?: Record<string, unknown>) =>
+    [...teacherKeys.lists(), params] as const,
+  details: () => [...teacherKeys.all, "detail"] as const,
+  detail: (id: string) => [...teacherKeys.details(), id] as const,
+  schedule: (id: string) => [...teacherKeys.all, "schedule", id] as const,
+} as const;
+
 export const batchKeys = {
   all: ["batches"] as const,
   lists: () => [...batchKeys.all, "list"] as const,

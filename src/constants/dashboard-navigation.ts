@@ -77,7 +77,7 @@ export const ADMIN_NAV_GROUPS: readonly DashboardNavGroup[] = [
         icon: Users,
       },
       {
-        title: "Faculty / Teachers",
+        title: "Teachers",
         href: "/dashboard/admin/teachers",
         icon: ShieldCheck,
       },
