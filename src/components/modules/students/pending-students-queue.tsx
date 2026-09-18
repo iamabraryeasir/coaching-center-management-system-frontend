@@ -374,7 +374,7 @@ export function PendingStudentsQueue() {
             </Field>
           </div>
 
-          <DialogFooter className="gap-2 sm:gap-0">
+          <DialogFooter className="gap-2.5 sm:gap-2.5">
             <DialogClose
               render={
                 <Button type="button" variant="outline" size="sm">

@@ -6,6 +6,7 @@ import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useTeachers } from "@/hooks";
 import { getTeacherPermissions, type User, type UserStatus } from "@/types";
+import { EditTeacherDialog } from "./edit-teacher-dialog";
 import { RegisterTeacherDialog } from "./register-teacher-dialog";
 import { TeacherDetailsModal } from "./teacher-details-modal";
 import { TeacherPermissionsDialog } from "./teacher-permissions-dialog";
@@ -19,6 +20,8 @@ export function TeachersManagementView() {
   const [selectedTeacherForDetails, setSelectedTeacherForDetails] =
     useState<User | null>(null);
   const [selectedTeacherForPermissions, setSelectedTeacherForPermissions] =
+    useState<User | null>(null);
+  const [selectedTeacherForEdit, setSelectedTeacherForEdit] =
     useState<User | null>(null);
 
   // URL Params for Teachers Directory
@@ -135,6 +138,7 @@ export function TeachersManagementView() {
           isLoading={isTeachersLoading}
           meta={teachersMeta}
           onViewDetails={(teacher) => setSelectedTeacherForDetails(teacher)}
+          onEditTeacher={(teacher) => setSelectedTeacherForEdit(teacher)}
           onManagePermissions={(teacher) =>
             setSelectedTeacherForPermissions(teacher)
           }
@@ -148,6 +152,15 @@ export function TeachersManagementView() {
         onOpenChange={setIsRegisterOpen}
       />
 
+      {/* Edit Faculty Details Dialog */}
+      <EditTeacherDialog
+        teacher={selectedTeacherForEdit}
+        open={Boolean(selectedTeacherForEdit)}
+        onOpenChange={(open) => {
+          if (!open) setSelectedTeacherForEdit(null);
+        }}
+      />
+
       {/* Teacher Profile Dossier Modal */}
       <TeacherDetailsModal
         teacher={selectedTeacherForDetails}
@@ -158,6 +171,10 @@ export function TeachersManagementView() {
         onManagePermissions={(teacher) => {
           setSelectedTeacherForDetails(null);
           setSelectedTeacherForPermissions(teacher);
+        }}
+        onEditTeacher={(teacher) => {
+          setSelectedTeacherForDetails(null);
+          setSelectedTeacherForEdit(teacher);
         }}
       />
 

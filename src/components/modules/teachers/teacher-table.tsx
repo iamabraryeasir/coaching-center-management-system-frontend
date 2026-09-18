@@ -2,6 +2,7 @@
 
 import {
   Calendar,
+  Edit2,
   Eye,
   KeyRound,
   MoreHorizontal,
@@ -57,6 +58,7 @@ interface TeacherTableProps {
   isLoading: boolean;
   meta?: ApiMeta;
   onViewDetails: (teacher: User) => void;
+  onEditTeacher: (teacher: User) => void;
   onManagePermissions: (teacher: User) => void;
   onCreateTeacher?: () => void;
 }
@@ -66,6 +68,7 @@ export function TeacherTable({
   isLoading,
   meta,
   onViewDetails,
+  onEditTeacher,
   onManagePermissions,
   onCreateTeacher,
 }: TeacherTableProps) {
@@ -290,6 +293,14 @@ export function TeacherTable({
                             </DropdownMenuItem>
 
                             <DropdownMenuItem
+                              onClick={() => onEditTeacher(teacher)}
+                              className="gap-2 text-xs cursor-pointer"
+                            >
+                              <Edit2 className="size-3.5 text-primary" />
+                              <span>Edit Faculty Details</span>
+                            </DropdownMenuItem>
+
+                            <DropdownMenuItem
                               onClick={() => onManagePermissions(teacher)}
                               className="gap-2 text-xs cursor-pointer"
                             >
@@ -374,7 +385,7 @@ export function TeacherTable({
             </div>
           )}
 
-          <DialogFooter className="gap-2 sm:gap-0 pt-2">
+          <DialogFooter className="gap-2.5 sm:gap-2.5 pt-2">
             <DialogClose
               render={
                 <Button

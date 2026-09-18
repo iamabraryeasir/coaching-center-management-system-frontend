@@ -62,6 +62,11 @@ export const routineKeys = {
     [...routineKeys.lists(), params] as const,
   details: () => [...routineKeys.all, "detail"] as const,
   detail: (id: string) => [...routineKeys.details(), id] as const,
+  batch: (batchId: string) => [...routineKeys.all, "batch", batchId] as const,
+  teacher: (teacherUserId: string) =>
+    [...routineKeys.all, "teacher", teacherUserId] as const,
+  myTeacherSchedule: () => [...routineKeys.all, "my-teacher-schedule"] as const,
+  myStudentSchedule: () => [...routineKeys.all, "my-student-schedule"] as const,
 } as const;
 
 export const attendanceKeys = {

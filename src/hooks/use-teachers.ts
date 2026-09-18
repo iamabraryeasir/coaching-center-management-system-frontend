@@ -3,9 +3,9 @@ import toast from "react-hot-toast";
 import {
   deleteTeacher,
   getTeacherById,
-  getTeacherSchedule,
   getTeachers,
   registerTeacher,
+  updateTeacher,
   updateTeacherPermissions,
   updateTeacherStatus,
 } from "@/api";
@@ -14,6 +14,7 @@ import type {
   RegisterTeacherDto,
   TeacherPermission,
   TeacherQueryParams,
+  UpdateTeacherDto,
   UserStatus,
 } from "@/types";
 
@@ -40,17 +41,6 @@ export function useTeacher(userId: string) {
 }
 
 /**
- * Fetch routine teaching schedule assigned to a teacher
- */
-export function useTeacherSchedule(teacherUserId: string) {
-  return useQuery({
-    queryKey: teacherKeys.schedule(teacherUserId),
-    queryFn: () => getTeacherSchedule(teacherUserId),
-    enabled: Boolean(teacherUserId),
-  });
-}
-
-/**
  * Mutation: Register new faculty teacher
  */
 export function useRegisterTeacherMutation() {
@@ -73,6 +63,44 @@ export function useRegisterTeacherMutation() {
     },
     onError: (error: Error, _vars, toastId) => {
       toast.error(error.message || "Failed to register teacher", {
+        id: toastId,
+      });
+    },
+  });
+}
+
+/**
+ * Mutation: Update faculty member profile details
+ */
+export function useUpdateTeacherMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      userId,
+      payload,
+    }: {
+      userId: string;
+      payload: UpdateTeacherDto;
+    }) => updateTeacher(userId, payload),
+    onMutate: () => {
+      return toast.loading("Updating faculty details...");
+    },
+    onSuccess: (response, variables, toastId) => {
+      queryClient.invalidateQueries({ queryKey: teacherKeys.all });
+      queryClient.invalidateQueries({ queryKey: userKeys.all });
+      queryClient.invalidateQueries({
+        queryKey: teacherKeys.detail(variables.userId),
+      });
+      toast.success(
+        response.message || "Faculty details updated successfully!",
+        {
+          id: toastId,
+        },
+      );
+    },
+    onError: (error: Error, _vars, toastId) => {
+      toast.error(error.message || "Failed to update faculty details", {
         id: toastId,
       });
     },

@@ -5,6 +5,7 @@ import {
   Calendar,
   CheckCircle2,
   Clock,
+  Edit2,
   Hash,
   KeyRound,
   Mail,
@@ -38,6 +39,7 @@ interface TeacherDetailsModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onManagePermissions?: (teacher: User) => void;
+  onEditTeacher?: (teacher: User) => void;
 }
 
 const PERMISSION_CONFIG: {
@@ -67,6 +69,7 @@ export function TeacherDetailsModal({
   open,
   onOpenChange,
   onManagePermissions,
+  onEditTeacher,
 }: TeacherDetailsModalProps) {
   const updateStatusMutation = useUpdateTeacherStatusMutation();
 
@@ -318,13 +321,31 @@ export function TeacherDetailsModal({
             </Button>
           </div>
 
-          <DialogClose
-            render={
-              <Button type="button" variant="secondary" size="sm">
-                Close Details
+          <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+            {onEditTeacher && (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  onOpenChange(false);
+                  onEditTeacher(activeTeacher);
+                }}
+                className="gap-1.5"
+              >
+                <Edit2 className="size-3.5 text-primary" />
+                <span>Edit Faculty</span>
               </Button>
-            }
-          />
+            )}
+
+            <DialogClose
+              render={
+                <Button type="button" variant="secondary" size="sm">
+                  Close Details
+                </Button>
+              }
+            />
+          </div>
         </DialogFooter>
       </DialogContent>
     </Dialog>

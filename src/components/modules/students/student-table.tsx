@@ -325,7 +325,7 @@ export function StudentTable({
               records.
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter className="gap-2 sm:gap-0">
+          <DialogFooter className="gap-2.5 sm:gap-2.5">
             <DialogClose render={<Button variant="outline" size="sm" />}>
               Cancel
             </DialogClose>

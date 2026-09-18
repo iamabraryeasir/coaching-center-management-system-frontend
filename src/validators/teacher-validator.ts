@@ -74,7 +74,60 @@ export const updateTeacherPermissionsSchema = z.object({
   ),
 });
 
+export const updateTeacherSchema = z.object({
+  name: z
+    .string()
+    .trim()
+    .min(2, "Full name must be at least 2 characters.")
+    .max(70, "Full name cannot exceed 70 characters."),
+  email: z
+    .string()
+    .trim()
+    .min(1, "Email address is required.")
+    .email("Please enter a valid email address."),
+  phone: z
+    .string()
+    .trim()
+    .min(1, "Phone number is required.")
+    .regex(
+      BD_PHONE_REGEX,
+      "Must be a valid 11-digit Bangladeshi number (e.g. 01712345678).",
+    ),
+  designation: z
+    .string()
+    .trim()
+    .min(2, "Faculty designation is required (e.g. Senior CS Faculty).")
+    .max(70, "Designation cannot exceed 70 characters."),
+  qualification: z
+    .string()
+    .trim()
+    .min(
+      2,
+      "Highest academic qualification is required (e.g. M.Sc in Mathematics).",
+    )
+    .max(100, "Qualification cannot exceed 100 characters."),
+  specialization: z
+    .string()
+    .trim()
+    .min(
+      2,
+      "Subject or domain specialization is required (e.g. Physics / Mechanics).",
+    )
+    .max(100, "Specialization cannot exceed 100 characters."),
+  joiningDate: z
+    .string()
+    .trim()
+    .min(1, "Official joining date is required.")
+    .refine((val) => !Number.isNaN(Date.parse(val)), {
+      message: "Please enter a valid date.",
+    }),
+  gender: z.enum(["MALE", "FEMALE", "OTHER"], {
+    message: "Please select gender.",
+  }),
+});
+
 export type RegisterTeacherInput = z.infer<typeof registerTeacherSchema>;
 export type UpdateTeacherPermissionsInput = z.infer<
   typeof updateTeacherPermissionsSchema
 >;
+export type UpdateTeacherInput = z.infer<typeof updateTeacherSchema>;

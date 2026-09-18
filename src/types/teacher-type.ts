@@ -46,3 +46,14 @@ export interface UpdateTeacherPermissionsDto {
 export interface UpdateTeacherStatusDto {
   status: UserStatus;
 }
+
+export interface UpdateTeacherDto {
+  name?: string;
+  email?: string;
+  phone?: string;
+  gender?: Gender;
+  designation?: string;
+  qualification?: string;
+  specialization?: string;
+  joiningDate?: string;
+}

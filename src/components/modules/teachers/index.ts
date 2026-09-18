@@ -1,3 +1,4 @@
+export * from "./edit-teacher-dialog";
 export * from "./register-teacher-dialog";
 export * from "./teacher-details-modal";
 export * from "./teacher-permissions-badges";

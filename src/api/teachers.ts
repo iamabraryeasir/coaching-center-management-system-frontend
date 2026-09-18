@@ -5,6 +5,7 @@ import type {
   RegisterTeacherDto,
   TeacherPermission,
   TeacherQueryParams,
+  UpdateTeacherDto,
   User,
   UserStatus,
 } from "@/types";
@@ -60,6 +61,19 @@ export async function registerTeacher(
 }
 
 /**
+ * Update faculty member profile details (name, phone, credentials, designation)
+ */
+export async function updateTeacher(
+  userId: string,
+  payload: UpdateTeacherDto,
+): Promise<ApiResponse<User>> {
+  return await apiClient<ApiResponse<User>>(`/users/teachers/${userId}`, {
+    method: "PATCH",
+    body: payload,
+  });
+}
+
+/**
  * Update teacher operational status (ACTIVE, INACTIVE, BLOCKED)
  */
 export async function updateTeacherStatus(
@@ -98,20 +112,6 @@ export async function deleteTeacher(
     `/users/${userId}`,
     {
       method: "DELETE",
-    },
-  );
-}
-
-/**
- * Fetch teaching routine schedule assigned to this teacher
- */
-export async function getTeacherSchedule(
-  teacherUserId: string,
-): Promise<ApiResponse<unknown[]>> {
-  return await apiClient<ApiResponse<unknown[]>>(
-    `/routines/teacher/${teacherUserId}`,
-    {
-      method: "GET",
     },
   );
 }
