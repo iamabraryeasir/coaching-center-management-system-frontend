@@ -134,14 +134,12 @@ export function PendingStudentsQueue() {
           <Table>
             <TableHeader>
               <TableRow className="bg-muted/40 hover:bg-muted/40">
-                <TableHead className="w-[240px]">Applicant</TableHead>
-                <TableHead className="min-w-[180px]">Academic</TableHead>
-                <TableHead className="min-w-[180px]">Contact</TableHead>
-                <TableHead className="min-w-[180px]">Guardian</TableHead>
-                <TableHead className="w-[120px]">Submitted</TableHead>
-                <TableHead className="w-[170px] text-right">
-                  Decisions
-                </TableHead>
+                <TableHead className="w-60">Applicant</TableHead>
+                <TableHead className="min-w-45">Academic</TableHead>
+                <TableHead className="min-w-45">Contact</TableHead>
+                <TableHead className="min-w-45">Guardian</TableHead>
+                <TableHead className="w-30">Submitted</TableHead>
+                <TableHead className="w-42.5 text-right">Decisions</TableHead>
               </TableRow>
             </TableHeader>
 
@@ -220,7 +218,7 @@ export function PendingStudentsQueue() {
                             {applicant.rollNumber}
                           </span>
                         </p>
-                        <p className="text-[11px] text-muted-foreground truncate max-w-[200px] flex items-center gap-1">
+                        <p className="text-[11px] text-muted-foreground truncate max-w-50 flex items-center gap-1">
                           <Building2 className="size-3 text-muted-foreground/70 shrink-0" />
                           {applicant.institutionName}
                         </p>

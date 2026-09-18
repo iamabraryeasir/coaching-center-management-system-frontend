@@ -39,6 +39,10 @@ export const batchKeys = {
     [...batchKeys.lists(), params] as const,
   details: () => [...batchKeys.all, "detail"] as const,
   detail: (id: string) => [...batchKeys.details(), id] as const,
+  pendingEnrollments: (params?: Record<string, unknown>) =>
+    [...batchKeys.all, "pending-enrollments", params] as const,
+  roster: (batchId: string, params?: Record<string, unknown>) =>
+    [...batchKeys.all, "roster", batchId, params] as const,
 } as const;
 
 export const routineKeys = {

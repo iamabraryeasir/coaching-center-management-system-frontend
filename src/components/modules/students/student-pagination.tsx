@@ -16,18 +16,23 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { cn } from "@/lib/utils";
 import type { ApiMeta } from "@/types";
 
 interface StudentPaginationProps {
   meta?: ApiMeta;
   onPageChange?: (page: number) => void;
   onLimitChange?: (limit: number) => void;
+  className?: string;
+  itemLabel?: string;
 }
 
 export function StudentPagination({
   meta,
   onPageChange,
   onLimitChange,
+  className,
+  itemLabel = "students",
 }: StudentPaginationProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -108,7 +113,12 @@ export function StudentPagination({
   };
 
   return (
-    <div className="flex flex-col gap-3 py-3 sm:flex-row sm:items-center sm:justify-between border-t border-border/60">
+    <div
+      className={cn(
+        "flex flex-col gap-3 py-3.5 px-4 sm:flex-row sm:items-center sm:justify-between border-t border-border/60",
+        className,
+      )}
+    >
       {/* Range readout & limit selector */}
       <div className="flex items-center gap-3 text-xs text-muted-foreground">
         <span>
@@ -118,7 +128,7 @@ export function StudentPagination({
           <span className="font-semibold text-foreground">
             {total.toLocaleString()}
           </span>{" "}
-          students
+          {itemLabel}
         </span>
 
         <div className="flex items-center gap-1.5 ml-2">
