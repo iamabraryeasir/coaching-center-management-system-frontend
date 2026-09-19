@@ -98,6 +98,8 @@ export const examKeys = {
   details: () => [...examKeys.all, "detail"] as const,
   detail: (id: string) => [...examKeys.details(), id] as const,
   results: (examId: string) => [...examKeys.all, "results", examId] as const,
+  myResults: () => [...examKeys.all, "my-results"] as const,
+  myResult: (examId: string) => [...examKeys.all, "my-result", examId] as const,
 } as const;
 
 export const paymentKeys = {
