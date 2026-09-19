@@ -118,7 +118,7 @@ export function RoutinePrintModal({
 
         {/* Document Preview Viewport (Scrollable Canvas) */}
         <div className="flex-1 overflow-y-auto bg-neutral-100 dark:bg-neutral-900 p-3 sm:p-6 flex justify-center">
-          <div className="w-full max-w-[1050px] shadow-lg rounded-sm overflow-hidden bg-white">
+          <div className="w-full max-w-262.5 shadow-lg rounded-sm overflow-hidden bg-white">
             <RoutinePrintSheet
               viewMode={viewMode}
               schedule={schedule}
