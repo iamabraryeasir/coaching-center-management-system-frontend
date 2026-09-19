@@ -10,6 +10,7 @@ import {
   UserPlus,
 } from "lucide-react";
 import { useState } from "react";
+import { DatePicker } from "@/components/forms/date-picker";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -373,13 +374,10 @@ export function RegisterTeacherDialog({
                         Official Joining Date{" "}
                         <span className="text-destructive">*</span>
                       </FieldLabel>
-                      <Input
-                        name={field.name}
-                        type="date"
+                      <DatePicker
                         value={field.state.value}
-                        onBlur={field.handleBlur}
-                        onChange={(e) => field.handleChange(e.target.value)}
-                        className="h-9 text-xs"
+                        onChange={(val) => field.handleChange(val)}
+                        className="h-9 w-full"
                       />
                       {errorMsg && <FieldError>{errorMsg}</FieldError>}
                     </Field>

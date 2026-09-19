@@ -8,6 +8,7 @@ import {
   UserCheck,
 } from "lucide-react";
 import Link from "next/link";
+import { TeacherSelfCheckInCard } from "@/components/modules/attendance";
 import { buttonVariants } from "@/components/ui/button";
 import {
   Card,
@@ -49,6 +50,9 @@ export default function TeacherDashboardPage() {
           </Link>
         )}
       </div>
+
+      {/* Daily Campus Check-in Card */}
+      <TeacherSelfCheckInCard />
 
       {/* Teacher Metric Summary */}
       <div className="grid gap-4 sm:grid-cols-3">

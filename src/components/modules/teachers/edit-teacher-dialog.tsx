@@ -2,6 +2,7 @@
 
 import { useForm } from "@tanstack/react-form";
 import { Edit2, GraduationCap, Loader2, User as UserIcon } from "lucide-react";
+import { DatePicker } from "@/components/forms/date-picker";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -317,13 +318,10 @@ function EditTeacherForm({
                   <FieldLabel className="text-xs font-medium">
                     Joining Date <span className="text-destructive">*</span>
                   </FieldLabel>
-                  <Input
-                    name={field.name}
-                    type="date"
+                  <DatePicker
                     value={field.state.value}
-                    onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                    className="h-9 text-xs"
+                    onChange={(val) => field.handleChange(val)}
+                    className="h-9 w-full"
                   />
                   {errorMsg && <FieldError>{errorMsg}</FieldError>}
                 </Field>

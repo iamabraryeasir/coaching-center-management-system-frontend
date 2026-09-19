@@ -76,6 +76,18 @@ export const attendanceKeys = {
     [...attendanceKeys.lists(), params] as const,
   summary: (params?: Record<string, unknown>) =>
     [...attendanceKeys.all, "summary", params] as const,
+  batchSheet: (batchId: string, date?: string) =>
+    [...attendanceKeys.all, "batch-sheet", batchId, date] as const,
+  studentHistory: (studentUserId: string, params?: Record<string, unknown>) =>
+    [...attendanceKeys.all, "student-history", studentUserId, params] as const,
+  mySummary: (params?: Record<string, unknown>) =>
+    [...attendanceKeys.all, "my-summary", params] as const,
+  teacherSheet: (date?: string, params?: Record<string, unknown>) =>
+    [...attendanceKeys.all, "teacher-sheet", date, params] as const,
+  teacherSummary: (teacherUserId: string, params?: Record<string, unknown>) =>
+    [...attendanceKeys.all, "teacher-summary", teacherUserId, params] as const,
+  myTeacherSummary: (params?: Record<string, unknown>) =>
+    [...attendanceKeys.all, "my-teacher-summary", params] as const,
 } as const;
 
 export const examKeys = {
