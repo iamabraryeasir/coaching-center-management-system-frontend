@@ -35,7 +35,7 @@ export const registerTeacherSchema = z.object({
   designation: z
     .string()
     .trim()
-    .min(2, "Faculty designation is required (e.g. Senior CS Faculty).")
+    .min(2, "Teacher designation is required (e.g. Senior Teacher).")
     .max(70, "Designation cannot exceed 70 characters."),
   qualification: z
     .string()
@@ -96,7 +96,7 @@ export const updateTeacherSchema = z.object({
   designation: z
     .string()
     .trim()
-    .min(2, "Faculty designation is required (e.g. Senior CS Faculty).")
+    .min(2, "Teacher designation is required (e.g. Senior Teacher).")
     .max(70, "Designation cannot exceed 70 characters."),
   qualification: z
     .string()

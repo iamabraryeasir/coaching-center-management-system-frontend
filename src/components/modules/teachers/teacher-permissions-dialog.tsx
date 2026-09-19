@@ -33,7 +33,7 @@ const AVAILABLE_PERMISSIONS: {
     id: "MANAGE_ATTENDANCE",
     label: "Daily Attendance Management",
     description:
-      "Empowers the faculty to mark batch daily attendance, record check-ins, and inspect student attendance history.",
+      "Empowers the teacher to mark batch daily attendance, record check-ins, and inspect student attendance history.",
   },
   {
     id: "MANAGE_EXAMS",

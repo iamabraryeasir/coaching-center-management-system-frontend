@@ -42,7 +42,7 @@ export default function DashboardSidebar({
     portalRole === "ADMIN" ? ADMIN_NAV_GROUPS : TEACHER_NAV_GROUPS;
 
   const roleLabel =
-    portalRole === "ADMIN" ? "Admin Portal" : "Faculty Workspace";
+    portalRole === "ADMIN" ? "Admin Portal" : "Teacher Workspace";
 
   const checkIsActive = (href: string, exact?: boolean): boolean => {
     if (!pathname) return false;

@@ -148,7 +148,7 @@ export const TEACHER_NAV_GROUPS: readonly DashboardNavGroup[] = [
     label: "Account",
     items: [
       {
-        title: "Faculty Profile",
+        title: "Teacher Profile",
         href: "/dashboard/teacher/profile",
         icon: UserCircle,
       },

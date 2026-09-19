@@ -65,7 +65,7 @@ export function RoutineToolbar({
                     return (
                       <div className="flex items-center gap-2">
                         <Users className="size-3.5 text-muted-foreground" />
-                        <span>By Faculty</span>
+                        <span>By Teacher</span>
                       </div>
                     );
                   }
@@ -94,7 +94,7 @@ export function RoutineToolbar({
               <SelectItem value="teacher" className="text-xs py-2">
                 <div className="flex items-center gap-2">
                   <Users className="size-3.5 text-muted-foreground" />
-                  <span>By Faculty</span>
+                  <span>By Teacher</span>
                 </div>
               </SelectItem>
             </SelectContent>
@@ -105,7 +105,7 @@ export function RoutineToolbar({
         {viewMode === "all" ? (
           <div className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary/10 border border-primary/20 text-xs font-medium text-primary">
             <Sparkles className="size-3.5 shrink-0" />
-            <span>Master Schedule (All Batches & Faculty)</span>
+            <span>Master Schedule (All Batches & Teachers)</span>
           </div>
         ) : viewMode === "batch" ? (
           <div className="w-full sm:w-64">
@@ -161,16 +161,13 @@ export function RoutineToolbar({
                 <SelectValue
                   placeholder={
                     teachers.length === 0
-                      ? "Loading faculty..."
-                      : "Select Faculty Teacher..."
+                      ? "Loading teachers..."
+                      : "Select Teacher..."
                   }
                 >
                   {(val: string | null) => {
                     const selected = teachers.find((t) => t.id === val);
-                    return (
-                      selected?.name ||
-                      (val ? val : "Select Faculty Teacher...")
-                    );
+                    return selected?.name || (val ? val : "Select Teacher...");
                   }}
                 </SelectValue>
               </SelectTrigger>
@@ -186,8 +183,7 @@ export function RoutineToolbar({
                         {teacher.name}
                       </span>
                       <span className="text-[11px] text-muted-foreground truncate">
-                        {teacher.teacherProfile?.designation ||
-                          "Faculty Member"}
+                        {teacher.teacherProfile?.designation || "Teacher"}
                       </span>
                     </div>
                   </SelectItem>

@@ -19,7 +19,7 @@ import type {
 } from "@/types";
 
 /**
- * Fetch paginated faculty teachers with filters and search
+ * Fetch paginated teachers with filters and search
  */
 export function useTeachers(params?: TeacherQueryParams) {
   return useQuery({
@@ -41,7 +41,7 @@ export function useTeacher(userId: string) {
 }
 
 /**
- * Mutation: Register new faculty teacher
+ * Mutation: Register new teacher
  */
 export function useRegisterTeacherMutation() {
   const queryClient = useQueryClient();
@@ -49,17 +49,14 @@ export function useRegisterTeacherMutation() {
   return useMutation({
     mutationFn: (payload: RegisterTeacherDto) => registerTeacher(payload),
     onMutate: () => {
-      return toast.loading("Onboarding faculty member...");
+      return toast.loading("Onboarding teacher...");
     },
     onSuccess: (response, _vars, toastId) => {
       queryClient.invalidateQueries({ queryKey: teacherKeys.all });
       queryClient.invalidateQueries({ queryKey: userKeys.all });
-      toast.success(
-        response.message || "Faculty member registered successfully!",
-        {
-          id: toastId,
-        },
-      );
+      toast.success(response.message || "Teacher registered successfully!", {
+        id: toastId,
+      });
     },
     onError: (error: Error, _vars, toastId) => {
       toast.error(error.message || "Failed to register teacher", {
@@ -70,7 +67,7 @@ export function useRegisterTeacherMutation() {
 }
 
 /**
- * Mutation: Update faculty member profile details
+ * Mutation: Update teacher profile details
  */
 export function useUpdateTeacherMutation() {
   const queryClient = useQueryClient();
@@ -84,7 +81,7 @@ export function useUpdateTeacherMutation() {
       payload: UpdateTeacherDto;
     }) => updateTeacher(userId, payload),
     onMutate: () => {
-      return toast.loading("Updating faculty details...");
+      return toast.loading("Updating teacher details...");
     },
     onSuccess: (response, variables, toastId) => {
       queryClient.invalidateQueries({ queryKey: teacherKeys.all });
@@ -93,14 +90,14 @@ export function useUpdateTeacherMutation() {
         queryKey: teacherKeys.detail(variables.userId),
       });
       toast.success(
-        response.message || "Faculty details updated successfully!",
+        response.message || "Teacher details updated successfully!",
         {
           id: toastId,
         },
       );
     },
     onError: (error: Error, _vars, toastId) => {
-      toast.error(error.message || "Failed to update faculty details", {
+      toast.error(error.message || "Failed to update teacher details", {
         id: toastId,
       });
     },
@@ -123,7 +120,7 @@ export function useUpdateTeacherStatusMutation() {
           : status === "BLOCKED"
             ? "Blocking"
             : "Deactivating";
-      return toast.loading(`${action} faculty account...`);
+      return toast.loading(`${action} teacher account...`);
     },
     onSuccess: (response, variables, toastId) => {
       queryClient.invalidateQueries({ queryKey: teacherKeys.all });
@@ -193,20 +190,20 @@ export function useDeleteTeacherMutation() {
   return useMutation({
     mutationFn: (userId: string) => deleteTeacher(userId),
     onMutate: () => {
-      return toast.loading("Archiving faculty account...");
+      return toast.loading("Archiving teacher account...");
     },
     onSuccess: (response, _vars, toastId) => {
       queryClient.invalidateQueries({ queryKey: teacherKeys.all });
       queryClient.invalidateQueries({ queryKey: userKeys.all });
       toast.success(
-        response.message || "Faculty account archived successfully!",
+        response.message || "Teacher account archived successfully!",
         {
           id: toastId,
         },
       );
     },
     onError: (error: Error, _vars, toastId) => {
-      toast.error(error.message || "Failed to archive faculty account", {
+      toast.error(error.message || "Failed to archive teacher account", {
         id: toastId,
       });
     },

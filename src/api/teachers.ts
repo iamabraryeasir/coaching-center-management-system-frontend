@@ -11,7 +11,7 @@ import type {
 } from "@/types";
 
 /**
- * Fetch paginated faculty teachers list with server-side filters, search, and sorting
+ * Fetch paginated teachers list with server-side filters, search, and sorting
  */
 export async function getTeachers(
   params?: TeacherQueryParams,
@@ -49,7 +49,7 @@ export async function getTeacherById(
 }
 
 /**
- * Register a new faculty member with credentials, academic profile, and permissions
+ * Register a new teacher with credentials, academic profile, and permissions
  */
 export async function registerTeacher(
   payload: RegisterTeacherDto,
@@ -61,7 +61,7 @@ export async function registerTeacher(
 }
 
 /**
- * Update faculty member profile details (name, phone, credentials, designation)
+ * Update teacher profile details (name, phone, credentials, designation)
  */
 export async function updateTeacher(
   userId: string,

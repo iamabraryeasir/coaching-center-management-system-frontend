@@ -78,11 +78,11 @@ export function EditTeacherDialog({
             </div>
             <div>
               <DialogTitle className="font-heading text-lg">
-                Edit Faculty Details
+                Edit Teacher Details
               </DialogTitle>
               <DialogDescription className="text-xs">
                 Update personal contact information, academic designations, and
-                credentials for this faculty member.
+                credentials for this teacher.
               </DialogDescription>
             </div>
           </div>
@@ -92,7 +92,7 @@ export function EditTeacherDialog({
         <div className="rounded-lg border border-border/70 bg-muted/30 p-3 flex items-center justify-between gap-2.5 text-xs">
           <div className="flex items-center gap-2">
             <span className="text-[11px] text-muted-foreground font-medium">
-              Faculty Member ID:
+              Teacher ID:
             </span>
             <span className="font-mono text-xs font-semibold text-foreground">
               {teacher.id.slice(0, 8)}...
@@ -361,7 +361,7 @@ function EditTeacherForm({
                     value={field.state.value}
                     onBlur={field.handleBlur}
                     onChange={(e) => field.handleChange(e.target.value)}
-                    placeholder="e.g. Senior CS Faculty / Lead Instructor"
+                    placeholder="e.g. Senior Teacher / Lead Instructor"
                     className="h-9 text-xs"
                   />
                   {errorMsg && <FieldError>{errorMsg}</FieldError>}
@@ -455,7 +455,7 @@ function EditTeacherForm({
               <span>Saving Changes...</span>
             </>
           ) : (
-            <span>Save Faculty Details</span>
+            <span>Save Teacher Details</span>
           )}
         </Button>
       </DialogFooter>

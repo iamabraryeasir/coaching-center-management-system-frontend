@@ -15,7 +15,7 @@ export default function DashboardShell({
   portalTitle,
 }: DashboardShellProps) {
   const defaultTitle =
-    portalRole === "ADMIN" ? "Admin Console" : "Faculty Workspace";
+    portalRole === "ADMIN" ? "Admin Console" : "Teacher Workspace";
 
   return (
     <>

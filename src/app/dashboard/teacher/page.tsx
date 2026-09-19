@@ -28,11 +28,11 @@ export default function TeacherDashboardPage() {
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="font-heading text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-            Welcome, {user?.name || "Faculty Member"}
+            Welcome, {user?.name || "Teacher"}
           </h2>
           <p className="text-sm text-muted-foreground">
             {user?.teacherProfile?.designation || "Instructor"} &bull;{" "}
-            {user?.teacherProfile?.specialization || "General Faculty"}
+            {user?.teacherProfile?.specialization || "General Teacher"}
           </p>
         </div>
 
@@ -146,7 +146,7 @@ export default function TeacherDashboardPage() {
         {/* Permissions & Profile Overview */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">Faculty Permissions</CardTitle>
+            <CardTitle className="text-lg">Teacher Permissions</CardTitle>
             <CardDescription>
               Administrative actions authorized by institution
             </CardDescription>

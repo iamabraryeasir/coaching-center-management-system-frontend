@@ -157,7 +157,7 @@ export function TeacherDetailsModal({
           <div className="rounded-lg border border-border/80 bg-muted/20 p-4">
             <h4 className="text-xs font-semibold text-foreground uppercase tracking-wider flex items-center gap-2 mb-3">
               <Award className="size-4 text-primary" />
-              Academic & Faculty Credentials
+              Academic & Teacher Credentials
             </h4>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
               <div>
@@ -165,7 +165,7 @@ export function TeacherDetailsModal({
                   Designation
                 </p>
                 <p className="text-sm font-semibold text-foreground mt-0.5">
-                  {profile?.designation || "Faculty Member"}
+                  {profile?.designation || "Teacher"}
                 </p>
               </div>
               <div>
@@ -310,12 +310,12 @@ export function TeacherDetailsModal({
               {activeTeacher.status === "ACTIVE" ? (
                 <>
                   <ShieldAlert className="size-3.5 text-amber-500" />
-                  <span>Deactivate Faculty Account</span>
+                  <span>Deactivate Teacher Account</span>
                 </>
               ) : (
                 <>
                   <ShieldCheck className="size-3.5 text-emerald-500" />
-                  <span>Activate Faculty Account</span>
+                  <span>Activate Teacher Account</span>
                 </>
               )}
             </Button>
@@ -334,7 +334,7 @@ export function TeacherDetailsModal({
                 className="gap-1.5"
               >
                 <Edit2 className="size-3.5 text-primary" />
-                <span>Edit Faculty</span>
+                <span>Edit Teacher</span>
               </Button>
             )}
 

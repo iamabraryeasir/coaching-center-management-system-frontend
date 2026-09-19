@@ -49,56 +49,56 @@ export function RoutineSlotCard({
         className,
       )}
     >
-      {/* Top Row: Time Badge & Actions Menu */}
-      <div className="px-3 py-2 flex items-center justify-between gap-1.5 print:p-1.5">
+      {/* Top-Right Floating Actions Menu (Appears on hover in desktop screen) */}
+      {!isPrint && (onEdit || onDelete) && (
+        <div className="absolute top-1.5 right-1.5 z-10 opacity-100 md:opacity-0 md:group-hover:opacity-100 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity duration-150 print:hidden">
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              render={
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon-xs"
+                  aria-label="Routine slot actions"
+                  className="size-6 rounded-md border border-border/70 bg-background/95 backdrop-blur-xs hover:bg-muted text-muted-foreground hover:text-foreground flex items-center justify-center shadow-2xs transition-colors"
+                />
+              }
+            >
+              <MoreHorizontal className="size-3.5" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-36">
+              {onEdit && (
+                <DropdownMenuItem
+                  onClick={() => onEdit(slot)}
+                  className="gap-2 text-xs cursor-pointer"
+                >
+                  <Edit2 className="size-3.5 text-muted-foreground" />
+                  <span>Edit Slot</span>
+                </DropdownMenuItem>
+              )}
+              {onEdit && onDelete && <DropdownMenuSeparator />}
+              {onDelete && (
+                <DropdownMenuItem
+                  onClick={() => onDelete(slot)}
+                  className="gap-2 text-xs text-destructive focus:bg-destructive/10 focus:text-destructive cursor-pointer"
+                >
+                  <Trash2 className="size-3.5" />
+                  <span>Delete Slot</span>
+                </DropdownMenuItem>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      )}
+
+      {/* Top Row: Time Badge */}
+      <div className="px-3 py-2 flex items-center print:p-1.5">
         <span className="font-mono text-[11px] font-bold text-foreground bg-muted/80 px-2 py-0.5 rounded-md border border-border/60 inline-flex items-center gap-1.5 whitespace-nowrap print:bg-neutral-100 print:text-black print:border-neutral-300 print:text-[10px] print:px-1.5 print:py-0.5">
           <Clock className="size-3 text-primary shrink-0 print:text-neutral-600" />
           <span>
             {slot.startTime} – {slot.endTime}
           </span>
         </span>
-
-        {/* Actions Dropdown: Positioned at right of top bar, visible on mobile, reveal on hover on desktop */}
-        {!isPrint && (onEdit || onDelete) && (
-          <div className="sm:opacity-0 sm:group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity print:hidden shrink-0">
-            <DropdownMenu>
-              <DropdownMenuTrigger
-                render={
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon-xs"
-                    aria-label="Routine slot actions"
-                    className="size-6 rounded-md border border-border/70 bg-background/90 backdrop-blur-xs hover:bg-muted text-muted-foreground hover:text-foreground flex items-center justify-center shadow-2xs transition-colors"
-                  />
-                }
-              >
-                <MoreHorizontal className="size-3.5" />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-36">
-                {onEdit && (
-                  <DropdownMenuItem
-                    onClick={() => onEdit(slot)}
-                    className="gap-2 text-xs cursor-pointer"
-                  >
-                    <Edit2 className="size-3.5 text-muted-foreground" />
-                    <span>Edit Slot</span>
-                  </DropdownMenuItem>
-                )}
-                {onEdit && onDelete && <DropdownMenuSeparator />}
-                {onDelete && (
-                  <DropdownMenuItem
-                    onClick={() => onDelete(slot)}
-                    className="gap-2 text-xs text-destructive focus:bg-destructive/10 focus:text-destructive cursor-pointer"
-                  >
-                    <Trash2 className="size-3.5" />
-                    <span>Delete Slot</span>
-                  </DropdownMenuItem>
-                )}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        )}
       </div>
 
       {/* 1. SUBJECT */}
@@ -118,7 +118,7 @@ export function RoutineSlotCard({
           {showTeacher && (
             <div
               className="flex items-center gap-1.5 min-w-0"
-              title={`Faculty: ${slot.teacher?.name || "Unassigned"}`}
+              title={`Teacher: ${slot.teacher?.name || "Unassigned"}`}
             >
               <User className="size-3.5 text-primary shrink-0 print:size-3 print:text-neutral-500" />
               <span className="font-semibold text-xs text-foreground truncate print:text-[10px] print:text-black">

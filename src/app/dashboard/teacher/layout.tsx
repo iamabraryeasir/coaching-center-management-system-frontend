@@ -8,12 +8,12 @@ export default function TeacherLayout({ children }: { children: ReactNode }) {
     <RoleGuard
       allowedRoles={["TEACHER"]}
       loadingFallback={
-        <DashboardShell portalRole="TEACHER" portalTitle="Faculty Workspace">
+        <DashboardShell portalRole="TEACHER" portalTitle="Teacher Workspace">
           <TeacherDashboardLoading />
         </DashboardShell>
       }
     >
-      <DashboardShell portalRole="TEACHER" portalTitle="Faculty Workspace">
+      <DashboardShell portalRole="TEACHER" portalTitle="Teacher Workspace">
         {children}
       </DashboardShell>
     </RoleGuard>

@@ -7,7 +7,7 @@ import { siteConfig } from "@/config/site";
 export const metadata: Metadata = {
   title: `Class Routines & Timetable | ${siteConfig.name}`,
   description:
-    "Organize 7-day weekly class schedules, manage room allocations, and prevent faculty conflicts.",
+    "Organize 7-day weekly class schedules, manage room allocations, and prevent teacher conflicts.",
 };
 
 function RoutinesPageFallback() {

@@ -149,8 +149,8 @@ export function RoutineSlotDialog({
               </DialogTitle>
               <DialogDescription className="text-xs">
                 {isEditing
-                  ? "Update session timing, assigned room, or faculty member."
-                  : "Allocate a weekly routine slot with room and faculty conflict checks."}
+                  ? "Update session timing, assigned room, or teacher."
+                  : "Allocate a weekly routine slot with room and teacher conflict checks."}
               </DialogDescription>
             </div>
           </div>
@@ -351,12 +351,12 @@ export function RoutineSlotDialog({
             </form.Field>
           </div>
 
-          {/* Assigned Faculty Member */}
+          {/* Assigned Teacher */}
           <form.Field name="teacherId">
             {(field) => (
               <Field className="gap-1.5">
                 <FieldLabel className="text-xs font-semibold">
-                  Instructor / Faculty Member
+                  Teacher / Instructor
                 </FieldLabel>
                 <Select
                   value={field.state.value}

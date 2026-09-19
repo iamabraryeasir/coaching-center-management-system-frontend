@@ -100,7 +100,7 @@ export function TeacherTable({
           <Table>
             <TableHeader>
               <TableRow className="bg-muted/40 hover:bg-muted/40">
-                <TableHead className="min-w-60">Faculty Member</TableHead>
+                <TableHead className="min-w-60">Teacher</TableHead>
                 <TableHead className="min-w-44">
                   Designation & Specialty
                 </TableHead>
@@ -159,11 +159,11 @@ export function TeacherTable({
                         <Users className="size-6" />
                       </div>
                       <p className="font-semibold text-sm text-foreground">
-                        No faculty members found
+                        No teachers found
                       </p>
                       <p className="text-xs leading-relaxed">
                         No teachers matched your search or status filters. Try
-                        clearing active filters or onboard a new faculty member.
+                        clearing active filters or onboard a new teacher.
                       </p>
                       {onCreateTeacher && (
                         <Button
@@ -173,7 +173,7 @@ export function TeacherTable({
                           className="mt-2 gap-1.5 font-medium"
                         >
                           <Plus className="size-3.5" />
-                          <span>Onboard Faculty Member</span>
+                          <span>Onboard Teacher</span>
                         </Button>
                       )}
                     </div>
@@ -208,7 +208,7 @@ export function TeacherTable({
                       key={teacher.id}
                       className="group transition-colors"
                     >
-                      {/* Faculty Member Column */}
+                      {/* Teacher Column */}
                       <TableCell>
                         <div className="flex items-center gap-3">
                           <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary/10 font-bold text-primary text-xs shadow-2xs">
@@ -237,7 +237,7 @@ export function TeacherTable({
                       <TableCell>
                         <div className="flex flex-col truncate">
                           <span className="text-xs font-semibold text-foreground truncate">
-                            {profile?.designation || "Faculty Member"}
+                            {profile?.designation || "Teacher"}
                           </span>
                           <span className="text-[11px] text-muted-foreground truncate">
                             {profile?.specialization
@@ -275,7 +275,7 @@ export function TeacherTable({
                               <Button
                                 variant="ghost"
                                 size="icon-sm"
-                                aria-label="Faculty actions"
+                                aria-label="Teacher actions"
                                 className="size-8 p-0 text-muted-foreground hover:text-foreground"
                               />
                             }
@@ -289,7 +289,7 @@ export function TeacherTable({
                               className="gap-2 text-xs cursor-pointer"
                             >
                               <Eye className="size-3.5 text-muted-foreground" />
-                              <span>View Faculty Profile</span>
+                              <span>View Teacher Profile</span>
                             </DropdownMenuItem>
 
                             <DropdownMenuItem
@@ -297,7 +297,7 @@ export function TeacherTable({
                               className="gap-2 text-xs cursor-pointer"
                             >
                               <Edit2 className="size-3.5 text-primary" />
-                              <span>Edit Faculty Details</span>
+                              <span>Edit Teacher Details</span>
                             </DropdownMenuItem>
 
                             <DropdownMenuItem
@@ -332,7 +332,7 @@ export function TeacherTable({
                               className="gap-2 text-xs text-destructive focus:bg-destructive/10 focus:text-destructive cursor-pointer"
                             >
                               <Trash2 className="size-3.5" />
-                              <span>Delete Faculty Account</span>
+                              <span>Delete Teacher Account</span>
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -346,7 +346,7 @@ export function TeacherTable({
 
         {/* Table Footer with Pagination */}
         {meta && meta.total > 0 && (
-          <StudentPagination meta={meta} itemLabel="faculty members" />
+          <StudentPagination meta={meta} itemLabel="teachers" />
         )}
       </div>
 
@@ -360,10 +360,10 @@ export function TeacherTable({
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="text-destructive font-heading">
-              Confirm Faculty Deletion
+              Confirm Teacher Deletion
             </DialogTitle>
             <DialogDescription className="text-xs sm:text-sm leading-relaxed pt-1">
-              Are you sure you want to delete the faculty account for{" "}
+              Are you sure you want to delete the teacher account for{" "}
               <strong className="text-foreground">
                 {teacherToDelete?.name}
               </strong>
@@ -379,8 +379,8 @@ export function TeacherTable({
                 Permanent Revocation Notice
               </p>
               <p className="text-muted-foreground text-[11px]">
-                Faculty member will immediately lose access to attendance
-                registers, routine timetables, and assessment recording.
+                Teacher will immediately lose access to attendance registers,
+                routine timetables, and assessment recording.
               </p>
             </div>
           )}
@@ -406,7 +406,7 @@ export function TeacherTable({
               disabled={deleteMutation.isPending}
             >
               {deleteMutation.isPending
-                ? "Deleting Faculty..."
+                ? "Deleting Teacher..."
                 : "Confirm Delete"}
             </Button>
           </DialogFooter>

@@ -69,11 +69,11 @@ export default function AdminDashboardPage() {
           </CardContent>
         </Card>
 
-        {/* Teaching Faculty */}
+        {/* Teachers */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              Teaching Faculty
+              Teachers
             </CardTitle>
             <div className="flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
               <ShieldCheck className="size-5" />
@@ -82,7 +82,7 @@ export default function AdminDashboardPage() {
           <CardContent>
             <div className="text-2xl font-bold text-foreground">18</div>
             <p className="text-xs text-muted-foreground mt-1">
-              All faculty active & verified
+              All teachers active & verified
             </p>
           </CardContent>
         </Card>

@@ -143,7 +143,7 @@ export function RegisterTeacherDialog({
             </div>
             <div>
               <DialogTitle className="font-heading text-lg">
-                Onboard Faculty Teacher
+                Onboard Teacher
               </DialogTitle>
               <DialogDescription className="text-xs">
                 Register a new teacher account with credentials, qualifications,
@@ -350,7 +350,7 @@ export function RegisterTeacherDialog({
                         value={field.state.value}
                         onBlur={field.handleBlur}
                         onChange={(e) => field.handleChange(e.target.value)}
-                        placeholder="e.g. Senior Faculty / Lecturer"
+                        placeholder="e.g. Senior Teacher / Lecturer"
                         className="h-9 text-xs"
                       />
                       {errorMsg && <FieldError>{errorMsg}</FieldError>}
@@ -524,7 +524,7 @@ export function RegisterTeacherDialog({
                   <span>Registering...</span>
                 </>
               ) : (
-                "Onboard Faculty Member"
+                "Onboard Teacher"
               )}
             </Button>
           </DialogFooter>

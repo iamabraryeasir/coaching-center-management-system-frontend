@@ -36,7 +36,7 @@ export function RoutinePrintModal({
     viewMode === "batch"
       ? `Batch: ${batchName || "Academic Batch"}`
       : viewMode === "teacher"
-        ? `Faculty: ${teacherName || "Faculty Member"}`
+        ? `Teacher: ${teacherName || "Teacher"}`
         : "Master Timetable (All Classes)";
 
   return (
@@ -90,7 +90,7 @@ export function RoutinePrintModal({
               {viewMode === "batch"
                 ? "enrolled students"
                 : viewMode === "teacher"
-                  ? "faculty scheduling"
+                  ? "teacher scheduling"
                   : "central administration"}
               .
             </DialogDescription>

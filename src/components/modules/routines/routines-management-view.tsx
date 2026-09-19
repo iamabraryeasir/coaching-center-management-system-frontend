@@ -238,7 +238,7 @@ export function RoutinesManagementView() {
           {viewMode === "batch"
             ? `Class Routine — ${selectedBatchObj?.name || "Academic Batch"}`
             : viewMode === "teacher"
-              ? `Class Routine — ${selectedTeacherObj?.name || "Faculty Member"}`
+              ? `Class Routine — ${selectedTeacherObj?.name || "Teacher"}`
               : "Weekly Class Routine"}
         </h2>
       </div>
@@ -257,7 +257,7 @@ export function RoutinesManagementView() {
               ? "No classes scheduled across any batch yet"
               : viewMode === "batch"
                 ? `No classes scheduled for "${selectedBatchObj?.name || "this batch"}"`
-                : `No classes scheduled for "${selectedTeacherObj?.name || "this faculty member"}"`
+                : `No classes scheduled for "${selectedTeacherObj?.name || "this teacher"}"`
           }
           emptyDescription="Start scheduling regular weekly periods to assign rooms and prevent timetable clashes."
         />

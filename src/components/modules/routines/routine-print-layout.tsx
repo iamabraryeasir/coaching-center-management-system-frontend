@@ -29,7 +29,7 @@ const DAY_TITLES: Record<DayOfWeek, string> = {
  * Ultra-clean, production-grade academic routine sheet.
  * Strictly limited to:
  * 1. Coaching Name
- * 2. Routine Title (with Batch Name for batch view, Faculty Name for faculty view)
+ * 2. Routine Title (with Batch Name for batch view, Teacher Name for teacher view)
  * 3. 7-Day Timetable Grid
  *
  * Excludes all redundant banners, rules, reference codes, and signature lines.
@@ -56,7 +56,7 @@ export function RoutinePrintSheet({
     viewMode === "batch"
       ? `Class Routine — ${batchName || "Academic Batch"}`
       : viewMode === "teacher"
-        ? `Class Routine — ${teacherName || "Faculty Member"}`
+        ? `Class Routine — ${teacherName || "Teacher"}`
         : "Weekly Class Routine";
 
   return (
@@ -116,7 +116,7 @@ export function RoutinePrintSheet({
                             className="text-[10px] text-neutral-800 truncate"
                             title={slot.teacher?.name || "Unassigned"}
                           >
-                            <span className="text-neutral-500">Faculty: </span>
+                            <span className="text-neutral-500">Teacher: </span>
                             <span className="font-medium">
                               {slot.teacher?.name || "Unassigned"}
                             </span>

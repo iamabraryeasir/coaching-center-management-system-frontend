@@ -5,9 +5,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { siteConfig } from "@/config/site";
 
 export const metadata: Metadata = {
-  title: `Faculty & Teachers | ${siteConfig.name}`,
+  title: `Teachers | ${siteConfig.name}`,
   description:
-    "Supervise faculty members, manage academic credentials, configure account statuses, and delegate administrative privileges.",
+    "Supervise teachers, manage academic credentials, configure account statuses, and delegate administrative privileges.",
 };
 
 function TeachersPageFallback() {
