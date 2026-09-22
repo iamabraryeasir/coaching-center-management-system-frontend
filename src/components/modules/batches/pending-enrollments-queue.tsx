@@ -39,6 +39,7 @@ import {
 } from "@/components/ui/table";
 import {
   useApproveEnrollmentMutation,
+  useDebounce,
   usePendingEnrollments,
   useRejectEnrollmentMutation,
 } from "@/hooks";
@@ -47,6 +48,7 @@ import { BatchStatusBadge } from "./batch-status-badge";
 
 export function PendingEnrollmentsQueue() {
   const [search, setSearch] = useState("");
+  const debouncedSearch = useDebounce(search, 500);
   const [enrollmentToReject, setEnrollmentToReject] =
     useState<BatchEnrollment | null>(null);
   const [rejectionReason, setRejectionReason] = useState("");
@@ -60,8 +62,8 @@ export function PendingEnrollmentsQueue() {
 
   // Filter client-side by student name, email, or batch name
   const filteredList = useMemo(() => {
-    if (!search.trim()) return pendingList;
-    const q = search.toLowerCase();
+    if (!debouncedSearch.trim()) return pendingList;
+    const q = debouncedSearch.toLowerCase();
     return pendingList.filter(
       (item) =>
         item.student?.name?.toLowerCase().includes(q) ||
@@ -69,7 +71,7 @@ export function PendingEnrollmentsQueue() {
         item.student?.phone?.toLowerCase().includes(q) ||
         item.batch?.name?.toLowerCase().includes(q),
     );
-  }, [pendingList, search]);
+  }, [pendingList, debouncedSearch]);
 
   const handleApprove = (enrollment: BatchEnrollment) => {
     approveMutation.mutate(enrollment.id);

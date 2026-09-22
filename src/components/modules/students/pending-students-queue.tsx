@@ -12,7 +12,7 @@ import {
   UserX,
   XCircle,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -37,6 +37,7 @@ import {
 } from "@/components/ui/table";
 import {
   useApproveStudentMutation,
+  useDebounce,
   usePendingStudents,
   useRejectStudentMutation,
 } from "@/hooks";
@@ -47,15 +48,24 @@ export function PendingStudentsQueue() {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [search, setSearch] = useState("");
+  const debouncedSearch = useDebounce(search, 500);
   const [studentToReject, setStudentToReject] = useState<PendingStudent | null>(
     null,
   );
   const [rejectionReason, setRejectionReason] = useState("");
 
+  const prevSearchRef = useRef(debouncedSearch);
+  useEffect(() => {
+    if (prevSearchRef.current !== debouncedSearch) {
+      prevSearchRef.current = debouncedSearch;
+      setPage(1);
+    }
+  }, [debouncedSearch]);
+
   const { data, isLoading } = usePendingStudents({
     page,
     limit,
-    search: search.trim() ? search.trim() : undefined,
+    search: debouncedSearch.trim() ? debouncedSearch.trim() : undefined,
   });
 
   const approveMutation = useApproveStudentMutation();

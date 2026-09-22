@@ -34,6 +34,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import {
+  useDebounce,
   useMarkBulkTeacherAttendanceMutation,
   useTeacherAttendanceSheet,
   useTeachers,
@@ -109,6 +110,7 @@ export function TeacherAttendanceSheet() {
   const todayStr = useMemo(() => new Date().toISOString().split("T")[0], []);
   const [selectedDate, setSelectedDate] = useState<string>(todayStr);
   const [searchQuery, setSearchQuery] = useState("");
+  const debouncedSearch = useDebounce(searchQuery, 500);
   const [rows, setRows] = useState<TeacherRowState[]>([]);
 
   const isToday = selectedDate === todayStr;
@@ -251,15 +253,15 @@ export function TeacherAttendanceSheet() {
 
   // Filter rows
   const filteredRows = useMemo(() => {
-    if (!searchQuery.trim()) return rows;
-    const q = searchQuery.toLowerCase();
+    if (!debouncedSearch.trim()) return rows;
+    const q = debouncedSearch.toLowerCase();
     return rows.filter(
       (r) =>
         r.teacher.name.toLowerCase().includes(q) ||
         r.teacher.email.toLowerCase().includes(q) ||
         r.teacher.teacherProfile?.designation?.toLowerCase().includes(q),
     );
-  }, [rows, searchQuery]);
+  }, [rows, debouncedSearch]);
 
   // Real-time KPI statistics
   const stats = useMemo(() => {

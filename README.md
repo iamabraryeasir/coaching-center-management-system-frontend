@@ -16,6 +16,7 @@ Designed for high-concurrency environments, multi-branch scalability, white-labe
 ## 🌟 Executive Overview & Business Value
 
 Running a modern coaching center demands synchronization across disparate operational domains: student admissions, teacher scheduling, batch enrollments, daily physical presence verification, exam grading, merit list publishing, and monthly fee collections.
+Running a modern coaching center demands synchronization across core academic and administrative operations: student admissions, teacher scheduling, batch enrollments, daily physical presence verification, exam grading, and merit list publishing.
 
 This application provides a unified, real-time command center for administrators, teachers, and students with zero latency, accessible interfaces, and deterministic state synchronization.
 
@@ -32,6 +33,7 @@ flowchart TD
         AuthModule["🔐 Auth & Session Engine (HttpOnly + Silent Refresh)"]
 
         subgraph Operations["Academic & Financial Modules"]
+        subgraph Operations["Academic & Administrative Modules"]
             Admissions["📋 Admissions & Student Lifecycle"]
             Staff["🛡️ Teacher Delegation & Attendance"]
             Batches["📚 Batches & Enrollment Workflow"]
@@ -74,6 +76,7 @@ flowchart TD
 - **Application Review & Approval Pipeline**: Administrators review pending applications from a centralized queue, with one-click actions to `APPROVE` (activating the account) or `REJECT` (with custom rejection reasoning).
 - **Status State Machine**: Students progress through lifecycle states: `PENDING_ACTIVATION` $\rightarrow$ `ACTIVE` $\leftrightarrow$ `INACTIVE` / `BLOCKED`.
 - **Dossier & Academic Record**: Complete student profile includes guardian contacts, institutional enrollment, batch histories, attendance ratios, exam report cards, and balance ledgers.
+- **Dossier & Academic Record**: Complete student profile includes guardian contacts, institutional enrollment, batch histories, attendance ratios, and exam report cards.
 
 ---
 
@@ -92,6 +95,7 @@ flowchart TD
 ### 4. 📚 Academic Batches & Enrollment Streams
 
 - **Batch Hierarchy & Capacity**: Batches represent specific classroom groups with custom monthly fee schedules, target grade levels, and status tracking (`UPCOMING`, `ONGOING`, `COMPLETED`, `CANCELLED`).
+- **Batch Hierarchy & Capacity**: Batches represent specific classroom groups with target grade levels, curriculum details, and status tracking (`UPCOMING`, `ONGOING`, `COMPLETED`, `CANCELLED`).
 - **Dual Enrollment Architecture**:
   - _Student Self-Enrollment Request_: Students browse open batches and apply for enrollment, entering the admin `PendingEnrollments` approval queue.
   - _Administrative Direct Enrollment_: Administrators assign any active student directly to batches with immediate roster enrollment.
@@ -171,6 +175,7 @@ flowchart TD
 | **Manual Cash Payment Collection**   |   Full Access    |     No Access     |         No Access         |    No Access    |
 | **Online Stripe Tuition Payment**    |    No Access     |     No Access     |         No Access         |  Self Checkout  |
 | **Download PDF Receipts / Reports**  |   Full Access    |   Batch Reports   |       Batch Reports       |  Personal Only  |
+| **Download PDF Reports / Schedules** |   Full Access    |   Batch Reports   |       Batch Reports       |  Personal Only  |
 
 ---
 
@@ -213,8 +218,10 @@ coaching-management-system-frontend/
 │   │   │   └── (marketing)/     # Landing page, public presentation, hero section
 │   │   ├── dashboard/           # Protected dashboard layout and smart gateway
 │   │   │   ├── admin/           # Admin portal (students, teachers, batches, routines, exams, payments)
+│   │   │   ├── admin/           # Admin portal (students, teachers, batches, routines, exams)
 │   │   │   ├── teacher/         # Teacher workspace (batches, routines, attendance, exams)
 │   │   │   └── student/         # Student mobile-first portal (routines, attendance, exams, payments)
+│   │   │   └── student/         # Student mobile-first portal (routines, attendance, exams)
 │   │   ├── globals.css          # Tailwind CSS v4 @theme inline and semantic OKLCH tokens
 │   │   └── layout.tsx           # Root layout with fonts, metadata, and AppProviders
 │   ├── assets/                  # Scalable vector graphics and static assets
@@ -231,6 +238,7 @@ coaching-management-system-frontend/
 │   ├── proxy.ts                 # Next.js 16 server routing proxy (replaces legacy middleware)
 │   ├── types/                   # TypeScript domain models, DTOs, and API responses
 │   └── validators/              # Zod validation schemas (auth, student, teacher, batch, exam, payment, routine)
+│   └── validators/              # Zod validation schemas (auth, student, teacher, batch, exam, routine)
 ├── AGENTS.md                    # Persistent memory, architectural blueprint, and agent engineering standard
 ├── DESIGN.md                    # Design system specification, OKLCH tokens, and component hierarchy
 ├── package.json                 # Dependency definitions and scripts

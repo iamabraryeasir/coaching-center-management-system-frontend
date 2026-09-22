@@ -101,13 +101,3 @@ export const examKeys = {
   myResults: () => [...examKeys.all, "my-results"] as const,
   myResult: (examId: string) => [...examKeys.all, "my-result", examId] as const,
 } as const;
-
-export const paymentKeys = {
-  all: ["payments"] as const,
-  lists: () => [...paymentKeys.all, "list"] as const,
-  list: (params?: Record<string, unknown>) =>
-    [...paymentKeys.lists(), params] as const,
-  details: () => [...paymentKeys.all, "detail"] as const,
-  detail: (id: string) => [...paymentKeys.details(), id] as const,
-  summary: () => [...paymentKeys.all, "summary"] as const,
-} as const;

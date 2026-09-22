@@ -17,6 +17,7 @@ This document serves as the permanent memory, architectural blueprint, and engin
 ## 1. System Overview & Core Stack
 
 - **Application Domain**: Coaching Center Management System (Multi-tenant/multi-instance coaching administration, student admissions, batch scheduling, attendance verification, exam grading, and fee collections).
+- **Application Domain**: Coaching Center Management System (Multi-tenant/multi-instance coaching administration, student admissions, batch scheduling, attendance verification, and exam grading).
 - **Package Manager & Runtime**: `bun` (`bun@1.4.2`). Always use `bun` for installing dependencies and executing scripts.
 - **Core Technology Matrix**:
   - **Framework**: Next.js 16.3.4 (App Router) + React 19.2.8
@@ -33,6 +34,7 @@ This document serves as the permanent memory, architectural blueprint, and engin
 ## 2. Exhaustive Business Logic & Domain Architecture
 
 The application model is structured into 8 core business domains that govern the coaching center's operational and academic life:
+The application model is structured into 7 core business domains that govern the coaching center's operational and academic life:
 
 ```mermaid
 flowchart TD
@@ -147,6 +149,7 @@ flowchart TD
 #### 1. Batch State Lifecycle
 
 - Batches represent academic groups with a defined monthly fee (`fee`) and status:
+- Batches represent academic groups with target grade levels, curriculum schedules, and status:
   - `UPCOMING`: Scheduled future batch, open for enrollment.
   - `ONGOING`: Active teaching in progress.
   - `COMPLETED`: Curriculum concluded.
@@ -266,8 +269,10 @@ src/
 │   │   └── (marketing)/  # Marketing landing pages, hero presentation
 │   ├── dashboard/        # Protected management portal
 │   │   ├── admin/        # Admin portal routes (students, teachers, batches, routines, exams, payments)
+│   │   ├── admin/        # Admin portal routes (students, teachers, batches, routines, exams)
 │   │   ├── teacher/      # Teacher workspace (batches, routines, attendance, exams)
 │   │   ├── student/      # Student mobile-first portal (routines, attendance, exams, payments)
+│   │   ├── student/      # Student mobile-first portal (routines, attendance, exams)
 │   │   ├── layout.tsx    # Dashboard shell with dynamic sidebar and header
 │   │   └── page.tsx      # Smart Gateway redirecting to role dashboard
 │   ├── globals.css       # Tailwind CSS v4 @theme inline and semantic OKLCH tokens

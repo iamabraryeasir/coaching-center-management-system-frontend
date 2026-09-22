@@ -5,7 +5,7 @@ import DashboardSidebar from "./sidebar";
 
 interface DashboardShellProps {
   children: ReactNode;
-  portalRole: "ADMIN" | "TEACHER";
+  portalRole: "ADMIN" | "TEACHER" | "STUDENT";
   portalTitle?: string;
 }
 
@@ -15,7 +15,11 @@ export default function DashboardShell({
   portalTitle,
 }: DashboardShellProps) {
   const defaultTitle =
-    portalRole === "ADMIN" ? "Admin Console" : "Teacher Workspace";
+    portalRole === "ADMIN"
+      ? "Admin Console"
+      : portalRole === "TEACHER"
+        ? "Teacher Workspace"
+        : "Student Portal";
 
   return (
     <>

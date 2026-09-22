@@ -9,6 +9,7 @@ import {
   useBatchAttendanceSheet,
   useBatches,
   useBatchStudents,
+  useDebounce,
   useMarkBatchAttendanceMutation,
 } from "@/hooks";
 import type { AttendanceStatus, Batch, BatchEnrollment, User } from "@/types";
@@ -47,6 +48,7 @@ export function AttendanceManagementView({
     return todayStr;
   });
   const [searchQuery, setSearchQuery] = useState("");
+  const debouncedSearch = useDebounce(searchQuery, 500);
   const [studentRows, setStudentRows] = useState<StudentAttendanceRowState[]>(
     [],
   );
@@ -219,8 +221,8 @@ export function AttendanceManagementView({
 
   // Filtered rows for search query
   const filteredRows = useMemo(() => {
-    if (!searchQuery.trim()) return studentRows;
-    const q = searchQuery.toLowerCase();
+    if (!debouncedSearch.trim()) return studentRows;
+    const q = debouncedSearch.toLowerCase();
     return studentRows.filter(
       (r) =>
         r.student.name.toLowerCase().includes(q) ||
@@ -228,7 +230,7 @@ export function AttendanceManagementView({
         r.student.studentProfile?.rollNumber?.toLowerCase().includes(q) ||
         r.student.studentProfile?.guardianPhone?.includes(q),
     );
-  }, [studentRows, searchQuery]);
+  }, [studentRows, debouncedSearch]);
 
   // Real-time KPI counts across 5 statuses
   const stats = useMemo(() => {

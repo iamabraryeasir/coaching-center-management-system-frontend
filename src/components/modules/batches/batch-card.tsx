@@ -2,6 +2,7 @@
 
 import {
   ArrowRight,
+  Banknote,
   Calendar,
   CreditCard,
   Edit2,
@@ -112,6 +113,7 @@ export function BatchCard({ batch, onEdit, onDelete }: BatchCardProps) {
           <BatchStatusBadge status={batch.status} />
           <div className="flex items-center gap-1 text-sm font-semibold text-foreground">
             <CreditCard className="size-3.5 text-muted-foreground" />
+            <Banknote className="size-3.5 text-muted-foreground" />
             <span>৳ {batch.fee.toLocaleString()}</span>
           </div>
         </div>

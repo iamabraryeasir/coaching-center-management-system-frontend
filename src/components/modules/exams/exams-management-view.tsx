@@ -12,7 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useAuth, useBatches, useExams } from "@/hooks";
+import { useAuth, useBatches, useDebounce, useExams } from "@/hooks";
 import type { Exam, ExamStatus } from "@/types";
 import { CreateExamDialog } from "./create-exam-dialog";
 import { EditExamDialog } from "./edit-exam-dialog";
@@ -37,6 +37,7 @@ export function ExamsManagementView({
     useState<string>(initialBatchId);
   const [activeTab, setActiveTab] = useState<string>("ALL");
   const [searchQuery, setSearchQuery] = useState("");
+  const debouncedSearch = useDebounce(searchQuery, 500);
 
   // Modal States
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
@@ -61,10 +62,10 @@ export function ExamsManagementView({
         activeTab === "ALL" || activeTab === "DRAFT"
           ? undefined
           : (activeTab as ExamStatus),
-      search: searchQuery.trim() || undefined,
+      search: debouncedSearch.trim() || undefined,
       limit: 100,
     };
-  }, [selectedBatchId, activeTab, searchQuery]);
+  }, [selectedBatchId, activeTab, debouncedSearch]);
 
   const { data: examsResponse, isLoading } = useExams(queryParams);
 

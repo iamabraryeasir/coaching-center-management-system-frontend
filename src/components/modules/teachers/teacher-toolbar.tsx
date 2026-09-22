@@ -12,6 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useDebounce } from "@/hooks/use-debounce";
 import type { UserStatus } from "@/types";
 
 interface TeacherToolbarProps {
@@ -46,6 +47,7 @@ export function TeacherToolbar({
   const [_isPending, startTransition] = useTransition();
 
   const [searchTerm, setSearchTerm] = useState(currentSearch);
+  const debouncedSearch = useDebounce(searchTerm, 500);
 
   // Sync state if URL changes externally
   useEffect(() => {
@@ -68,24 +70,20 @@ export function TeacherToolbar({
 
   // Debounced search effect
   useEffect(() => {
-    const timer = setTimeout(() => {
-      if (searchTerm !== currentSearch) {
-        const params = new URLSearchParams(searchParams.toString());
-        if (searchTerm.trim() !== "") {
-          params.set("search", searchTerm);
-        } else {
-          params.delete("search");
-        }
-        params.delete("page");
-
-        startTransition(() => {
-          router.push(`${pathname}?${params.toString()}`);
-        });
+    if (debouncedSearch !== currentSearch) {
+      const params = new URLSearchParams(searchParams.toString());
+      if (debouncedSearch.trim() !== "") {
+        params.set("search", debouncedSearch.trim());
+      } else {
+        params.delete("search");
       }
-    }, 350);
+      params.delete("page");
 
-    return () => clearTimeout(timer);
-  }, [searchTerm, currentSearch, pathname, router, searchParams]);
+      startTransition(() => {
+        router.push(`${pathname}?${params.toString()}`);
+      });
+    }
+  }, [debouncedSearch, currentSearch, pathname, router, searchParams]);
 
   const handleStatusChange = (val: string | null) => {
     updateQuery("status", val);

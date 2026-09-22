@@ -2,6 +2,7 @@
 
 import {
   ArrowLeft,
+  Banknote,
   Calendar,
   CreditCard,
   Edit2,
@@ -149,6 +150,7 @@ export function BatchDetailView({ batchId }: BatchDetailViewProps) {
           <CardContent className="p-4 flex items-center gap-3">
             <div className="size-10 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold">
               <CreditCard className="size-5" />
+              <Banknote className="size-5" />
             </div>
             <div>
               <p className="text-xs text-muted-foreground">Course Fee</p>

@@ -8,7 +8,7 @@ import {
   UserPlus,
   Users,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -36,7 +36,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useBatchStudents, useRemoveStudentFromBatchMutation } from "@/hooks";
+import {
+  useBatchStudents,
+  useDebounce,
+  useRemoveStudentFromBatchMutation,
+} from "@/hooks";
 
 import type { BatchEnrollment } from "@/types";
 import { StudentPagination } from "../students/student-pagination";
@@ -54,14 +58,23 @@ export function BatchStudentRoster({
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [search, setSearch] = useState("");
+  const debouncedSearch = useDebounce(search, 500);
   const [isDirectEnrollOpen, setIsDirectEnrollOpen] = useState(false);
   const [enrollmentToRemove, setEnrollmentToRemove] =
     useState<BatchEnrollment | null>(null);
 
+  const prevSearchRef = useRef(debouncedSearch);
+  useEffect(() => {
+    if (prevSearchRef.current !== debouncedSearch) {
+      prevSearchRef.current = debouncedSearch;
+      setPage(1);
+    }
+  }, [debouncedSearch]);
+
   const { data, isLoading } = useBatchStudents(batchId, {
     page,
     limit,
-    search: search.trim() || undefined,
+    search: debouncedSearch.trim() || undefined,
   });
 
   const removeMutation = useRemoveStudentFromBatchMutation();

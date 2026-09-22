@@ -22,12 +22,13 @@ import { siteConfig } from "@/config/site";
 import {
   ADMIN_NAV_GROUPS,
   type DashboardNavGroup,
+  STUDENT_NAV_GROUPS,
   TEACHER_NAV_GROUPS,
 } from "@/constants";
 import { useAuth } from "@/hooks";
 
 interface DashboardSidebarProps {
-  portalRole: "ADMIN" | "TEACHER";
+  portalRole: "ADMIN" | "TEACHER" | "STUDENT";
   className?: string;
 }
 
@@ -39,10 +40,18 @@ export default function DashboardSidebar({
   const { user, hasPermission, logout, isLoggingOut } = useAuth();
 
   const navGroups: readonly DashboardNavGroup[] =
-    portalRole === "ADMIN" ? ADMIN_NAV_GROUPS : TEACHER_NAV_GROUPS;
+    portalRole === "ADMIN"
+      ? ADMIN_NAV_GROUPS
+      : portalRole === "TEACHER"
+        ? TEACHER_NAV_GROUPS
+        : STUDENT_NAV_GROUPS;
 
   const roleLabel =
-    portalRole === "ADMIN" ? "Admin Portal" : "Teacher Workspace";
+    portalRole === "ADMIN"
+      ? "Admin Portal"
+      : portalRole === "TEACHER"
+        ? "Teacher Workspace"
+        : "Student Portal";
 
   const checkIsActive = (href: string, exact?: boolean): boolean => {
     if (!pathname) return false;

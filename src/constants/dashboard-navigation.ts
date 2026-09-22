@@ -1,7 +1,6 @@
 import type { LucideIcon } from "lucide-react";
 import {
   CalendarDays,
-  CreditCard,
   GraduationCap,
   Layers,
   LayoutDashboard,
@@ -81,11 +80,6 @@ export const ADMIN_NAV_GROUPS: readonly DashboardNavGroup[] = [
         href: "/dashboard/admin/teachers",
         icon: ShieldCheck,
       },
-      {
-        title: "Fee & Payments",
-        href: "/dashboard/admin/payments",
-        icon: CreditCard,
-      },
     ],
   },
   {
@@ -156,6 +150,59 @@ export const TEACHER_NAV_GROUPS: readonly DashboardNavGroup[] = [
         title: "Settings",
         href: "/dashboard/teacher/settings",
         icon: Settings,
+      },
+    ],
+  },
+] as const;
+
+/**
+ * Student Portal Navigation Structure
+ * High-accessibility, touch-friendly academic, routine, and attendance overview
+ */
+export const STUDENT_NAV_GROUPS: readonly DashboardNavGroup[] = [
+  {
+    label: "Overview",
+    items: [
+      {
+        title: "Dashboard",
+        href: "/dashboard/student",
+        icon: LayoutDashboard,
+        exact: true,
+      },
+    ],
+  },
+  {
+    label: "Academic",
+    items: [
+      {
+        title: "My Batches",
+        href: "/dashboard/student/batches",
+        icon: Layers,
+      },
+      {
+        title: "Class Routine",
+        href: "/dashboard/student/routines",
+        icon: CalendarDays,
+      },
+      {
+        title: "My Attendance",
+        href: "/dashboard/student/attendance",
+        icon: UserCheck,
+      },
+      {
+        title: "Exams & Results",
+        href: "/dashboard/student/exams",
+        icon: GraduationCap,
+      },
+    ],
+  },
+  {
+    label: "Account",
+    items: [
+      {
+        title: "Student Profile",
+        href: "/dashboard/student/profile",
+        icon: UserCircle,
       },
     ],
   },

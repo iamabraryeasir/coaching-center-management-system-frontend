@@ -1,7 +1,7 @@
 "use client";
 
-import { Check, Loader2, Search, UserPlus } from "lucide-react";
-import { useState } from "react";
+import { Check, CheckCircle2, Loader2, Search, UserPlus } from "lucide-react";
+import { useMemo, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,7 +15,12 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useDirectEnrollStudentMutation, useStudents } from "@/hooks";
+import {
+  useBatchStudents,
+  useDebounce,
+  useDirectEnrollStudentMutation,
+  useStudents,
+} from "@/hooks";
 import type { User } from "@/types";
 
 interface DirectEnrollDialogProps {
@@ -38,37 +43,63 @@ export function DirectEnrollDialog({
   const setIsOpen = setControlledOpen || setInternalOpen;
 
   const [search, setSearch] = useState("");
+  const debouncedSearch = useDebounce(search, 500);
   const [selectedStudent, setSelectedStudent] = useState<User | null>(null);
 
-  // Search active students
-  const { data, isLoading } = useStudents({
-    search: search.trim() || undefined,
+  // 1. Fetch current batch roster to identify already-enrolled students
+  const { data: rosterResponse, isLoading: isLoadingRoster } = useBatchStudents(
+    batchId,
+    { limit: 200 },
+  );
+
+  const enrolledStudentIds = useMemo(() => {
+    const set = new Set<string>();
+    const roster = rosterResponse?.data || [];
+    for (const enrollment of roster) {
+      if (enrollment.studentId) set.add(enrollment.studentId);
+      if (enrollment.userId) set.add(enrollment.userId);
+      if (enrollment.student?.id) set.add(enrollment.student.id);
+      if (enrollment.user?.id) set.add(enrollment.user.id);
+    }
+    return set;
+  }, [rosterResponse]);
+
+  // 2. Search active students
+  const { data, isLoading: isLoadingStudents } = useStudents({
+    search: debouncedSearch.trim() || undefined,
     status: "ACTIVE",
-    limit: 8,
+    limit: 12,
   });
 
   const enrollMutation = useDirectEnrollStudentMutation();
   const students = data?.data || [];
 
   const handleEnroll = async () => {
-    if (!selectedStudent) return;
-    await enrollMutation.mutateAsync(
-      {
-        batchId,
-        studentId: selectedStudent.id,
-        payload: {
+    if (!selectedStudent || enrolledStudentIds.has(selectedStudent.id)) return;
+
+    try {
+      await enrollMutation.mutateAsync(
+        {
+          batchId,
           studentId: selectedStudent.id,
+          payload: {
+            studentId: selectedStudent.id,
+          },
         },
-      },
-      {
-        onSuccess: () => {
-          setSelectedStudent(null);
-          setSearch("");
-          setIsOpen(false);
+        {
+          onSuccess: () => {
+            setSelectedStudent(null);
+            setSearch("");
+            setIsOpen(false);
+          },
         },
-      },
-    );
+      );
+    } catch {
+      // Handled gracefully via mutation's onError toast
+    }
   };
+
+  const isLoading = isLoadingStudents || isLoadingRoster;
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -131,6 +162,7 @@ export function DirectEnrollDialog({
 
             {!isLoading &&
               students.map((student) => {
+                const isAlreadyEnrolled = enrolledStudentIds.has(student.id);
                 const isSelected = selectedStudent?.id === student.id;
                 const profile = student.studentProfile;
 
@@ -138,10 +170,17 @@ export function DirectEnrollDialog({
                   <button
                     key={student.id}
                     type="button"
-                    onClick={() => setSelectedStudent(student)}
-                    className={`w-full text-left p-3 transition-colors flex items-center justify-between gap-3 hover:bg-muted/40 ${
-                      isSelected ? "bg-primary/5 border-l-2 border-primary" : ""
-                    }`}
+                    disabled={isAlreadyEnrolled}
+                    onClick={() => {
+                      if (!isAlreadyEnrolled) {
+                        setSelectedStudent(student);
+                      }
+                    }}
+                    className={`w-full text-left p-3 transition-colors flex items-center justify-between gap-3 ${
+                      isAlreadyEnrolled
+                        ? "bg-muted/30 opacity-60 cursor-not-allowed"
+                        : "hover:bg-muted/40 cursor-pointer"
+                    } ${isSelected ? "bg-primary/5 border-l-2 border-primary" : ""}`}
                   >
                     <div className="flex items-center gap-2.5 min-w-0">
                       <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary font-bold text-xs">
@@ -150,9 +189,16 @@ export function DirectEnrollDialog({
                           : "S"}
                       </div>
                       <div className="min-w-0">
-                        <p className="text-xs font-semibold text-foreground truncate">
-                          {student.name}
-                        </p>
+                        <div className="flex items-center gap-1.5">
+                          <p className="text-xs font-semibold text-foreground truncate">
+                            {student.name}
+                          </p>
+                          {isAlreadyEnrolled && (
+                            <span className="text-[10px] text-muted-foreground font-medium">
+                              (Already enrolled)
+                            </span>
+                          )}
+                        </div>
                         <div className="flex items-center gap-2 text-[11px] text-muted-foreground truncate">
                           <span className="truncate">{student.email}</span>
                           {profile?.rollNumber && (
@@ -165,7 +211,15 @@ export function DirectEnrollDialog({
                     </div>
 
                     <div className="shrink-0">
-                      {isSelected ? (
+                      {isAlreadyEnrolled ? (
+                        <Badge
+                          variant="outline"
+                          className="text-[10px] border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 gap-1"
+                        >
+                          <CheckCircle2 className="size-3" />
+                          <span>Enrolled</span>
+                        </Badge>
+                      ) : isSelected ? (
                         <div className="flex size-6 items-center justify-center rounded-full bg-primary text-primary-foreground">
                           <Check className="size-3.5" />
                         </div>
@@ -224,7 +278,11 @@ export function DirectEnrollDialog({
             type="button"
             size="sm"
             onClick={handleEnroll}
-            disabled={!selectedStudent || enrollMutation.isPending}
+            disabled={
+              !selectedStudent ||
+              enrolledStudentIds.has(selectedStudent.id) ||
+              enrollMutation.isPending
+            }
           >
             {enrollMutation.isPending ? (
               <>
