@@ -120,3 +120,13 @@ export const institutionKeys = {
   all: ["institution"] as const,
   profile: () => [...institutionKeys.all, "profile"] as const,
 } as const;
+
+export const auditLogKeys = {
+  all: ["audit-logs"] as const,
+  lists: () => [...auditLogKeys.all, "list"] as const,
+  list: (params?: Record<string, unknown>) =>
+    [...auditLogKeys.lists(), params] as const,
+  stats: () => [...auditLogKeys.all, "stats"] as const,
+  details: () => [...auditLogKeys.all, "detail"] as const,
+  detail: (id: string) => [...auditLogKeys.details(), id] as const,
+} as const;

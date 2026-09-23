@@ -1,5 +1,6 @@
 export * from "./api-type";
 export * from "./attendance";
+export * from "./audit-log-type";
 export * from "./auth-type";
 export * from "./batch-type";
 export * from "./exam";

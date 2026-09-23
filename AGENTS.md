@@ -385,6 +385,16 @@ flowchart TD
 - Use path aliases `@/*` pointing to `src/*`.
 - Biome is the sole linter and formatter. Never add ESLint or Prettier config files.
 
+### 5.7 React 19 & Next.js 16 Suspense-First Loading Architecture
+
+- **Zero Manual `if (isLoading)` / `isPending` Branching**: Never litter presentation components with manual loading guards (`if (isLoading) return <Skeleton />`) or ternary inline skeleton switches (`{isLoading ? <SkeletonRows /> : rows.map(...)}`).
+- **Declarative `<Suspense>` Boundaries**:
+  - Always delegate asynchronous loading states to React `<Suspense fallback={<FeatureSkeleton />}>` or Next.js route-level `loading.tsx`.
+  - Use TanStack Query Suspense hooks (`useSuspenseQuery`) or wrap async feature slices with explicit `<Suspense>` boundaries.
+  - Presentation components must expect data to be ready (non-null/defined) and focus solely on rendering business UI.
+  - Skeletons must be extracted into dedicated, reusable fallback components (e.g. `FeatureSkeleton`, `FeatureTableSkeleton`, `FeatureStatsSkeleton`) and supplied strictly to `<Suspense fallback={...}>`.
+- **Transitions over Spinners**: When updating filters, tabs, or pagination, use React 19 `useTransition` or TanStack Query `placeholderData` so existing UI remains visible and responsive without jarring layout shifts or ad-hoc loading spinners.
+
 ---
 
 ## 6. Mandatory Post-Task Code Quality Pipeline
