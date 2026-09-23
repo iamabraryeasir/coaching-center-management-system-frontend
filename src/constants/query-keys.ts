@@ -115,3 +115,8 @@ export const paymentKeys = {
   transactionDetail: (id: string) =>
     [...paymentKeys.all, "transaction", id] as const,
 } as const;
+
+export const institutionKeys = {
+  all: ["institution"] as const,
+  profile: () => [...institutionKeys.all, "profile"] as const,
+} as const;
