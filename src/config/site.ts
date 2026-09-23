@@ -24,6 +24,14 @@ export const siteConfig = {
 
   // Support & Contact
   supportEmail: process.env.NEXT_PUBLIC_SUPPORT_EMAIL || "support@coaching.com",
+  supportPhone: process.env.NEXT_PUBLIC_SUPPORT_PHONE || "+880 1700-000000",
+  campusAddress:
+    process.env.NEXT_PUBLIC_CAMPUS_ADDRESS ||
+    "Chattagram Central Campus, Academic Avenue, Bangladesh",
+
+  // Operational Defaults
+  defaultCurrency: process.env.NEXT_PUBLIC_CURRENCY || "BDT (৳)",
+  academicYear: process.env.NEXT_PUBLIC_ACADEMIC_YEAR || "2026-2027",
 } as const;
 
 export type SiteConfig = typeof siteConfig;
