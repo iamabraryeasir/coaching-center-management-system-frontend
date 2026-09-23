@@ -16,7 +16,6 @@ Designed for high-concurrency environments, multi-branch scalability, white-labe
 ## 🌟 Executive Overview & Business Value
 
 Running a modern coaching center demands synchronization across disparate operational domains: student admissions, teacher scheduling, batch enrollments, daily physical presence verification, exam grading, merit list publishing, and monthly fee collections.
-Running a modern coaching center demands synchronization across core academic and administrative operations: student admissions, teacher scheduling, batch enrollments, daily physical presence verification, exam grading, and merit list publishing.
 
 This application provides a unified, real-time command center for administrators, teachers, and students with zero latency, accessible interfaces, and deterministic state synchronization.
 
@@ -33,7 +32,6 @@ flowchart TD
         AuthModule["🔐 Auth & Session Engine (HttpOnly + Silent Refresh)"]
 
         subgraph Operations["Academic & Financial Modules"]
-        subgraph Operations["Academic & Administrative Modules"]
             Admissions["📋 Admissions & Student Lifecycle"]
             Staff["🛡️ Teacher Delegation & Attendance"]
             Batches["📚 Batches & Enrollment Workflow"]
@@ -175,7 +173,6 @@ flowchart TD
 | **Manual Cash Payment Collection**   |   Full Access    |     No Access     |         No Access         |    No Access    |
 | **Online Stripe Tuition Payment**    |    No Access     |     No Access     |         No Access         |  Self Checkout  |
 | **Download PDF Receipts / Reports**  |   Full Access    |   Batch Reports   |       Batch Reports       |  Personal Only  |
-| **Download PDF Reports / Schedules** |   Full Access    |   Batch Reports   |       Batch Reports       |  Personal Only  |
 
 ---
 

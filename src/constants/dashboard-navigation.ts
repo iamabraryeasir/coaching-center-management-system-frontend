@@ -1,6 +1,7 @@
 import type { LucideIcon } from "lucide-react";
 import {
   CalendarDays,
+  CreditCard,
   GraduationCap,
   Layers,
   LayoutDashboard,
@@ -64,6 +65,16 @@ export const ADMIN_NAV_GROUPS: readonly DashboardNavGroup[] = [
         title: "Exams & Results",
         href: "/dashboard/admin/exams",
         icon: GraduationCap,
+      },
+    ],
+  },
+  {
+    label: "Financial Management",
+    items: [
+      {
+        title: "Fee & Payments",
+        href: "/dashboard/admin/payments",
+        icon: CreditCard,
       },
     ],
   },
@@ -193,6 +204,16 @@ export const STUDENT_NAV_GROUPS: readonly DashboardNavGroup[] = [
         title: "Exams & Results",
         href: "/dashboard/student/exams",
         icon: GraduationCap,
+      },
+    ],
+  },
+  {
+    label: "Financial",
+    items: [
+      {
+        title: "Fees & Payments",
+        href: "/dashboard/student/payments",
+        icon: CreditCard,
       },
     ],
   },

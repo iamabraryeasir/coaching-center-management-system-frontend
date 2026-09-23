@@ -3,6 +3,7 @@
 import {
   ArrowRight,
   CalendarDays,
+  CreditCard,
   GraduationCap,
   Layers,
   Sparkles,
@@ -60,8 +61,8 @@ export default function StudentDashboardPage() {
         </div>
       </div>
 
-      {/* 2. Academic Action & Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* 2. Academic & Billing Action Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
         {/* Enrolled Batches */}
         <Link
           href="/dashboard/student/batches"
@@ -146,6 +147,28 @@ export default function StudentDashboardPage() {
           </p>
           <span className="text-[11px] text-muted-foreground flex items-center gap-1 pt-1">
             <span>View grades & ranks</span>
+            <ArrowRight className="size-3 transition-transform group-hover:translate-x-0.5" />
+          </span>
+        </Link>
+
+        {/* Fees & Payments */}
+        <Link
+          href="/dashboard/student/payments"
+          className="group rounded-xl border border-border/80 bg-card p-4 shadow-2xs space-y-2 transition-all hover:border-primary/40 hover:shadow-xs"
+        >
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-muted-foreground font-medium">
+              Fees & Payments
+            </span>
+            <div className="size-8 rounded-lg bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+              <CreditCard className="size-4" />
+            </div>
+          </div>
+          <p className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">
+            Tuition & Receipts
+          </p>
+          <span className="text-[11px] text-muted-foreground flex items-center gap-1 pt-1">
+            <span>Online Stripe Checkout</span>
             <ArrowRight className="size-3 transition-transform group-hover:translate-x-0.5" />
           </span>
         </Link>
