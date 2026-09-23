@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  Camera,
   Eye,
   MoreHorizontal,
   ShieldAlert,
@@ -9,6 +10,8 @@ import {
   User as UserIcon,
 } from "lucide-react";
 import { useState } from "react";
+import { UserAvatarUploadDialog } from "@/components/modules/media";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -54,6 +57,7 @@ export function StudentTable({
   onViewDetails,
 }: StudentTableProps) {
   const [studentToDelete, setStudentToDelete] = useState<User | null>(null);
+  const [avatarStudent, setAvatarStudent] = useState<User | null>(null);
 
   const updateStatusMutation = useUpdateStudentStatusMutation();
   const deleteMutation = useDeleteStudentMutation();
@@ -181,9 +185,15 @@ export function StudentTable({
                       {/* Student Column */}
                       <TableCell>
                         <div className="flex items-center gap-3">
-                          <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary/10 font-bold text-primary text-xs shadow-2xs">
-                            {initials}
-                          </div>
+                          <Avatar className="size-9 ring-1 ring-border/50 shrink-0">
+                            <AvatarImage
+                              src={student.avatarUrl || undefined}
+                              alt={student.name}
+                            />
+                            <AvatarFallback className="bg-primary/10 font-bold text-primary text-xs">
+                              {initials}
+                            </AvatarFallback>
+                          </Avatar>
                           <div className="flex flex-col truncate">
                             <span className="font-semibold text-sm text-foreground truncate">
                               {student.name}
@@ -270,6 +280,14 @@ export function StudentTable({
                             </DropdownMenuItem>
 
                             <DropdownMenuItem
+                              onClick={() => setAvatarStudent(student)}
+                              className="gap-2 text-xs"
+                            >
+                              <Camera className="size-3.5 text-primary" />
+                              <span>Change Avatar</span>
+                            </DropdownMenuItem>
+
+                            <DropdownMenuItem
                               onClick={() => handleStatusToggle(student)}
                               className="gap-2 text-xs"
                             >
@@ -340,6 +358,15 @@ export function StudentTable({
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* User Avatar Upload Modal */}
+      <UserAvatarUploadDialog
+        user={avatarStudent}
+        open={Boolean(avatarStudent)}
+        onOpenChange={(open) => {
+          if (!open) setAvatarStudent(null);
+        }}
+      />
     </>
   );
 }

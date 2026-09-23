@@ -2,6 +2,7 @@
 
 import {
   Calendar,
+  Camera,
   Edit2,
   Eye,
   KeyRound,
@@ -13,6 +14,8 @@ import {
   Users,
 } from "lucide-react";
 import { useState } from "react";
+import { UserAvatarUploadDialog } from "@/components/modules/media";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -73,6 +76,7 @@ export function TeacherTable({
   onCreateTeacher,
 }: TeacherTableProps) {
   const [teacherToDelete, setTeacherToDelete] = useState<User | null>(null);
+  const [avatarTeacher, setAvatarTeacher] = useState<User | null>(null);
 
   const updateStatusMutation = useUpdateTeacherStatusMutation();
   const deleteMutation = useDeleteTeacherMutation();
@@ -211,9 +215,15 @@ export function TeacherTable({
                       {/* Teacher Column */}
                       <TableCell>
                         <div className="flex items-center gap-3">
-                          <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary/10 font-bold text-primary text-xs shadow-2xs">
-                            {initials}
-                          </div>
+                          <Avatar className="size-9 ring-1 ring-border/50 shrink-0">
+                            <AvatarImage
+                              src={teacher.avatarUrl || undefined}
+                              alt={teacher.name}
+                            />
+                            <AvatarFallback className="bg-primary/10 font-bold text-primary text-xs">
+                              {initials}
+                            </AvatarFallback>
+                          </Avatar>
                           <div className="flex flex-col truncate">
                             <span className="font-semibold text-sm text-foreground truncate">
                               {teacher.name}
@@ -306,6 +316,14 @@ export function TeacherTable({
                             >
                               <KeyRound className="size-3.5 text-primary" />
                               <span>Manage Permissions</span>
+                            </DropdownMenuItem>
+
+                            <DropdownMenuItem
+                              onClick={() => setAvatarTeacher(teacher)}
+                              className="gap-2 text-xs cursor-pointer"
+                            >
+                              <Camera className="size-3.5 text-primary" />
+                              <span>Change Avatar</span>
                             </DropdownMenuItem>
 
                             <DropdownMenuItem
@@ -412,6 +430,15 @@ export function TeacherTable({
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Teacher Avatar Upload Modal */}
+      <UserAvatarUploadDialog
+        user={avatarTeacher}
+        open={Boolean(avatarTeacher)}
+        onOpenChange={(open) => {
+          if (!open) setAvatarTeacher(null);
+        }}
+      />
     </>
   );
 }

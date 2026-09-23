@@ -130,3 +130,9 @@ export const auditLogKeys = {
   details: () => [...auditLogKeys.all, "detail"] as const,
   detail: (id: string) => [...auditLogKeys.details(), id] as const,
 } as const;
+
+export const mediaKeys = {
+  all: ["media"] as const,
+  avatar: (userId?: string) => [...mediaKeys.all, "avatar", userId] as const,
+  myAvatar: () => [...mediaKeys.all, "my-avatar"] as const,
+} as const;

@@ -3,6 +3,7 @@
 import {
   Building2,
   Calendar,
+  Camera,
   GraduationCap,
   Hash,
   Mail,
@@ -12,6 +13,9 @@ import {
   User as UserIcon,
   Users,
 } from "lucide-react";
+import { useState } from "react";
+import { UserAvatarUploadDialog } from "@/components/modules/media";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -37,6 +41,7 @@ export function StudentDetailsModal({
   open,
   onOpenChange,
 }: StudentDetailsModalProps) {
+  const [isAvatarDialogOpen, setIsAvatarDialogOpen] = useState(false);
   const updateStatusMutation = useUpdateStudentStatusMutation();
 
   if (!student) return null;
@@ -65,8 +70,25 @@ export function StudentDetailsModal({
       <DialogContent className="sm:max-w-xl md:max-w-2xl max-h-[90vh] overflow-y-auto p-6">
         <DialogHeader className="pb-4 border-b border-border/70">
           <div className="flex items-start gap-4">
-            <div className="size-14 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xl ring-2 ring-primary/20 shrink-0">
-              {student.name.charAt(0).toUpperCase()}
+            <div className="relative group/avatar shrink-0">
+              <Avatar className="size-14 ring-2 ring-primary/20 shadow-sm">
+                <AvatarImage
+                  src={student.avatarUrl || undefined}
+                  alt={student.name}
+                />
+                <AvatarFallback className="text-xl font-bold bg-primary/10 text-primary">
+                  {student.name.charAt(0).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+              <button
+                type="button"
+                onClick={() => setIsAvatarDialogOpen(true)}
+                title="Change student avatar"
+                className="absolute -bottom-1 -right-1 size-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-md hover:scale-110 transition-transform cursor-pointer"
+              >
+                <Camera className="size-3" />
+                <span className="sr-only">Change Avatar</span>
+              </button>
             </div>
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2.5 flex-wrap">
@@ -245,6 +267,12 @@ export function StudentDetailsModal({
           />
         </DialogFooter>
       </DialogContent>
+
+      <UserAvatarUploadDialog
+        user={student}
+        open={isAvatarDialogOpen}
+        onOpenChange={setIsAvatarDialogOpen}
+      />
     </Dialog>
   );
 }

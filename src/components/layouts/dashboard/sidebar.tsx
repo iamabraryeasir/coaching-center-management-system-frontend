@@ -4,6 +4,7 @@ import { Loader2, LogOut } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import AppLogo from "@/assets/svg/logo";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Sidebar,
   SidebarContent,
@@ -140,8 +141,16 @@ export default function DashboardSidebar({
         <SidebarMenu>
           <SidebarMenuItem>
             <div className="flex items-center gap-2 p-1 group-data-[collapsible=icon]:justify-center">
-              <div className="relative flex size-8 shrink-0 items-center justify-center rounded-full bg-primary font-bold text-primary-foreground text-xs shadow-xs">
-                {user?.name ? user.name.charAt(0).toUpperCase() : "U"}
+              <div className="relative shrink-0">
+                <Avatar className="size-8 ring-1 ring-sidebar-border shadow-xs">
+                  <AvatarImage
+                    src={user?.avatarUrl || undefined}
+                    alt={user?.name || "User"}
+                  />
+                  <AvatarFallback className="bg-primary font-bold text-primary-foreground text-xs">
+                    {user?.name ? user.name.charAt(0).toUpperCase() : "U"}
+                  </AvatarFallback>
+                </Avatar>
                 <span className="absolute bottom-0 right-0 size-2 rounded-full border border-sidebar bg-emerald-500" />
               </div>
 

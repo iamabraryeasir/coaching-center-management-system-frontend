@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { AdminAvatarCard } from "@/components/modules/media";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -225,6 +226,10 @@ export function AdminSettingsView() {
       </div>
 
       {/* 3. Main Form */}
+      {/* 3. Administrator Personal Avatar Card */}
+      <AdminAvatarCard />
+
+      {/* 4. Main Institution Form */}
       <form
         id="institution-settings-form"
         onSubmit={handleSave}

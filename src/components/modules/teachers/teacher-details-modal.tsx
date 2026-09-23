@@ -3,6 +3,7 @@
 import {
   Award,
   Calendar,
+  Camera,
   CheckCircle2,
   Clock,
   Edit2,
@@ -15,6 +16,9 @@ import {
   User as UserIcon,
   XCircle,
 } from "lucide-react";
+import { useState } from "react";
+import { UserAvatarUploadDialog } from "@/components/modules/media";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -71,6 +75,7 @@ export function TeacherDetailsModal({
   onManagePermissions,
   onEditTeacher,
 }: TeacherDetailsModalProps) {
+  const [isAvatarDialogOpen, setIsAvatarDialogOpen] = useState(false);
   const updateStatusMutation = useUpdateTeacherStatusMutation();
 
   // Fresh profile query
@@ -128,8 +133,25 @@ export function TeacherDetailsModal({
         {/* Modal Header */}
         <DialogHeader className="pb-4 border-b border-border/70">
           <div className="flex items-start gap-4">
-            <div className="size-14 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xl ring-2 ring-primary/20 shrink-0">
-              {initials}
+            <div className="relative group/avatar shrink-0">
+              <Avatar className="size-14 ring-2 ring-primary/20 shadow-sm">
+                <AvatarImage
+                  src={activeTeacher.avatarUrl || undefined}
+                  alt={activeTeacher.name}
+                />
+                <AvatarFallback className="text-xl font-bold bg-primary/10 text-primary">
+                  {initials}
+                </AvatarFallback>
+              </Avatar>
+              <button
+                type="button"
+                onClick={() => setIsAvatarDialogOpen(true)}
+                title="Change teacher avatar"
+                className="absolute -bottom-1 -right-1 size-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-md hover:scale-110 transition-transform cursor-pointer"
+              >
+                <Camera className="size-3" />
+                <span className="sr-only">Change Avatar</span>
+              </button>
             </div>
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2.5 flex-wrap">
@@ -348,6 +370,12 @@ export function TeacherDetailsModal({
           </div>
         </DialogFooter>
       </DialogContent>
+
+      <UserAvatarUploadDialog
+        user={activeTeacher}
+        open={isAvatarDialogOpen}
+        onOpenChange={setIsAvatarDialogOpen}
+      />
     </Dialog>
   );
 }

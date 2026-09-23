@@ -4,6 +4,7 @@ export * from "./auth";
 export * from "./batches";
 export * from "./exam";
 export * from "./institution";
+export * from "./media";
 export * from "./payment";
 export * from "./routines";
 export * from "./students";

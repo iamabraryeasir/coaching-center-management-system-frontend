@@ -5,6 +5,7 @@ export * from "./use-batches";
 export * from "./use-debounce";
 export * from "./use-exams";
 export * from "./use-institution";
+export * from "./use-media";
 export * from "./use-payments";
 export * from "./use-routines";
 export * from "./use-students";

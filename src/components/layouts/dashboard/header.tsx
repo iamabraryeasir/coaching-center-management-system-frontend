@@ -2,6 +2,7 @@
 
 import { Home } from "lucide-react";
 import Link from "next/link";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { buttonVariants } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
@@ -43,10 +44,16 @@ export default function DashboardHeader({
           <span>Home Page</span>
         </Link>
 
-        {/* User Pill */}
+        {/* User Pill with Avatar */}
         {user && (
-          <div className="flex items-center gap-2 rounded border border-border/80 bg-muted/40 py-1 pl-1.5 pr-3 text-xs">
-            <span className="font-medium text-foreground hidden sm:inline truncate">
+          <div className="flex items-center gap-2 rounded-full border border-border/80 bg-muted/40 py-1 pl-1 pr-3 text-xs shadow-2xs">
+            <Avatar className="size-6 ring-1 ring-border/60">
+              <AvatarImage src={user.avatarUrl || undefined} alt={user.name} />
+              <AvatarFallback className="text-[10px] font-bold">
+                {user.name.charAt(0).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+            <span className="font-medium text-foreground hidden sm:inline truncate max-w-32">
               {user.name}
             </span>
             <span className="rounded bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold text-primary">
