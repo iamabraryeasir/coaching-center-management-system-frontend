@@ -3,6 +3,7 @@ export * from "./attendance";
 export * from "./audit-log-type";
 export * from "./auth-type";
 export * from "./batch-type";
+export * from "./dashboard-type";
 export * from "./exam";
 export * from "./institution-type";
 export * from "./payment-type";

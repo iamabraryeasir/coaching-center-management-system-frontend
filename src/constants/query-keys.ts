@@ -136,3 +136,12 @@ export const mediaKeys = {
   avatar: (userId?: string) => [...mediaKeys.all, "avatar", userId] as const,
   myAvatar: () => [...mediaKeys.all, "my-avatar"] as const,
 } as const;
+
+export const dashboardKeys = {
+  all: ["dashboard"] as const,
+  today: () => [...dashboardKeys.all, "today"] as const,
+  monthlySummary: (params?: Record<string, unknown>) =>
+    [...dashboardKeys.all, "monthly-summary", params] as const,
+  revenueTrend: (months?: number) =>
+    [...dashboardKeys.all, "revenue-trend", months] as const,
+} as const;

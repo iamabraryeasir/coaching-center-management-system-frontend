@@ -2,6 +2,7 @@ export * from "./attendance";
 export * from "./audit-logs";
 export * from "./auth";
 export * from "./batches";
+export * from "./dashboard";
 export * from "./exam";
 export * from "./institution";
 export * from "./media";
