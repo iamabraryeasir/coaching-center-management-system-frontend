@@ -1,5 +1,13 @@
 import apiClient from "@/lib/api-client";
-import type { ApiResponse, AuthTokens, LoginResponse, User } from "@/types";
+import type {
+  ApiResponse,
+  AuthTokens,
+  ChangePasswordDto,
+  LoginResponse,
+  UpdateMyProfileDto,
+  User,
+  UserSession,
+} from "@/types";
 import type { LoginInput } from "@/validators";
 
 /**
@@ -52,5 +60,38 @@ export async function logoutAllDevices(): Promise<ApiResponse<null>> {
 export async function refreshToken(): Promise<ApiResponse<AuthTokens>> {
   return await apiClient<ApiResponse<AuthTokens>>("/auth/refresh-token", {
     method: "POST",
+  });
+}
+
+/**
+ * Get all active sessions/devices for the authenticated user
+ */
+export async function getActiveSessions(): Promise<ApiResponse<UserSession[]>> {
+  return await apiClient<ApiResponse<UserSession[]>>("/auth/sessions", {
+    method: "GET",
+  });
+}
+
+/**
+ * Change authenticated user's password
+ */
+export async function changePassword(
+  payload: ChangePasswordDto,
+): Promise<ApiResponse<null>> {
+  return await apiClient<ApiResponse<null>>("/users/change-password", {
+    method: "PATCH",
+    body: payload,
+  });
+}
+
+/**
+ * Update authenticated user's personal profile (name, phone, gender)
+ */
+export async function updateMyProfile(
+  payload: UpdateMyProfileDto,
+): Promise<ApiResponse<User>> {
+  return await apiClient<ApiResponse<User>>("/users/me", {
+    method: "PATCH",
+    body: payload,
   });
 }

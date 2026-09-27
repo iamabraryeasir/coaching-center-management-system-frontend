@@ -9,6 +9,7 @@ export const authKeys = {
   currentUser: () => [...authKeys.all, "currentUser"] as const,
   session: () => [...authKeys.all, "session"] as const,
   profile: () => [...authKeys.all, "profile"] as const,
+  sessions: () => [...authKeys.all, "sessions"] as const,
 } as const;
 
 export const userKeys = {

@@ -77,3 +77,29 @@ export interface LoginResponseData {
 }
 
 export type LoginResponse = ApiResponse<LoginResponseData>;
+
+export interface UserSession {
+  id: string;
+  userId?: string;
+  ipAddress?: string | null;
+  userAgent?: string | null;
+  browser?: string | null;
+  os?: string | null;
+  device?: string | null;
+  isCurrent?: boolean;
+  lastActiveAt?: string | null;
+  createdAt: string;
+  expiresAt?: string;
+}
+
+export interface ChangePasswordDto {
+  currentPassword: string;
+  newPassword: string;
+  confirmPassword?: string;
+}
+
+export interface UpdateMyProfileDto {
+  name?: string;
+  phone?: string | null;
+  gender?: Gender;
+}

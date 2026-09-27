@@ -6,6 +6,7 @@ import {
   CheckCircle2,
   DollarSign,
   GraduationCap,
+  KeyRound,
   Layers,
   Loader2,
   Mail,
@@ -16,17 +17,24 @@ import {
   Settings,
   ShieldCheck,
   UserCheck,
+  User as UserIcon,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+
 import { AdminAvatarCard } from "@/components/modules/media";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { siteConfig } from "@/config/site";
 import { useInstitutionProfile, useUpdateInstitutionMutation } from "@/hooks";
 import { updateInstitutionSchema } from "@/validators";
+
+import { ActiveSessionsCard } from "./active-sessions-card";
+import { AdminProfileCard } from "./admin-profile-card";
+import { ChangePasswordCard } from "./change-password-card";
 
 function getErrorMessage(error: unknown): string {
   if (!error) return "";
@@ -146,49 +154,15 @@ export function AdminSettingsView() {
         <div className="space-y-1">
           <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-primary/10 border border-primary/20 text-xs font-semibold text-primary">
             <Settings className="size-3" />
-            <span>Institution Administration</span>
+            <span>Settings & Security</span>
           </div>
           <h1 className="text-2xl font-bold tracking-tight text-foreground font-heading">
-            Institution Settings
+            Admin Settings
           </h1>
           <p className="text-xs text-muted-foreground">
-            Manage your coaching center branding, campus contact details, and
-            administrative profile.
+            Manage your coaching center branding, campus profile, account
+            credentials, and active sessions.
           </p>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={handleReset}
-            disabled={updateMutation.isPending}
-            className="gap-1.5 text-xs font-medium"
-          >
-            <RotateCcw className="size-3.5" />
-            <span>Reset</span>
-          </Button>
-
-          <Button
-            type="submit"
-            form="institution-settings-form"
-            size="sm"
-            disabled={updateMutation.isPending}
-            className="gap-1.5 text-xs font-semibold"
-          >
-            {updateMutation.isPending ? (
-              <>
-                <Loader2 className="size-3.5 animate-spin" />
-                <span>Saving...</span>
-              </>
-            ) : (
-              <>
-                <Save className="size-3.5" />
-                <span>Save Changes</span>
-              </>
-            )}
-          </Button>
         </div>
       </div>
 
@@ -225,212 +199,274 @@ export function AdminSettingsView() {
         </div>
       </div>
 
-      {/* 3. Main Form */}
-      {/* 3. Administrator Personal Avatar Card */}
-      <AdminAvatarCard />
+      {/* 3. Settings Navigation Tabs */}
+      <Tabs defaultValue="institution" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-3 max-w-md">
+          <TabsTrigger value="institution" className="gap-1.5 text-xs">
+            <Building2 className="size-3.5" />
+            <span>Institution</span>
+          </TabsTrigger>
+          <TabsTrigger value="account" className="gap-1.5 text-xs">
+            <UserIcon className="size-3.5" />
+            <span>My Profile</span>
+          </TabsTrigger>
+          <TabsTrigger value="security" className="gap-1.5 text-xs">
+            <KeyRound className="size-3.5" />
+            <span>Security</span>
+          </TabsTrigger>
+        </TabsList>
 
-      {/* 4. Main Institution Form */}
-      <form
-        id="institution-settings-form"
-        onSubmit={handleSave}
-        className="space-y-6"
-      >
-        <Card className="p-6 bg-card border-border/80 shadow-2xs space-y-6">
-          {/* Brand & Identity */}
-          <div>
-            <div className="flex items-center justify-between border-b border-border/60 pb-2 mb-4">
-              <h2 className="text-sm font-semibold text-foreground flex items-center gap-2">
-                <Building2 className="size-4 text-primary" />
-                <span>Brand & Identity</span>
-              </h2>
-              <span className="text-[11px] text-muted-foreground flex items-center gap-1">
-                <CheckCircle2 className="size-3 text-emerald-500" />
-                <span>Live Database Sync</span>
-              </span>
-            </div>
-
-            <div className="flex items-center gap-4 mb-5">
-              <div className="size-14 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center font-bold text-primary font-heading text-xl shrink-0">
-                {(institutionName || siteConfig.shortName)
-                  .slice(0, 2)
-                  .toUpperCase()}
-              </div>
+        {/* Tab 1: Institution Branding & Campus */}
+        <TabsContent value="institution" className="space-y-6">
+          <form
+            id="institution-settings-form"
+            onSubmit={handleSave}
+            className="space-y-6"
+          >
+            <Card className="p-6 bg-card border-border/80 shadow-2xs space-y-6">
+              {/* Brand & Identity */}
               <div>
-                <p className="text-sm font-bold text-foreground">
-                  {institutionName || siteConfig.name}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  {siteConfig.shortName} • {siteConfig.defaultCurrency}
-                </p>
-              </div>
-            </div>
+                <div className="flex items-center justify-between border-b border-border/60 pb-2 mb-4">
+                  <h2 className="text-sm font-semibold text-foreground flex items-center gap-2">
+                    <Building2 className="size-4 text-primary" />
+                    <span>Brand & Identity</span>
+                  </h2>
+                  <span className="text-[11px] text-muted-foreground flex items-center gap-1">
+                    <CheckCircle2 className="size-3 text-emerald-500" />
+                    <span>Live Database Sync</span>
+                  </span>
+                </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-1.5 sm:col-span-2">
-                <Label className="text-xs font-medium text-foreground">
-                  Institution Name <span className="text-rose-500">*</span>
-                </Label>
-                <Input
-                  required
-                  value={institutionName}
-                  onChange={(e) => setInstitutionName(e.target.value)}
-                  placeholder="e.g. Radiant Way Coaching Home"
-                  className="h-9 text-xs"
-                />
-              </div>
+                <div className="flex items-center gap-4 mb-5">
+                  <div className="size-14 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center font-bold text-primary font-heading text-xl shrink-0">
+                    {(institutionName || siteConfig.shortName)
+                      .slice(0, 2)
+                      .toUpperCase()}
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-foreground">
+                      {institutionName || siteConfig.name}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {siteConfig.shortName} • {siteConfig.defaultCurrency}
+                    </p>
+                  </div>
+                </div>
 
-              <div className="space-y-1.5 sm:col-span-2">
-                <Label className="text-xs font-medium text-foreground">
-                  Official Tagline / Slogan
-                </Label>
-                <Input
-                  value={tagline}
-                  onChange={(e) => setTagline(e.target.value)}
-                  placeholder="e.g. Nurturing academic excellence since 2018"
-                  className="h-9 text-xs"
-                />
-              </div>
-            </div>
-          </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-1.5 sm:col-span-2">
+                    <Label className="text-xs font-medium text-foreground">
+                      Institution Name <span className="text-rose-500">*</span>
+                    </Label>
+                    <Input
+                      required
+                      value={institutionName}
+                      onChange={(e) => setInstitutionName(e.target.value)}
+                      placeholder="e.g. Radiant Way Coaching Home"
+                      className="h-9 text-xs"
+                    />
+                  </div>
 
-          {/* Campus Location & Contact */}
-          <div>
-            <h2 className="text-sm font-semibold text-foreground border-b border-border/60 pb-2 mb-4 flex items-center gap-2">
-              <MapPin className="size-4 text-primary" />
-              <span>Campus Location & Contact</span>
-            </h2>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <Label className="text-xs font-medium text-foreground">
-                  Official Contact Email{" "}
-                  <span className="text-rose-500">*</span>
-                </Label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
-                  <Input
-                    required
-                    type="email"
-                    value={institutionEmail}
-                    onChange={(e) => setInstitutionEmail(e.target.value)}
-                    placeholder="info@institution.edu.bd"
-                    className="pl-8.5 h-9 text-xs"
-                  />
+                  <div className="space-y-1.5 sm:col-span-2">
+                    <Label className="text-xs font-medium text-foreground">
+                      Official Tagline / Slogan
+                    </Label>
+                    <Input
+                      value={tagline}
+                      onChange={(e) => setTagline(e.target.value)}
+                      placeholder="e.g. Nurturing academic excellence since 2018"
+                      className="h-9 text-xs"
+                    />
+                  </div>
                 </div>
               </div>
 
-              <div className="space-y-1.5">
-                <Label className="text-xs font-medium text-foreground">
-                  Official Contact Phone{" "}
-                  <span className="text-rose-500">*</span>
-                </Label>
-                <div className="relative">
-                  <Phone className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
-                  <Input
-                    required
-                    value={institutionPhone}
-                    onChange={(e) => setInstitutionPhone(e.target.value)}
-                    placeholder="+880 1700-000000"
-                    className="pl-8.5 h-9 text-xs"
-                  />
+              {/* Campus Location & Contact */}
+              <div>
+                <h2 className="text-sm font-semibold text-foreground border-b border-border/60 pb-2 mb-4 flex items-center gap-2">
+                  <MapPin className="size-4 text-primary" />
+                  <span>Campus Location & Contact</span>
+                </h2>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-medium text-foreground">
+                      Official Contact Email{" "}
+                      <span className="text-rose-500">*</span>
+                    </Label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
+                      <Input
+                        required
+                        type="email"
+                        value={institutionEmail}
+                        onChange={(e) => setInstitutionEmail(e.target.value)}
+                        placeholder="info@institution.edu.bd"
+                        className="pl-8.5 h-9 text-xs"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-medium text-foreground">
+                      Official Contact Phone{" "}
+                      <span className="text-rose-500">*</span>
+                    </Label>
+                    <div className="relative">
+                      <Phone className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
+                      <Input
+                        required
+                        value={institutionPhone}
+                        onChange={(e) => setInstitutionPhone(e.target.value)}
+                        placeholder="+880 1700-000000"
+                        className="pl-8.5 h-9 text-xs"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5 sm:col-span-2">
+                    <Label className="text-xs font-medium text-foreground">
+                      Physical Campus Address{" "}
+                      <span className="text-rose-500">*</span>
+                    </Label>
+                    <div className="relative">
+                      <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
+                      <Input
+                        required
+                        value={institutionAddress}
+                        onChange={(e) => setInstitutionAddress(e.target.value)}
+                        placeholder="Ambagan, Khulshi, Chattagram"
+                        className="pl-8.5 h-9 text-xs"
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              <div className="space-y-1.5 sm:col-span-2">
-                <Label className="text-xs font-medium text-foreground">
-                  Physical Campus Address{" "}
-                  <span className="text-rose-500">*</span>
-                </Label>
-                <div className="relative">
-                  <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
-                  <Input
-                    required
-                    value={institutionAddress}
-                    onChange={(e) => setInstitutionAddress(e.target.value)}
-                    placeholder="Ambagan, Khulshi, Chattagram"
-                    className="pl-8.5 h-9 text-xs"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
+              {/* Administrative In-Charge Profile */}
+              <div>
+                <h2 className="text-sm font-semibold text-foreground border-b border-border/60 pb-2 mb-4 flex items-center gap-2">
+                  <ShieldCheck className="size-4 text-primary" />
+                  <span>Administrative Contact In-Charge</span>
+                </h2>
 
-          {/* Administrative In-Charge Profile */}
-          <div>
-            <h2 className="text-sm font-semibold text-foreground border-b border-border/60 pb-2 mb-4 flex items-center gap-2">
-              <ShieldCheck className="size-4 text-primary" />
-              <span>Administrative Contact In-Charge</span>
-            </h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-medium text-foreground">
+                      Admin In-Charge Name
+                    </Label>
+                    <Input
+                      value={adminName}
+                      onChange={(e) => setAdminName(e.target.value)}
+                      placeholder="e.g. Abrar Yeasir"
+                      className="h-9 text-xs"
+                    />
+                  </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <Label className="text-xs font-medium text-foreground">
-                  Admin In-Charge Name
-                </Label>
-                <Input
-                  value={adminName}
-                  onChange={(e) => setAdminName(e.target.value)}
-                  placeholder="e.g. Abrar Yeasir"
-                  className="h-9 text-xs"
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <Label className="text-xs font-medium text-foreground">
-                  Admin In-Charge Phone
-                </Label>
-                <div className="relative">
-                  <Phone className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
-                  <Input
-                    value={adminPhone}
-                    onChange={(e) => setAdminPhone(e.target.value)}
-                    placeholder="e.g. +880 1800-000000"
-                    className="pl-8.5 h-9 text-xs"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Operational Environment Defaults */}
-          <div>
-            <h2 className="text-sm font-semibold text-foreground border-b border-border/60 pb-2 mb-4 flex items-center gap-2">
-              <Calendar className="size-4 text-primary" />
-              <span>System & Currency Standards</span>
-            </h2>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <Label className="text-xs font-medium text-muted-foreground">
-                  Billing Currency
-                </Label>
-                <div className="relative">
-                  <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
-                  <Input
-                    readOnly
-                    value={siteConfig.defaultCurrency}
-                    className="pl-8.5 h-9 text-xs bg-muted/20 cursor-not-allowed"
-                  />
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-medium text-foreground">
+                      Admin In-Charge Phone
+                    </Label>
+                    <div className="relative">
+                      <Phone className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
+                      <Input
+                        value={adminPhone}
+                        onChange={(e) => setAdminPhone(e.target.value)}
+                        placeholder="e.g. +880 1800-000000"
+                        className="pl-8.5 h-9 text-xs"
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              <div className="space-y-1.5">
-                <Label className="text-xs font-medium text-muted-foreground">
-                  Academic Session
-                </Label>
-                <div className="relative">
-                  <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
-                  <Input
-                    readOnly
-                    value={siteConfig.academicYear}
-                    className="pl-8.5 h-9 text-xs bg-muted/20 cursor-not-allowed"
-                  />
+              {/* Operational Environment Defaults */}
+              <div>
+                <h2 className="text-sm font-semibold text-foreground border-b border-border/60 pb-2 mb-4 flex items-center gap-2">
+                  <Calendar className="size-4 text-primary" />
+                  <span>System & Currency Standards</span>
+                </h2>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-medium text-muted-foreground">
+                      Billing Currency
+                    </Label>
+                    <div className="relative">
+                      <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
+                      <Input
+                        readOnly
+                        value={siteConfig.defaultCurrency}
+                        className="pl-8.5 h-9 text-xs bg-muted/20 cursor-not-allowed"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-medium text-muted-foreground">
+                      Academic Session
+                    </Label>
+                    <div className="relative">
+                      <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
+                      <Input
+                        readOnly
+                        value={siteConfig.academicYear}
+                        className="pl-8.5 h-9 text-xs bg-muted/20 cursor-not-allowed"
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          </div>
-        </Card>
-      </form>
+
+              {/* Form Actions Footer */}
+              <div className="border-t border-border/60 pt-4 flex items-center justify-end gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={handleReset}
+                  disabled={updateMutation.isPending}
+                  className="gap-1.5 text-xs font-medium"
+                >
+                  <RotateCcw className="size-3.5" />
+                  <span>Reset</span>
+                </Button>
+
+                <Button
+                  type="submit"
+                  size="sm"
+                  disabled={updateMutation.isPending}
+                  className="gap-1.5 text-xs font-semibold"
+                >
+                  {updateMutation.isPending ? (
+                    <>
+                      <Loader2 className="size-3.5 animate-spin" />
+                      <span>Saving...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Save className="size-3.5" />
+                      <span>Save Changes</span>
+                    </>
+                  )}
+                </Button>
+              </div>
+            </Card>
+          </form>
+        </TabsContent>
+
+        {/* Tab 2: Personal Profile & Avatar */}
+        <TabsContent value="account" className="space-y-6">
+          <AdminAvatarCard />
+          <AdminProfileCard />
+        </TabsContent>
+
+        {/* Tab 3: Security, Password & Active Sessions */}
+        <TabsContent value="security" className="space-y-6">
+          <ChangePasswordCard />
+          <ActiveSessionsCard />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

@@ -4,10 +4,22 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 
-import { getCurrentUser, logoutAllDevices, logoutUser } from "@/api/auth";
+import {
+  changePassword,
+  getActiveSessions,
+  getCurrentUser,
+  logoutAllDevices,
+  logoutUser,
+  updateMyProfile,
+} from "@/api/auth";
 import { authKeys } from "@/constants/query-keys";
 import { authChannel } from "@/lib/auth-channel";
-import type { TeacherPermission, User } from "@/types";
+import type {
+  ChangePasswordDto,
+  TeacherPermission,
+  UpdateMyProfileDto,
+  User,
+} from "@/types";
 
 /**
  * Reusable Production-Grade Auth Hook
@@ -142,3 +154,72 @@ export function useAuth() {
 }
 
 export type UseAuthReturn = ReturnType<typeof useAuth>;
+
+/**
+ * Fetch all active sessions/devices for the authenticated user
+ */
+export function useActiveSessions() {
+  return useQuery({
+    queryKey: authKeys.sessions(),
+    queryFn: async () => {
+      const res = await getActiveSessions();
+      return res.data ?? [];
+    },
+    staleTime: 60 * 1000,
+  });
+}
+
+/**
+ * Mutation to change authenticated user's password
+ */
+export function useChangePasswordMutation() {
+  return useMutation({
+    mutationFn: (data: ChangePasswordDto) => changePassword(data),
+  });
+}
+
+/**
+ * Mutation to update authenticated user's personal profile (name, phone, gender)
+ */
+export function useUpdateMyProfileMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: UpdateMyProfileDto) => updateMyProfile(data),
+    onSuccess: (response) => {
+      if (response.data) {
+        queryClient.setQueryData(authKeys.currentUser(), response.data);
+      }
+      queryClient.invalidateQueries({ queryKey: authKeys.currentUser() });
+    },
+  });
+}
+
+/**
+ * Mutation to log out from all devices and clear sessions
+ */
+export function useLogoutAllMutation() {
+  const queryClient = useQueryClient();
+  const router = useRouter();
+
+  return useMutation({
+    mutationFn: logoutAllDevices,
+    onMutate: async () => {
+      queryClient.setQueryData(authKeys.currentUser(), null);
+      authChannel.postMessage({ type: "LOGOUT" });
+    },
+    onSuccess: () => {
+      queryClient.removeQueries({ queryKey: authKeys.all });
+      toast.success("Logged out from all devices");
+      router.push("/");
+    },
+    onError: (err: unknown) => {
+      const message =
+        err instanceof Error
+          ? err.message
+          : "Failed to logout from all devices";
+      queryClient.removeQueries({ queryKey: authKeys.all });
+      toast.error(message);
+      router.push("/");
+    },
+  });
+}
