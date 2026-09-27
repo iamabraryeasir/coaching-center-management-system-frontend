@@ -1,6 +1,6 @@
 "use client";
 
-import { format } from "date-fns";
+import { format, isToday } from "date-fns";
 import { Banknote, ChevronRight } from "lucide-react";
 import Link from "next/link";
 
@@ -60,15 +60,24 @@ function TransactionRow({ tx }: { tx: TodayRecentTransaction }) {
 
 export function RecentTransactionsCard() {
   const { data: today } = useDashboardToday();
-  const transactions = today.recentTransactions;
+  const todayTransactions = (today.recentTransactions || []).filter((tx) =>
+    isToday(new Date(tx.paidAt)),
+  );
 
   return (
     <div className="rounded-xl border border-border/80 bg-card p-6">
       {/* Header */}
       <div className="mb-4 flex items-center justify-between">
-        <h3 className="font-heading text-base font-semibold text-foreground">
-          Today&apos;s Payments
-        </h3>
+        <div className="flex items-center gap-2">
+          <h3 className="font-heading text-base font-semibold text-foreground">
+            Today&apos;s Payments
+          </h3>
+          {todayTransactions.length > 0 && (
+            <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">
+              {todayTransactions.length}
+            </span>
+          )}
+        </div>
         <Link
           href="/dashboard/admin/payments"
           className="flex items-center gap-0.5 text-xs font-medium text-primary hover:underline"
@@ -79,14 +88,14 @@ export function RecentTransactionsCard() {
       </div>
 
       {/* Transactions list */}
-      {transactions.length === 0 ? (
+      {todayTransactions.length === 0 ? (
         <div className="flex flex-col items-center justify-center gap-2 py-10 text-muted-foreground">
           <Banknote className="size-8 opacity-40" />
           <p className="text-sm">No payments collected today yet.</p>
         </div>
       ) : (
         <div className="divide-y divide-border/50">
-          {transactions.map((tx) => (
+          {todayTransactions.map((tx) => (
             <TransactionRow key={tx.id} tx={tx} />
           ))}
         </div>
