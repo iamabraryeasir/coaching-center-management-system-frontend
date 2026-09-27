@@ -22,9 +22,15 @@ import { CreateBatchDialog } from "./create-batch-dialog";
 
 interface BatchDetailViewProps {
   batchId: string;
+  portalRole?: "ADMIN" | "TEACHER";
 }
 
-export function BatchDetailView({ batchId }: BatchDetailViewProps) {
+export function BatchDetailView({
+  batchId,
+  portalRole = "ADMIN",
+}: BatchDetailViewProps) {
+  const isAdmin = portalRole === "ADMIN";
+  const basePath = `/dashboard/${portalRole.toLowerCase()}/batches`;
   const [isEditOpen, setIsEditOpen] = useState(false);
 
   const { data: batchResponse, isLoading: isBatchLoading } = useBatch(batchId);
@@ -75,7 +81,7 @@ export function BatchDetailView({ batchId }: BatchDetailViewProps) {
           The requested batch does not exist or may have been archived.
         </p>
         <Link
-          href="/dashboard/admin/batches"
+          href={basePath}
           className={cn(
             buttonVariants({ variant: "outline", size: "sm" }),
             "gap-1.5 text-xs inline-flex items-center",
@@ -94,7 +100,7 @@ export function BatchDetailView({ batchId }: BatchDetailViewProps) {
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="space-y-1">
           <Link
-            href="/dashboard/admin/batches"
+            href={basePath}
             className={cn(
               buttonVariants({ variant: "ghost", size: "sm" }),
               "h-8 -ml-2 text-xs text-muted-foreground hover:text-foreground gap-1.5 mb-1 inline-flex items-center",
@@ -115,17 +121,19 @@ export function BatchDetailView({ batchId }: BatchDetailViewProps) {
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setIsEditOpen(true)}
-            className="gap-1.5 text-xs"
-          >
-            <Edit2 className="size-3.5" />
-            <span>Edit Parameters</span>
-          </Button>
-        </div>
+        {isAdmin && (
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setIsEditOpen(true)}
+              className="gap-1.5 text-xs"
+            >
+              <Edit2 className="size-3.5" />
+              <span>Edit Parameters</span>
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* Metrics Cards */}
@@ -193,14 +201,20 @@ export function BatchDetailView({ batchId }: BatchDetailViewProps) {
       </div>
 
       {/* Student Roster */}
-      <BatchStudentRoster batchId={batch.id} batchName={batch.name} />
-
-      {/* Edit Batch Dialog */}
-      <CreateBatchDialog
-        open={isEditOpen}
-        onOpenChange={setIsEditOpen}
-        batchToEdit={batch}
+      <BatchStudentRoster
+        batchId={batch.id}
+        batchName={batch.name}
+        portalRole={portalRole}
       />
+
+      {/* Edit Batch Dialog (Admin only) */}
+      {isAdmin && (
+        <CreateBatchDialog
+          open={isEditOpen}
+          onOpenChange={setIsEditOpen}
+          batchToEdit={batch}
+        />
+      )}
     </div>
   );
 }

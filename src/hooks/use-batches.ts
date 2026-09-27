@@ -125,11 +125,15 @@ export function useDeleteBatchMutation() {
 /**
  * Fetch pending enrollment requests across all batches
  */
-export function usePendingEnrollments(params?: QueryParams) {
+export function usePendingEnrollments(
+  params?: QueryParams,
+  options?: { enabled?: boolean },
+) {
   return useQuery({
     queryKey: batchKeys.pendingEnrollments(params as Record<string, unknown>),
     queryFn: () => getPendingEnrollments(params),
     placeholderData: (previousData) => previousData,
+    enabled: options?.enabled ?? true,
   });
 }
 

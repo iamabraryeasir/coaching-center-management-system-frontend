@@ -2,13 +2,16 @@
 
 import {
   AlertTriangle,
+  History,
   MoreHorizontal,
+  Phone,
   Search,
   UserMinus,
   UserPlus,
   Users,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { StudentAttendanceHistoryModal } from "@/components/modules/attendance/student-attendance-history-modal";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -24,6 +27,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
@@ -42,19 +46,22 @@ import {
   useRemoveStudentFromBatchMutation,
 } from "@/hooks";
 
-import type { BatchEnrollment } from "@/types";
+import type { BatchEnrollment, User } from "@/types";
 import { StudentPagination } from "../students/student-pagination";
 import { DirectEnrollDialog } from "./direct-enroll-dialog";
 
 interface BatchStudentRosterProps {
   batchId: string;
   batchName: string;
+  portalRole?: "ADMIN" | "TEACHER";
 }
 
 export function BatchStudentRoster({
   batchId,
   batchName,
+  portalRole = "ADMIN",
 }: BatchStudentRosterProps) {
+  const isAdmin = portalRole === "ADMIN";
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [search, setSearch] = useState("");
@@ -62,6 +69,10 @@ export function BatchStudentRoster({
   const [isDirectEnrollOpen, setIsDirectEnrollOpen] = useState(false);
   const [enrollmentToRemove, setEnrollmentToRemove] =
     useState<BatchEnrollment | null>(null);
+
+  const [selectedStudentForHistory, setSelectedStudentForHistory] =
+    useState<User | null>(null);
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
 
   const prevSearchRef = useRef(debouncedSearch);
   useEffect(() => {
@@ -95,6 +106,35 @@ export function BatchStudentRoster({
     );
   };
 
+  const handleOpenAttendanceHistory = (item: BatchEnrollment) => {
+    const studentUser = item.student || item.user;
+    if (!studentUser) return;
+
+    const mappedUser: User = {
+      id: studentUser.id,
+      name: studentUser.name,
+      email: studentUser.email,
+      phone: studentUser.phone ?? null,
+      gender: studentUser.gender ?? null,
+      role: "STUDENT",
+      status: "ACTIVE",
+      createdAt: item.createdAt || "",
+      studentProfile: studentUser.studentProfile
+        ? {
+            id: studentUser.id,
+            guardianName: studentUser.studentProfile.guardianName || "",
+            guardianPhone: studentUser.studentProfile.guardianPhone || "",
+            institutionName: studentUser.studentProfile.institutionName || "",
+            classLevel: studentUser.studentProfile.classLevel || "",
+            rollNumber: studentUser.studentProfile.rollNumber || "",
+          }
+        : undefined,
+    };
+
+    setSelectedStudentForHistory(mappedUser);
+    setIsHistoryOpen(true);
+  };
+
   return (
     <div className="space-y-4">
       {/* Top action / search bar */}
@@ -116,7 +156,9 @@ export function BatchStudentRoster({
               </Badge>
             </div>
             <p className="text-xs text-muted-foreground">
-              Manage active student roster and direct admissions for this batch.
+              {isAdmin
+                ? "Manage active student roster and direct admissions for this batch."
+                : "View enrolled student roster and academic contact details for this batch."}
             </p>
           </div>
         </div>
@@ -136,15 +178,17 @@ export function BatchStudentRoster({
             />
           </div>
 
-          <Button
-            type="button"
-            size="sm"
-            onClick={() => setIsDirectEnrollOpen(true)}
-            className="h-9 gap-1.5 text-xs shrink-0"
-          >
-            <UserPlus className="size-3.5" />
-            <span>Enroll Student</span>
-          </Button>
+          {isAdmin && (
+            <Button
+              type="button"
+              size="sm"
+              onClick={() => setIsDirectEnrollOpen(true)}
+              className="h-9 gap-1.5 text-xs shrink-0"
+            >
+              <UserPlus className="size-3.5" />
+              <span>Enroll Student</span>
+            </Button>
+          )}
         </div>
       </div>
 
@@ -214,19 +258,22 @@ export function BatchStudentRoster({
                         No students enrolled yet
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        Enroll active students directly or approve
-                        self-enrollment applications.
+                        {isAdmin
+                          ? "Enroll active students directly or approve self-enrollment applications."
+                          : "No students are enrolled in this batch yet."}
                       </p>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setIsDirectEnrollOpen(true)}
-                        className="mt-2 gap-1.5 text-xs"
-                      >
-                        <UserPlus className="size-3.5" />
-                        <span>Enroll First Student</span>
-                      </Button>
+                      {isAdmin && (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setIsDirectEnrollOpen(true)}
+                          className="mt-2 gap-1.5 text-xs"
+                        >
+                          <UserPlus className="size-3.5" />
+                          <span>Enroll First Student</span>
+                        </Button>
+                      )}
                     </div>
                   </TableCell>
                 </TableRow>
@@ -249,6 +296,8 @@ export function BatchStudentRoster({
                   const isApproved =
                     item.status === "APPROVED" || item.status === "ENROLLED";
                   const isPending = item.status === "PENDING";
+                  const guardianPhone =
+                    profile?.guardianPhone || student?.phone || null;
 
                   return (
                     <TableRow key={item.id} className="transition-colors">
@@ -286,15 +335,26 @@ export function BatchStudentRoster({
                         </div>
                       </TableCell>
 
-                      {/* Contact Column */}
+                      {/* Contact Column with Guardian Phone and Student Email */}
                       <TableCell>
                         <div className="flex flex-col truncate">
                           <span className="text-xs text-foreground truncate">
                             {student?.email || "—"}
                           </span>
-                          <span className="text-[11px] text-muted-foreground">
-                            {student?.phone || "No phone"}
-                          </span>
+                          {guardianPhone ? (
+                            <a
+                              href={`tel:${guardianPhone.replace(/\s+/g, "")}`}
+                              className="text-[11px] text-muted-foreground hover:text-primary flex items-center gap-1"
+                              title="Guardian Phone"
+                            >
+                              <Phone className="size-2.5 text-emerald-600" />
+                              <span>{guardianPhone}</span>
+                            </a>
+                          ) : (
+                            <span className="text-[11px] text-muted-foreground">
+                              No phone
+                            </span>
+                          )}
                         </div>
                       </TableCell>
 
@@ -323,7 +383,7 @@ export function BatchStudentRoster({
                         {formattedDate}
                       </TableCell>
 
-                      {/* Actions */}
+                      {/* Actions Column */}
                       <TableCell className="text-right">
                         <DropdownMenu>
                           <DropdownMenuTrigger
@@ -339,14 +399,27 @@ export function BatchStudentRoster({
                             <MoreHorizontal className="size-4" />
                           </DropdownMenuTrigger>
 
-                          <DropdownMenuContent align="end" className="w-44">
+                          <DropdownMenuContent align="end" className="w-48">
                             <DropdownMenuItem
-                              onClick={() => setEnrollmentToRemove(item)}
-                              className="gap-2 text-xs text-destructive focus:bg-destructive/10 focus:text-destructive"
+                              onClick={() => handleOpenAttendanceHistory(item)}
+                              className="gap-2 text-xs"
                             >
-                              <UserMinus className="size-3.5" />
-                              <span>Remove from Batch</span>
+                              <History className="size-3.5 text-primary" />
+                              <span>Attendance History</span>
                             </DropdownMenuItem>
+
+                            {isAdmin && (
+                              <>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem
+                                  onClick={() => setEnrollmentToRemove(item)}
+                                  className="gap-2 text-xs text-destructive focus:bg-destructive/10 focus:text-destructive"
+                                >
+                                  <UserMinus className="size-3.5" />
+                                  <span>Remove from Batch</span>
+                                </DropdownMenuItem>
+                              </>
+                            )}
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </TableCell>
@@ -368,82 +441,88 @@ export function BatchStudentRoster({
         />
       </div>
 
-      {/* Remove student confirmation modal */}
-      <Dialog
-        open={!!enrollmentToRemove}
-        onOpenChange={(open) => !open && setEnrollmentToRemove(null)}
-      >
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <div className="flex items-center gap-2">
-              <div className="flex size-8 items-center justify-center rounded-lg bg-destructive/10 text-destructive">
-                <AlertTriangle className="size-4" />
+      {/* Remove student confirmation modal (Admin only) */}
+      {isAdmin && (
+        <Dialog
+          open={!!enrollmentToRemove}
+          onOpenChange={(open) => !open && setEnrollmentToRemove(null)}
+        >
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <div className="flex items-center gap-2">
+                <div className="flex size-8 items-center justify-center rounded-lg bg-destructive/10 text-destructive">
+                  <AlertTriangle className="size-4" />
+                </div>
+                <div>
+                  <DialogTitle className="font-heading text-base font-semibold text-foreground">
+                    Remove Student
+                  </DialogTitle>
+                  <DialogDescription className="text-xs text-muted-foreground">
+                    This action will unenroll the student from this batch.
+                  </DialogDescription>
+                </div>
               </div>
-              <div>
-                <DialogTitle className="font-heading text-lg">
-                  Remove Student from Batch
-                </DialogTitle>
-                <DialogDescription className="text-xs">
-                  This will unenroll the student from &quot;{batchName}&quot;.
-                  Their account will remain active in the system.
-                </DialogDescription>
-              </div>
-            </div>
-          </DialogHeader>
+            </DialogHeader>
 
-          {enrollmentToRemove && (
-            <div className="rounded-lg border border-border bg-muted/30 p-3 text-xs space-y-1.5">
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Student:</span>
-                <span className="font-medium text-foreground">
-                  {enrollmentToRemove.student?.name}
+            <div className="py-2 text-xs text-muted-foreground space-y-2">
+              <p>
+                Are you sure you want to remove{" "}
+                <span className="font-semibold text-foreground">
+                  {enrollmentToRemove?.student?.name || "this student"}
+                </span>{" "}
+                from{" "}
+                <span className="font-semibold text-foreground">
+                  {batchName}
                 </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Email:</span>
-                <span className="text-foreground">
-                  {enrollmentToRemove.student?.email}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Batch:</span>
-                <span className="font-medium text-foreground">{batchName}</span>
-              </div>
+                ?
+              </p>
+              <p className="rounded-lg bg-destructive/5 p-3 text-destructive border border-destructive/20 leading-relaxed">
+                The student&apos;s previous attendance and exam records will be
+                preserved, but they will no longer appear on daily active
+                attendance sheets.
+              </p>
             </div>
-          )}
 
-          <DialogFooter className="gap-2 pt-2">
-            <DialogClose
-              render={
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  disabled={removeMutation.isPending}
-                >
-                  Cancel
-                </Button>
-              }
-            />
-            <Button
-              type="button"
-              variant="destructive"
-              size="sm"
-              onClick={handleConfirmRemove}
-              disabled={removeMutation.isPending}
-            >
-              {removeMutation.isPending ? "Removing..." : "Confirm Removal"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+            <DialogFooter className="gap-2 sm:gap-0">
+              <DialogClose
+                render={
+                  <Button variant="outline" size="sm" className="text-xs">
+                    Cancel
+                  </Button>
+                }
+              />
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={handleConfirmRemove}
+                disabled={removeMutation.isPending}
+                className="text-xs gap-1.5"
+              >
+                <UserMinus className="size-3.5" />
+                <span>
+                  {removeMutation.isPending ? "Removing..." : "Confirm Removal"}
+                </span>
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
 
-      {/* Direct Enroll Modal */}
-      <DirectEnrollDialog
-        batchId={batchId}
-        batchName={batchName}
-        open={isDirectEnrollOpen}
-        onOpenChange={setIsDirectEnrollOpen}
+      {/* Direct Enrollment Dialog (Admin only) */}
+      {isAdmin && (
+        <DirectEnrollDialog
+          open={isDirectEnrollOpen}
+          onOpenChange={setIsDirectEnrollOpen}
+          batchId={batchId}
+          batchName={batchName}
+        />
+      )}
+
+      {/* Longitudinal Attendance History Modal (Accessible by both Admin and Teacher) */}
+      <StudentAttendanceHistoryModal
+        student={selectedStudentForHistory}
+        open={isHistoryOpen}
+        onOpenChange={setIsHistoryOpen}
       />
     </div>
   );

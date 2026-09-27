@@ -32,11 +32,20 @@ import { BatchStatusBadge } from "./batch-status-badge";
 
 interface BatchCardProps {
   batch: Batch;
-  onEdit: (batch: Batch) => void;
-  onDelete: (batch: Batch) => void;
+  onEdit?: (batch: Batch) => void;
+  onDelete?: (batch: Batch) => void;
+  portalRole?: "ADMIN" | "TEACHER";
 }
 
-export function BatchCard({ batch, onEdit, onDelete }: BatchCardProps) {
+export function BatchCard({
+  batch,
+  onEdit,
+  onDelete,
+  portalRole = "ADMIN",
+}: BatchCardProps) {
+  const isAdmin = portalRole === "ADMIN";
+  const basePath = `/dashboard/${portalRole.toLowerCase()}/batches/${batch.id}`;
+
   const formattedDate = batch.createdAt
     ? new Date(batch.createdAt).toLocaleDateString(undefined, {
         year: "numeric",
@@ -79,7 +88,7 @@ export function BatchCard({ batch, onEdit, onDelete }: BatchCardProps) {
               <DropdownMenuItem
                 render={
                   <Link
-                    href={`/dashboard/admin/batches/${batch.id}`}
+                    href={basePath}
                     className="flex items-center gap-2 text-xs w-full"
                   />
                 }
@@ -87,21 +96,29 @@ export function BatchCard({ batch, onEdit, onDelete }: BatchCardProps) {
                 <Users className="size-3.5 text-muted-foreground" />
                 <span>View Roster</span>
               </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => onEdit(batch)}
-                className="gap-2 text-xs"
-              >
-                <Edit2 className="size-3.5 text-muted-foreground" />
-                <span>Edit Parameters</span>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onClick={() => onDelete(batch)}
-                className="gap-2 text-xs text-destructive focus:bg-destructive/10 focus:text-destructive"
-              >
-                <Trash2 className="size-3.5" />
-                <span>Cancel / Archive</span>
-              </DropdownMenuItem>
+
+              {isAdmin && onEdit && (
+                <DropdownMenuItem
+                  onClick={() => onEdit(batch)}
+                  className="gap-2 text-xs"
+                >
+                  <Edit2 className="size-3.5 text-muted-foreground" />
+                  <span>Edit Parameters</span>
+                </DropdownMenuItem>
+              )}
+
+              {isAdmin && onDelete && (
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={() => onDelete(batch)}
+                    className="gap-2 text-xs text-destructive focus:bg-destructive/10 focus:text-destructive"
+                  >
+                    <Trash2 className="size-3.5" />
+                    <span>Cancel / Archive</span>
+                  </DropdownMenuItem>
+                </>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -129,13 +146,13 @@ export function BatchCard({ batch, onEdit, onDelete }: BatchCardProps) {
 
       <CardFooter className="p-4 pt-2 border-t border-border/50 bg-muted/20">
         <Link
-          href={`/dashboard/admin/batches/${batch.id}`}
+          href={basePath}
           className={cn(
             buttonVariants({ variant: "outline", size: "sm" }),
             "w-full justify-between text-xs group",
           )}
         >
-          <span>Manage Students</span>
+          <span>{isAdmin ? "Manage Students" : "View Student Roster"}</span>
           <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" />
         </Link>
       </CardFooter>

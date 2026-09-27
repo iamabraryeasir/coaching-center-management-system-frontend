@@ -45,8 +45,9 @@ import { BatchStatusBadge } from "./batch-status-badge";
 interface BatchTableProps {
   batches: Batch[];
   isLoading: boolean;
-  onEditBatch: (batch: Batch) => void;
+  onEditBatch?: (batch: Batch) => void;
   onCreateBatch?: () => void;
+  portalRole?: "ADMIN" | "TEACHER";
 }
 
 export function BatchTable({
@@ -54,7 +55,9 @@ export function BatchTable({
   isLoading,
   onEditBatch,
   onCreateBatch,
+  portalRole = "ADMIN",
 }: BatchTableProps) {
+  const isAdmin = portalRole === "ADMIN";
   const [batchToDelete, setBatchToDelete] = useState<Batch | null>(null);
   const deleteMutation = useDeleteBatchMutation();
 
@@ -118,23 +121,23 @@ export function BatchTable({
                       <div className="flex size-12 items-center justify-center rounded-full bg-muted text-muted-foreground">
                         <Layers className="size-6" />
                       </div>
-                      <p className="font-semibold text-sm text-foreground">
-                        No academic batches found
-                      </p>
+                      <h3 className="font-heading text-sm font-semibold text-foreground">
+                        No batches found
+                      </h3>
                       <p className="text-xs text-muted-foreground">
-                        No batches matched your current filter criteria, or none
-                        have been created yet.
+                        {isAdmin
+                          ? "Try adjusting your search criteria or create a new batch."
+                          : "No batches matched your search or filter options."}
                       </p>
-                      {onCreateBatch && (
+                      {isAdmin && onCreateBatch && (
                         <Button
-                          type="button"
+                          onClick={onCreateBatch}
                           variant="outline"
                           size="sm"
-                          onClick={onCreateBatch}
-                          className="mt-2 gap-1.5 text-xs"
+                          className="mt-2 text-xs gap-1.5"
                         >
                           <FolderPlus className="size-3.5" />
-                          <span>Create First Batch</span>
+                          <span>Create New Batch</span>
                         </Button>
                       )}
                     </div>
@@ -142,7 +145,7 @@ export function BatchTable({
                 </TableRow>
               )}
 
-              {/* Data rows */}
+              {/* Batches rows */}
               {!isLoading &&
                 batches.map((batch) => {
                   const formattedDate = batch.createdAt
@@ -153,30 +156,29 @@ export function BatchTable({
                       })
                     : "—";
 
+                  const detailPath = `/dashboard/${portalRole.toLowerCase()}/batches/${batch.id}`;
+
                   return (
                     <TableRow
                       key={batch.id}
-                      className="group transition-colors"
+                      className="group transition-colors hover:bg-muted/40"
                     >
-                      {/* Batch Details Column */}
+                      {/* Batch Identity Column */}
                       <TableCell>
                         <div className="flex items-center gap-3">
-                          <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 font-bold text-primary text-xs shadow-2xs">
-                            <Layers className="size-4" />
+                          <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                            <Layers className="size-4.5" />
                           </div>
-                          <div className="flex flex-col truncate">
+                          <div className="min-w-0">
                             <Link
-                              href={`/dashboard/admin/batches/${batch.id}`}
-                              className="font-semibold text-sm text-foreground hover:text-primary transition-colors truncate flex items-center gap-1 group/link"
+                              href={detailPath}
+                              className="font-medium text-sm text-foreground hover:underline flex items-center gap-1 group/title"
                             >
-                              <span>{batch.name}</span>
-                              <ArrowUpRight className="size-3 opacity-0 -translate-x-1 group-hover/link:opacity-100 group-hover/link:translate-x-0 transition-all text-muted-foreground" />
+                              <span className="truncate">{batch.name}</span>
+                              <ArrowUpRight className="size-3 opacity-0 -translate-y-0.5 translate-x-0.5 transition-all group-hover/title:opacity-100" />
                             </Link>
-                            <span className="text-[11px] text-muted-foreground">
-                              ID:{" "}
-                              <code className="font-mono">
-                                {batch.id.slice(0, 8)}
-                              </code>
+                            <span className="text-[11px] text-muted-foreground font-mono">
+                              ID: {batch.id.slice(0, 8)}
                             </span>
                           </div>
                         </div>
@@ -219,7 +221,7 @@ export function BatchTable({
                             <DropdownMenuItem
                               render={
                                 <Link
-                                  href={`/dashboard/admin/batches/${batch.id}`}
+                                  href={detailPath}
                                   className="flex items-center gap-2 text-xs w-full"
                                 />
                               }
@@ -228,23 +230,28 @@ export function BatchTable({
                               <span>View Roster & Details</span>
                             </DropdownMenuItem>
 
-                            <DropdownMenuItem
-                              onClick={() => onEditBatch(batch)}
-                              className="gap-2 text-xs"
-                            >
-                              <Edit2 className="size-3.5 text-muted-foreground" />
-                              <span>Edit Parameters</span>
-                            </DropdownMenuItem>
+                            {isAdmin && onEditBatch && (
+                              <DropdownMenuItem
+                                onClick={() => onEditBatch(batch)}
+                                className="gap-2 text-xs"
+                              >
+                                <Edit2 className="size-3.5 text-muted-foreground" />
+                                <span>Edit Parameters</span>
+                              </DropdownMenuItem>
+                            )}
 
-                            <DropdownMenuSeparator />
-
-                            <DropdownMenuItem
-                              onClick={() => setBatchToDelete(batch)}
-                              className="gap-2 text-xs text-destructive focus:bg-destructive/10 focus:text-destructive"
-                            >
-                              <Trash2 className="size-3.5" />
-                              <span>Cancel / Archive</span>
-                            </DropdownMenuItem>
+                            {isAdmin && (
+                              <>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem
+                                  onClick={() => setBatchToDelete(batch)}
+                                  className="gap-2 text-xs text-destructive focus:bg-destructive/10 focus:text-destructive"
+                                >
+                                  <Trash2 className="size-3.5" />
+                                  <span>Cancel / Archive</span>
+                                </DropdownMenuItem>
+                              </>
+                            )}
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </TableCell>
@@ -256,75 +263,70 @@ export function BatchTable({
         </div>
       </div>
 
-      {/* Delete / Cancel Batch Confirmation Dialog */}
-      <Dialog
-        open={!!batchToDelete}
-        onOpenChange={(open) => !open && setBatchToDelete(null)}
-      >
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <div className="flex items-center gap-2">
-              <div className="flex size-8 items-center justify-center rounded-lg bg-destructive/10 text-destructive">
-                <AlertTriangle className="size-4" />
+      {/* Delete / Archive Confirmation Dialog (Admin only) */}
+      {isAdmin && (
+        <Dialog
+          open={Boolean(batchToDelete)}
+          onOpenChange={(open) => !open && setBatchToDelete(null)}
+        >
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <div className="flex items-center gap-3">
+                <div className="flex size-10 items-center justify-center rounded-full bg-destructive/10 text-destructive">
+                  <AlertTriangle className="size-5" />
+                </div>
+                <div>
+                  <DialogTitle className="font-heading text-lg font-bold">
+                    Cancel & Archive Batch
+                  </DialogTitle>
+                  <DialogDescription className="text-xs text-muted-foreground">
+                    This action will soft-delete the batch from active
+                    enrollment.
+                  </DialogDescription>
+                </div>
               </div>
-              <div>
-                <DialogTitle className="font-heading text-lg">
-                  Cancel / Archive Batch
-                </DialogTitle>
-                <DialogDescription className="text-xs">
-                  This will mark the batch as CANCELLED. Students currently
-                  enrolled will remain in system records.
-                </DialogDescription>
-              </div>
-            </div>
-          </DialogHeader>
+            </DialogHeader>
 
-          {batchToDelete && (
-            <div className="rounded-lg border border-border bg-muted/30 p-3 text-xs space-y-1">
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Batch Name:</span>
-                <span className="font-medium text-foreground">
-                  {batchToDelete.name}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Fee:</span>
-                <span className="font-medium text-foreground">
-                  ৳ {batchToDelete.fee.toLocaleString()}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Status:</span>
-                <BatchStatusBadge status={batchToDelete.status} />
-              </div>
+            <div className="text-xs text-muted-foreground space-y-2 py-2">
+              <p>
+                Are you sure you want to cancel{" "}
+                <strong className="text-foreground font-semibold">
+                  {batchToDelete?.name}
+                </strong>
+                ?
+              </p>
+              <p className="rounded-lg bg-destructive/5 p-3 text-destructive border border-destructive/20 leading-relaxed">
+                Existing enrolled students will remain linked in historical
+                records, but new admissions into this batch will be blocked.
+              </p>
             </div>
-          )}
 
-          <DialogFooter className="gap-2 pt-2">
-            <DialogClose
-              render={
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  disabled={deleteMutation.isPending}
-                >
-                  Keep Batch
-                </Button>
-              }
-            />
-            <Button
-              type="button"
-              variant="destructive"
-              size="sm"
-              onClick={confirmDelete}
-              disabled={deleteMutation.isPending}
-            >
-              {deleteMutation.isPending ? "Cancelling..." : "Confirm Cancel"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+            <DialogFooter className="gap-2 sm:gap-0">
+              <DialogClose
+                render={
+                  <Button variant="outline" size="sm" className="text-xs">
+                    Keep Active
+                  </Button>
+                }
+              />
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={confirmDelete}
+                disabled={deleteMutation.isPending}
+                className="text-xs gap-1.5"
+              >
+                <Trash2 className="size-3.5" />
+                <span>
+                  {deleteMutation.isPending
+                    ? "Archiving..."
+                    : "Confirm Cancellation"}
+                </span>
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
     </>
   );
 }

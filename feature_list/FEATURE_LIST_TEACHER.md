@@ -11,8 +11,8 @@
 | Metric                                                         | Count  | Percentage |
 | :------------------------------------------------------------- | :----: | :--------: |
 | **Total Teacher-Relevant Endpoints in Postman Collection**     | **44** |    100%    |
-| **Fully Implemented Features (API + Hooks + UI)**              | **21** | **47.7%**  |
-| **API Ready / Component Ready (Pending Dedicated Teacher UI)** | **14** | **31.8%**  |
+| **Fully Implemented Features (API + Hooks + UI)**              | **24** | **54.5%**  |
+| **API Ready / Component Ready (Pending Dedicated Teacher UI)** | **11** | **25.0%**  |
 | **Unimplemented / Backlog Features & APIs**                    | **9**  | **20.5%**  |
 
 ---
@@ -105,6 +105,17 @@ The following capabilities are actively functional in the Teacher workspace (**A
 - **Student Report Card PDF Preview & Download**: `GET /api/v1/exams/:examId/students/:id/report-card/pdf`
 - **Dispatch Report Card PDF via Email**: `POST /api/v1/exams/:examId/students/:id/send-report-card`
 
+### 2.5 My Batches & Student Rosters (`/dashboard/teacher/batches`)
+
+- **Batches Directory**: `GET /api/v1/batches`
+  - Interactive grid and table views with live debounced search and status filtering on `/dashboard/teacher/batches`.
+  - Displays batch enrollment counters, fee badges, and weekly routine slots summary.
+- **Batch Details & Statistics**: `GET /api/v1/batches/:batchId`
+  - Overview cards displaying total students, tuition fee, and scheduled lecture counts on `/dashboard/teacher/batches/:batchId`.
+- **Enrolled Student Roster**: `GET /api/v1/batches/:batchId/students`
+  - Detailed roster table with Student Roll Number, Class Level, Institution Name, and clickable Guardian Phone (`tel:...`).
+  - Longitudinal attendance history modal trigger (`StudentAttendanceHistoryModal`).
+
 ---
 
 ## 3. API Ready / Component Ready (Pending Dedicated Teacher Pages)
@@ -122,15 +133,7 @@ _Existing Assets_: `ChangePasswordCard`, `ActiveSessionsCard`, `AdminProfileCard
 - `PATCH /api/v1/users/me/avatar` — Upload or update personal avatar.
 - `DELETE /api/v1/users/me/avatar` — Remove profile avatar.
 
-### 3.2 My Batches & Student Rosters (`/dashboard/teacher/batches`)
-
-_Existing Assets_: `getBatches()`, `getBatchById()`, `getBatchStudents()` in `src/api/batches.ts` and `useBatches()`, `useBatchStudents()` hooks.
-
-- `GET /api/v1/batches` — View active batches assigned to teacher.
-- `GET /api/v1/batches/:batchId` — View curriculum, active enrollment count, and fee schedule.
-- `GET /api/v1/batches/:batchId/students` — View student roster (student name, roll number, guardian phone).
-
-### 3.3 Class Routines & Weekly Schedule (`/dashboard/teacher/routines`)
+### 3.2 Class Routines & Weekly Schedule (`/dashboard/teacher/routines`)
 
 _Existing Assets_: `TeacherRoutineView` in `src/components/modules/routines/teacher-routine-view.tsx` and routine API endpoints in `src/api/routines.ts`.
 
@@ -204,9 +207,9 @@ The following features require frontend implementation to complete the Teacher r
 | **12** | `Delete My Avatar`                                  | `/api/v1/users/me/avatar`                                    | `DELETE` |        None         | ⚠️ _Component Ready_ | `deleteMyAvatar()` / Needs `/dashboard/teacher/settings`                 |
 | **13** | `Teacher Self Check-In`                             | `/api/v1/attendance/teachers/check-in`                       |  `POST`  |        None         |   ✅ **COMPLETED**   | `TeacherSelfCheckInCard` on `/dashboard/teacher`                         |
 | **14** | `Get My Teacher Attendance Summary`                 | `/api/v1/attendance/teachers/my/summary`                     |  `GET`   |        None         |   ✅ **COMPLETED**   | `TeacherSelfCheckInCard` & `useTeacherDashboardAttendanceSummary`        |
-| **15** | `Get All Batches (QueryBuilder)`                    | `/api/v1/batches`                                            |  `GET`   |        None         | ⚠️ _Component Ready_ | `src/api/batches.ts` / Needs `/dashboard/teacher/batches`                |
-| **16** | `Get Batch Details by ID`                           | `/api/v1/batches/:batchId`                                   |  `GET`   |        None         | ⚠️ _Component Ready_ | `src/api/batches.ts` / Needs `/dashboard/teacher/batches`                |
-| **17** | `Get Batch Student Roster (Admin & Teacher)`        | `/api/v1/batches/:batchId/students`                          |  `GET`   |        None         | ⚠️ _Component Ready_ | `src/api/batches.ts` / Needs `/dashboard/teacher/batches`                |
+| **15** | `Get All Batches (QueryBuilder)`                    | `/api/v1/batches`                                            |  `GET`   |        None         |   ✅ **COMPLETED**   | `TeacherBatchesView` on `/dashboard/teacher/batches`                     |
+| **16** | `Get Batch Details by ID`                           | `/api/v1/batches/:batchId`                                   |  `GET`   |        None         |   ✅ **COMPLETED**   | `TeacherBatchDetailView` on `/dashboard/teacher/batches/:batchId`        |
+| **17** | `Get Batch Student Roster (Admin & Teacher)`        | `/api/v1/batches/:batchId/students`                          |  `GET`   |        None         |   ✅ **COMPLETED**   | `TeacherBatchRosterTable` on `/dashboard/teacher/batches/:batchId`       |
 | **18** | `Get My Teaching Schedule (Teacher Only)`           | `/api/v1/routines/my/teacher-schedule`                       |  `GET`   |        None         | ⚠️ _Component Ready_ | `src/api/routines.ts` / Needs `/dashboard/teacher/routines`              |
 | **19** | `Get Teacher Teaching Schedule`                     | `/api/v1/routines/teacher/:teacherUserId`                    |  `GET`   |        None         | ⚠️ _Component Ready_ | `TeacherRoutineView` / Needs `/dashboard/teacher/routines`               |
 | **20** | `Get Batch Timetable (Day-Wise Grouped)`            | `/api/v1/routines/batch/:batchId`                            |  `GET`   |        None         | ⚠️ _Component Ready_ | `src/api/routines.ts` / Needs `/dashboard/teacher/routines`              |
@@ -249,11 +252,14 @@ To bring the Teacher role to 100% completion aligned with the Postman collection
 4. **Campus Check-In Notification Strip**: `TeacherSelfCheckInCard` redesigned as a sleek, top-anchored banner with instant local state caching, duplicate check-in prevention, and localized BST time formatting.
 5. **Suspense Loading Skeleton**: `TeacherDashboardPageSkeleton` and route-level `loading.tsx`.
 
-### Phase 2: My Batches & Student Rosters (`/dashboard/teacher/batches`)
+### Phase 2: My Batches & Student Rosters (`/dashboard/teacher/batches`) — ✅ COMPLETED
 
-1. Create `src/app/dashboard/teacher/batches/page.tsx` and route skeleton.
-2. Render teacher's active batches with schedule chips and enrolled student count.
-3. Dedicated slide-over or dialog displaying the batch student roster (`GET /batches/:batchId/students`), showing student roll numbers and guardian contact numbers.
+1. **Batches Directory (`/dashboard/teacher/batches`)**: `TeacherBatchesView` with live debounced search, status filter (`ONGOING`, `UPCOMING`, `COMPLETED`), and Grid vs. Table view switcher.
+2. **Teacher Batch Cards**: `TeacherBatchCard` with routine schedule tags, enrolled student counter, monthly fee badge, and fast action bridges to attendance and exams.
+3. **Teacher Batch Table**: `TeacherBatchTable` offering dense row-by-row scanning with status badges and contextual dropdown actions.
+4. **Batch Detail & Roster View (`/dashboard/teacher/batches/:batchId`)**: `TeacherBatchDetailView` and `TeacherBatchRosterTable` displaying student roll numbers, class level, institution name, and clickable guardian phone (`tel:...`).
+5. **Attendance History Bridge**: Integrated `StudentAttendanceHistoryModal` trigger per enrolled student.
+6. **Suspense-First Skeletons**: `TeacherBatchesPageSkeleton`, `TeacherBatchDetailSkeleton`, and route-level `loading.tsx` wrappers.
 
 ### Phase 3: Teacher Class Routines (`/dashboard/teacher/routines`)
 
