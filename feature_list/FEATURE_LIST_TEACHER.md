@@ -13,6 +13,8 @@
 | **Total Teacher-Relevant Endpoints in Postman Collection**     | **44** |    100%    |
 | **Fully Implemented Features (API + Hooks + UI)**              | **31** | **70.5%**  |
 | **API Ready / Component Ready (Pending Dedicated Teacher UI)** | **7**  | **15.9%**  |
+| **Fully Implemented Features (API + Hooks + UI)**              | **38** | **86.4%**  |
+| **API Ready / Component Ready (Pending Dedicated Teacher UI)** | **0**  |   **0%**   |
 | **Unimplemented / Backlog Features & APIs**                    | **6**  | **13.6%**  |
 
 ---
@@ -134,11 +136,31 @@ The following capabilities are actively functional in the Teacher workspace (**A
 - **Print & PDF Export**: `GET /api/v1/routines/batches/:batchId/pdf`
   - A4 landscape print styling and direct PDF download.
 
+### 2.7 Faculty Settings, Profile & Security (`/dashboard/teacher/settings`) — ✅ COMPLETED
+
+- **Faculty Profile & Academic Credentials**:
+  - Personal contact details update: `PATCH /api/v1/users/me` (`name`, `phone`, `gender`).
+  - Professional credentials inspection: Designation, educational qualification, subject specialization, joining date, and active delegation status badges (`MANAGE_ATTENDANCE`, `MANAGE_EXAMS`, `MANAGE_ROUTINES`).
+- **Profile Avatar Management**:
+  - Upload avatar: `PATCH /api/v1/users/me/avatar`.
+  - Delete avatar: `DELETE /api/v1/users/me/avatar`.
+- **Security & Device Management**:
+  - Change password: `PATCH /api/v1/users/change-password` with strength meter.
+  - Active login sessions: `GET /api/v1/auth/sessions` with device and browser detection.
+  - Revoke all other sessions: `POST /api/v1/auth/logout-all`.
+- **Personal Monthly Attendance Log**:
+  - `GET /api/v1/attendance/teachers/my/summary` with monthly working days, on-time, late, absent, leave, and attendance rate %, plus chronological check-in table.
+- **Campus & Institution Details**:
+  - `GET /api/v1/institution` — Read-only coaching center branding, campus address, helpline phone, and email.
+- **Unified Reusable Architecture**:
+  - Directly reuses `AdminAvatarCard`, `ChangePasswordCard`, and `ActiveSessionsCard` from `@/components/modules/settings`, maintaining 100% design and component consistency with Admin.
+
 ---
 
 ## 3. API Ready / Component Ready (Pending Dedicated Teacher Pages)
 
 The API endpoints, TanStack Query hooks, and shared UI primitives already exist in the codebase, but need **dedicated pages or integration inside the `/dashboard/teacher/*` route tree**.
+_All component-ready features have been integrated into dedicated pages. Zero pending features in this tier._
 
 ### 3.1 Teacher Account Settings & Security (`/dashboard/teacher/settings`)
 
@@ -205,15 +227,15 @@ The following features require frontend implementation to complete the Teacher r
 | **1**  | `Login — Teacher`                                   | `/api/v1/auth/login`                                         |  `POST`  |        None         |   ✅ **COMPLETED**   | `src/app/(public)/(auth)/login`                                          |
 | **2**  | `Refresh Access Token`                              | `/api/v1/auth/refresh-token`                                 |  `POST`  |        None         |   ✅ **COMPLETED**   | `src/lib/api-client.ts` (Automatic silent loop)                          |
 | **3**  | `Logout`                                            | `/api/v1/auth/logout`                                        |  `POST`  |        None         |   ✅ **COMPLETED**   | Header User Menu Dropdown                                                |
-| **4**  | `Logout from All Devices`                           | `/api/v1/auth/logout-all`                                    |  `POST`  |        None         | ⚠️ _Component Ready_ | `src/api/auth.ts` / Needs `/dashboard/teacher/settings`                  |
-| **5**  | `List Active Login Sessions`                        | `/api/v1/auth/sessions`                                      |  `GET`   |        None         | ⚠️ _Component Ready_ | `src/api/auth.ts` / Needs `/dashboard/teacher/settings`                  |
+| **4**  | `Logout from All Devices`                           | `/api/v1/auth/logout-all`                                    |  `POST`  |        None         |   ✅ **COMPLETED**   | `ActiveSessionsCard` on `/dashboard/teacher/settings`                    |
+| **5**  | `List Active Login Sessions`                        | `/api/v1/auth/sessions`                                      |  `GET`   |        None         |   ✅ **COMPLETED**   | `ActiveSessionsCard` on `/dashboard/teacher/settings`                    |
 | **6**  | `Forgot Password`                                   | `/api/v1/auth/forgot-password`                               |  `POST`  |        None         | ❌ **UNIMPLEMENTED** | `src/app/(public)/(auth)/forgot-password`                                |
 | **7**  | `Reset Password`                                    | `/api/v1/auth/reset-password`                                |  `POST`  |        None         | ❌ **UNIMPLEMENTED** | Pending Reset Password Page                                              |
 | **8**  | `Get Current User Profile (/me)`                    | `/api/v1/users/me`                                           |  `GET`   |        None         |   ✅ **COMPLETED**   | `useCurrentUser()` in `src/hooks/use-auth.ts`                            |
-| **9**  | `Update Current User Profile (/me)`                 | `/api/v1/users/me`                                           | `PATCH`  |        None         | ⚠️ _Component Ready_ | `updateMyProfile()` / Needs `/dashboard/teacher/settings`                |
-| **10** | `Change Password`                                   | `/api/v1/users/change-password`                              | `PATCH`  |        None         | ⚠️ _Component Ready_ | `changePassword()` / Needs `/dashboard/teacher/settings`                 |
-| **11** | `Upload My Avatar`                                  | `/api/v1/users/me/avatar`                                    | `PATCH`  |        None         | ⚠️ _Component Ready_ | `uploadMyAvatar()` / Needs `/dashboard/teacher/settings`                 |
-| **12** | `Delete My Avatar`                                  | `/api/v1/users/me/avatar`                                    | `DELETE` |        None         | ⚠️ _Component Ready_ | `deleteMyAvatar()` / Needs `/dashboard/teacher/settings`                 |
+| **9**  | `Update Current User Profile (/me)`                 | `/api/v1/users/me`                                           | `PATCH`  |        None         |   ✅ **COMPLETED**   | `TeacherProfileCard` on `/dashboard/teacher/settings`                    |
+| **10** | `Change Password`                                   | `/api/v1/users/change-password`                              | `PATCH`  |        None         |   ✅ **COMPLETED**   | `ChangePasswordCard` on `/dashboard/teacher/settings`                    |
+| **11** | `Upload My Avatar`                                  | `/api/v1/users/me/avatar`                                    | `PATCH`  |        None         |   ✅ **COMPLETED**   | `AdminAvatarCard` on `/dashboard/teacher/settings`                       |
+| **12** | `Delete My Avatar`                                  | `/api/v1/users/me/avatar`                                    | `DELETE` |        None         |   ✅ **COMPLETED**   | `AdminAvatarCard` on `/dashboard/teacher/settings`                       |
 | **13** | `Teacher Self Check-In`                             | `/api/v1/attendance/teachers/check-in`                       |  `POST`  |        None         |   ✅ **COMPLETED**   | `TeacherSelfCheckInCard` on `/dashboard/teacher`                         |
 | **14** | `Get My Teacher Attendance Summary`                 | `/api/v1/attendance/teachers/my/summary`                     |  `GET`   |        None         |   ✅ **COMPLETED**   | `TeacherSelfCheckInCard` & `useTeacherDashboardAttendanceSummary`        |
 | **15** | `Get All Batches (QueryBuilder)`                    | `/api/v1/batches`                                            |  `GET`   |        None         |   ✅ **COMPLETED**   | `TeacherBatchesView` on `/dashboard/teacher/batches`                     |
@@ -245,7 +267,7 @@ The following features require frontend implementation to complete the Teacher r
 | **41** | `Get Batch Exam Results / Merit List`               | `/api/v1/exams/:examId/results`                              |  `GET`   |   `MANAGE_EXAMS`    |   ✅ **COMPLETED**   | `MeritListModal` on `/dashboard/teacher/exams`                           |
 | **42** | `Download/Preview Student Exam Report Card PDF`     | `/api/v1/exams/:examId/students/:studentId/report-card/pdf`  |  `GET`   |   `MANAGE_EXAMS`    |   ✅ **COMPLETED**   | Student report card PDF preview on `/dashboard/teacher/exams`            |
 | **43** | `Dispatch Student Report Card PDF via Email`        | `/api/v1/exams/:examId/students/:studentId/send-report-card` |  `POST`  |   `MANAGE_EXAMS`    |   ✅ **COMPLETED**   | Dispatch report card email on `/dashboard/teacher/exams`                 |
-| **44** | `Get Institution Profile & Stats (Public)`          | `/api/v1/institution`                                        |  `GET`   |        None         | ⚠️ _Component Ready_ | `src/api/institution.ts`                                                 |
+| **44** | `Get Institution Profile & Stats (Public)`          | `/api/v1/institution`                                        |  `GET`   |        None         |   ✅ **COMPLETED**   | `TeacherInstitutionCard` on `/dashboard/teacher/settings`                |
 
 ---
 
@@ -279,10 +301,11 @@ To bring the Teacher role to 100% completion aligned with the Postman collection
 5. **Print & PDF Export**: Fully integrated A4 landscape print styles and PDF export accessible to all teachers.
 6. **Suspense-First Skeletons**: Extracted reusable `RoutinesSkeleton` in `src/components/modules/routines/` and wired into `loading.tsx` and `<Suspense>` boundaries.
 
-### Phase 4: Teacher Profile, Security & Attendance Summary (`/dashboard/teacher/settings`)
+### Phase 4: Teacher Profile, Security & Attendance Summary (`/dashboard/teacher/settings`) — ✅ COMPLETED
 
-1. Create `src/app/dashboard/teacher/settings/page.tsx` with tabs:
-   - **Faculty Profile**: Professional credentials (designation, qualification, specialization, joining date) and personal name/phone editing (`PATCH /users/me`).
-   - **Avatar & Picture**: Photo upload and purge (`PATCH/DELETE /users/me/avatar`).
-   - **Security**: Password reset (`ChangePasswordCard`), active sessions inspector (`ActiveSessionsCard`), and logout all devices.
-2. Add teacher personal attendance history summary card (`GET /attendance/teachers/my/summary`) showing monthly check-in record.
+1. **Faculty Profile & Academic Credentials**: `TeacherProfileCard` providing personal contact updates (`PATCH /users/me`) alongside read-only verified credentials (designation, qualification, specialization, joining date, and delegation status badges).
+2. **Avatar Management**: Reused `AdminAvatarCard` for direct photo upload and purge (`PATCH/DELETE /users/me/avatar`).
+3. **Security & Sessions**: Reused `ChangePasswordCard` (`PATCH /users/change-password`) and `ActiveSessionsCard` (`GET /auth/sessions`, `POST /auth/logout-all`).
+4. **Attendance History**: `TeacherAttendanceHistoryCard` rendering monthly working days, on-time, late, absent, leave, and attendance rate %, plus chronological check-in table via `useMyTeacherAttendanceSummary`.
+5. **Institution Overview**: `TeacherInstitutionCard` displaying campus address, contacts, and active size indicators.
+6. **Unified Route Architecture**: `/dashboard/teacher/settings` operating with dedicated Suspense skeleton and tab-based navigation.

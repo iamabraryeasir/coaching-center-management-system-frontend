@@ -2,3 +2,8 @@ export * from "./active-sessions-card";
 export * from "./admin-profile-card";
 export * from "./admin-settings-view";
 export * from "./change-password-card";
+export * from "./teacher-attendance-history-card";
+export * from "./teacher-institution-card";
+export * from "./teacher-profile-card";
+export * from "./teacher-settings-skeleton";
+export * from "./teacher-settings-view";
