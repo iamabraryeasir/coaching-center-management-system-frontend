@@ -1,19 +1,108 @@
 import type { Gender, TeacherPermission, User, UserStatus } from "./auth-type";
 
 export function getTeacherPermissions(
-  user?: Partial<User> | null,
+  user?: Partial<User> | Record<string, unknown> | null,
 ): TeacherPermission[] {
-  if (!user) return [];
-  if (
-    Array.isArray(user.teacherPermissions) &&
-    user.teacherPermissions.length > 0
-  ) {
-    return user.teacherPermissions;
+  if (!user || typeof user !== "object") return [];
+
+  const u = user as Record<string, unknown>;
+  const tp =
+    u.teacherProfile && typeof u.teacherProfile === "object"
+      ? (u.teacherProfile as Record<string, unknown>)
+      : null;
+
+  const candidateLists: unknown[] = [
+    u.permissions,
+    u.teacherPermissions,
+    u.userPermissions,
+    tp?.permissions,
+    tp?.teacherPermissions,
+    (u.profile as Record<string, unknown>)?.permissions,
+    (u.profile as Record<string, unknown>)?.teacherPermissions,
+  ];
+
+  const result = new Set<TeacherPermission>();
+
+  const processItem = (item: unknown) => {
+    if (!item) return;
+
+    if (typeof item === "string") {
+      const trimmed = item.trim();
+      if (trimmed.startsWith("[") && trimmed.endsWith("]")) {
+        try {
+          const parsed = JSON.parse(trimmed);
+          if (Array.isArray(parsed)) {
+            for (const p of parsed) processItem(p);
+            return;
+          }
+        } catch {
+          // ignore parsing error
+        }
+      }
+
+      if (trimmed.includes(",")) {
+        for (const part of trimmed.split(",")) {
+          processItem(part.trim());
+        }
+        return;
+      }
+
+      const normalized = trimmed.toUpperCase().replace(/[\s-]+/g, "_");
+      if (
+        normalized === "MANAGE_ATTENDANCE" ||
+        normalized === "ATTENDANCE" ||
+        normalized === "MANAGE_ATTENDANCES"
+      ) {
+        result.add("MANAGE_ATTENDANCE");
+      } else if (
+        normalized === "MANAGE_EXAMS" ||
+        normalized === "EXAMS" ||
+        normalized === "MANAGE_EXAM" ||
+        normalized === "EXAM_MANAGEMENT"
+      ) {
+        result.add("MANAGE_EXAMS");
+      } else if (
+        normalized === "MANAGE_ROUTINES" ||
+        normalized === "ROUTINES" ||
+        normalized === "MANAGE_ROUTINE" ||
+        normalized === "ROUTINE_MANAGEMENT"
+      ) {
+        result.add("MANAGE_ROUTINES");
+      } else if (
+        normalized === "ALL" ||
+        normalized === "*" ||
+        normalized === "MANAGE_ALL"
+      ) {
+        result.add("MANAGE_ATTENDANCE");
+        result.add("MANAGE_EXAMS");
+        result.add("MANAGE_ROUTINES");
+      }
+    } else if (typeof item === "object") {
+      const obj = item as Record<string, unknown>;
+      const val =
+        obj.permission ||
+        obj.name ||
+        obj.code ||
+        obj.permissionType ||
+        obj.permissionName ||
+        obj.value ||
+        obj.id;
+      if (val) {
+        processItem(val);
+      }
+    }
+  };
+
+  for (const c of candidateLists) {
+    if (!c) continue;
+    if (Array.isArray(c)) {
+      for (const item of c) processItem(item);
+    } else {
+      processItem(c);
+    }
   }
-  if (Array.isArray(user.permissions)) {
-    return user.permissions;
-  }
-  return [];
+
+  return Array.from(result);
 }
 
 export interface TeacherQueryParams {

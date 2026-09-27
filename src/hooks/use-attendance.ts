@@ -180,10 +180,26 @@ export function useTeacherCheckInMutation() {
         },
       );
     },
-    onError: (error: Error, _vars, toastId) => {
-      toast.error(error.message || "Failed to check in", {
-        id: toastId,
-      });
+    onError: (error: unknown, _vars, toastId) => {
+      const err = error as {
+        data?: { message?: string };
+        response?: { _data?: { message?: string } };
+        message?: string;
+      };
+      const serverMsg =
+        err?.data?.message ||
+        err?.response?._data?.message ||
+        err?.message ||
+        "Failed to check in";
+      if (serverMsg.toLowerCase().includes("already")) {
+        toast.success("You have already checked in for today!", {
+          id: toastId,
+        });
+      } else {
+        toast.error(serverMsg, {
+          id: toastId,
+        });
+      }
     },
   });
 }

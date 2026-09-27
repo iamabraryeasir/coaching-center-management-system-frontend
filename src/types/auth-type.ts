@@ -29,6 +29,8 @@ export interface TeacherProfile {
   qualification: string;
   specialization: string;
   joiningDate: string;
+  permissions?: TeacherPermission[] | string[];
+  teacherPermissions?: TeacherPermission[] | string[];
 }
 
 export interface StudentProfile {
@@ -60,8 +62,9 @@ export interface User {
   adminProfile?: AdminProfile;
   teacherProfile?: TeacherProfile;
   studentProfile?: StudentProfile;
-  permissions?: TeacherPermission[];
-  teacherPermissions?: TeacherPermission[];
+  permissions?: (TeacherPermission | string)[];
+  teacherPermissions?: (TeacherPermission | string)[];
+  userPermissions?: (TeacherPermission | string)[];
   institution?: InstitutionSummary;
 }
 

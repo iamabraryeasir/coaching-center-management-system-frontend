@@ -14,11 +14,12 @@ import {
 } from "@/api/auth";
 import { authKeys } from "@/constants/query-keys";
 import { authChannel } from "@/lib/auth-channel";
-import type {
-  ChangePasswordDto,
-  TeacherPermission,
-  UpdateMyProfileDto,
-  User,
+import {
+  type ChangePasswordDto,
+  getTeacherPermissions,
+  type TeacherPermission,
+  type UpdateMyProfileDto,
+  type User,
 } from "@/types";
 
 /**
@@ -42,10 +43,11 @@ export function useAuth() {
   } = useQuery({
     queryKey: authKeys.currentUser(),
     queryFn: getCurrentUser,
-    staleTime: 5 * 60 * 1000, // 5 minutes fresh
+    staleTime: 60 * 1000, // 1 minute fresh
     gcTime: 15 * 60 * 1000, // 15 minutes garbage collection
     retry: false,
     refetchOnWindowFocus: true,
+    refetchOnMount: true,
   });
 
   // Logout current session mutation
@@ -102,12 +104,13 @@ export function useAuth() {
   const isAdmin = role === "ADMIN";
   const isTeacher = role === "TEACHER";
   const isStudent = role === "STUDENT";
-  const permissions = user?.permissions ?? [];
+  const permissions = user ? getTeacherPermissions(user) : [];
 
   // Permission validation helper (Admins inherit all permissions automatically)
   const hasPermission = (permission: TeacherPermission): boolean => {
     if (isAdmin) return true;
-    return permissions.includes(permission);
+    const target = String(permission).toUpperCase().trim();
+    return permissions.some((p) => String(p).toUpperCase().trim() === target);
   };
 
   // Optimistic/Manual cache updater

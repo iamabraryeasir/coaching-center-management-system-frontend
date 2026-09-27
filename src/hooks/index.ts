@@ -10,4 +10,5 @@ export * from "./use-media";
 export * from "./use-payments";
 export * from "./use-routines";
 export * from "./use-students";
+export * from "./use-teacher-dashboard";
 export * from "./use-teachers";
