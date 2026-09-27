@@ -116,6 +116,24 @@ The following capabilities are actively functional in the Teacher workspace (**A
   - Detailed roster table with Student Roll Number, Class Level, Institution Name, and clickable Guardian Phone (`tel:...`).
   - Longitudinal attendance history modal trigger (`StudentAttendanceHistoryModal`).
 
+### 2.6 Class Routines & Weekly Schedule (`/dashboard/teacher/routines`) — ✅ COMPLETED
+
+- **My Schedule (Default for All Teachers)**: `GET /api/v1/routines/my/teacher-schedule`
+  - All faculty members can access `/dashboard/teacher/routines` without restrictions to view their personal weekly timetable.
+- **Teacher Schedule View**: `GET /api/v1/routines/teacher/:teacherUserId`
+  - Day-wise grouped timetable (Saturday to Friday) with room, subject, and batch metadata.
+- **Batch Timetable View**: `GET /api/v1/routines/batch/:batchId`
+  - Day-wise grouped schedule for any selected batch.
+- **Full Admin Equivalence for Routine Managers (`MANAGE_ROUTINES`)**:
+  - Teachers with `MANAGE_ROUTINES` receive complete parity with Admin:
+    - Master "All Classes" view across all batches and teachers.
+    - View mode switchers ("All Classes", "By Batch", "By Teacher").
+    - Slot scheduling (`POST /api/v1/routines`), slot updating (`PATCH /api/v1/routines/:routineId`), and slot deletion (`DELETE /api/v1/routines/:routineId`).
+- **Teacher Name Resolution & Pinned (You) Badge**:
+  - `combinedTeachers` memo synthesizes `/users?role=TEACHER`, routine slot metadata, and the authenticated user profile, ensuring teacher names and designations are always displayed (eliminating raw UUID fallbacks).
+- **Print & PDF Export**: `GET /api/v1/routines/batches/:batchId/pdf`
+  - A4 landscape print styling and direct PDF download.
+
 ---
 
 ## 3. API Ready / Component Ready (Pending Dedicated Teacher Pages)
@@ -133,18 +151,7 @@ _Existing Assets_: `ChangePasswordCard`, `ActiveSessionsCard`, `AdminProfileCard
 - `PATCH /api/v1/users/me/avatar` — Upload or update personal avatar.
 - `DELETE /api/v1/users/me/avatar` — Remove profile avatar.
 
-### 3.2 Class Routines & Weekly Schedule (`/dashboard/teacher/routines`) — ✅ COMPLETED
-
-- `GET /api/v1/routines/my/teacher-schedule` — Get logged-in teacher's personal schedule directly.
-- `GET /api/v1/routines/teacher/:teacherUserId` — View teacher's 7-day personal timetable (Saturday to Friday).
-- `GET /api/v1/routines/batch/:batchId` — View batch timetable.
-- `GET /api/v1/routines/batches/:batchId/pdf` — PDF timetable download / A4 native print layout.
-- `POST /api/v1/routines` — Create routine slot (authorized when `hasPermission("MANAGE_ROUTINES")`).
-- `PATCH /api/v1/routines/:routineId` — Edit routine slot time/room/subject (authorized when `hasPermission("MANAGE_ROUTINES")`).
-- `DELETE /api/v1/routines/:routineId` — Remove routine slot (authorized when `hasPermission("MANAGE_ROUTINES")`).
-- **Unified Reusable Architecture**: Driven by `RoutinesManagementView portalRole="TEACHER"`, auto-selecting teacher's personal schedule, supporting batch/teacher/all filters, (You) indicator badges, and permission-guarded mutation controls.
-
-### 3.4 Institution Information
+### 3.2 Institution Information
 
 - `GET /api/v1/institution` — View coaching center branding, campus address, and official contact information.
 
@@ -266,9 +273,9 @@ To bring the Teacher role to 100% completion aligned with the Postman collection
 ### Phase 3: Teacher Class Routines (`/dashboard/teacher/routines`) — ✅ COMPLETED
 
 1. **Sidebar Navigation Open**: Removed permission guard from `Class Routine` navigation item in `src/constants/dashboard-navigation.ts` so all active faculty members can access their weekly schedule.
-2. **Unified Role-Aware Architecture**: Enhanced `RoutinesManagementView` (`portalRole="TEACHER"`) eliminating redundant parallel components, auto-defaulting to `"teacher"` view mode with the logged-in teacher pre-selected.
-3. **Teacher Identification**: Added `(You)` badge on the teacher dropdown selector when the authenticated user is listed.
-4. **Granular Permission Enforcement**: Tied "Schedule Class" button, slot card action menus, and `RoutineSlotDialog` to `canManageRoutines` (`portalRole === "ADMIN" || hasPermission("MANAGE_ROUTINES")`).
+2. **Unified Role-Aware Architecture**: Enhanced `RoutinesManagementView` (`portalRole="TEACHER"`) eliminating redundant parallel components. For teachers without routine management, strictly renders personal schedule (`GET /routines/my/teacher-schedule`).
+3. **Full Admin Equivalence for Routine Managers**: Teachers with `MANAGE_ROUTINES` receive complete parity with Admin—defaulting to Master "All Classes" view on load, with full access to "By Batch" and "By Teacher" switchers, plus slot scheduling (`POST`), updating (`PATCH`), and deletion (`DELETE`).
+4. **Teacher Selector Name Resolution & Pinned (You) Badge**: Implemented `combinedTeachers` memo merging teacher directory query, routine slot references, and the authenticated teacher's profile with `(You)` badge. Solves missing names/UUID fallbacks cleanly.
 5. **Print & PDF Export**: Fully integrated A4 landscape print styles and PDF export accessible to all teachers.
 6. **Suspense-First Skeletons**: Extracted reusable `RoutinesSkeleton` in `src/components/modules/routines/` and wired into `loading.tsx` and `<Suspense>` boundaries.
 
