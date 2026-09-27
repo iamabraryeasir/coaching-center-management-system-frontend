@@ -139,7 +139,6 @@ export const TEACHER_NAV_GROUPS: readonly DashboardNavGroup[] = [
         title: "Class Routine",
         href: "/dashboard/teacher/routines",
         icon: CalendarDays,
-        requiredPermission: "MANAGE_ROUTINES",
       },
       {
         title: "Attendance",

@@ -11,9 +11,9 @@
 | Metric                                                         | Count  | Percentage |
 | :------------------------------------------------------------- | :----: | :--------: |
 | **Total Teacher-Relevant Endpoints in Postman Collection**     | **44** |    100%    |
-| **Fully Implemented Features (API + Hooks + UI)**              | **24** | **54.5%**  |
-| **API Ready / Component Ready (Pending Dedicated Teacher UI)** | **11** | **25.0%**  |
-| **Unimplemented / Backlog Features & APIs**                    | **9**  | **20.5%**  |
+| **Fully Implemented Features (API + Hooks + UI)**              | **31** | **70.5%**  |
+| **API Ready / Component Ready (Pending Dedicated Teacher UI)** | **7**  | **15.9%**  |
+| **Unimplemented / Backlog Features & APIs**                    | **6**  | **13.6%**  |
 
 ---
 
@@ -133,14 +133,16 @@ _Existing Assets_: `ChangePasswordCard`, `ActiveSessionsCard`, `AdminProfileCard
 - `PATCH /api/v1/users/me/avatar` — Upload or update personal avatar.
 - `DELETE /api/v1/users/me/avatar` — Remove profile avatar.
 
-### 3.2 Class Routines & Weekly Schedule (`/dashboard/teacher/routines`)
-
-_Existing Assets_: `TeacherRoutineView` in `src/components/modules/routines/teacher-routine-view.tsx` and routine API endpoints in `src/api/routines.ts`.
+### 3.2 Class Routines & Weekly Schedule (`/dashboard/teacher/routines`) — ✅ COMPLETED
 
 - `GET /api/v1/routines/my/teacher-schedule` — Get logged-in teacher's personal schedule directly.
 - `GET /api/v1/routines/teacher/:teacherUserId` — View teacher's 7-day personal timetable (Saturday to Friday).
 - `GET /api/v1/routines/batch/:batchId` — View batch timetable.
-- `GET /api/v1/routines/batches/:batchId/pdf` — PDF timetable download.
+- `GET /api/v1/routines/batches/:batchId/pdf` — PDF timetable download / A4 native print layout.
+- `POST /api/v1/routines` — Create routine slot (authorized when `hasPermission("MANAGE_ROUTINES")`).
+- `PATCH /api/v1/routines/:routineId` — Edit routine slot time/room/subject (authorized when `hasPermission("MANAGE_ROUTINES")`).
+- `DELETE /api/v1/routines/:routineId` — Remove routine slot (authorized when `hasPermission("MANAGE_ROUTINES")`).
+- **Unified Reusable Architecture**: Driven by `RoutinesManagementView portalRole="TEACHER"`, auto-selecting teacher's personal schedule, supporting batch/teacher/all filters, (You) indicator badges, and permission-guarded mutation controls.
 
 ### 3.4 Institution Information
 
@@ -162,12 +164,12 @@ The following features require frontend implementation to complete the Teacher r
   - `TeacherQuickActionsBar`: Direct one-click navigation guarded by delegated permissions.
   - `TeacherDashboardPageSkeleton`: Dedicated Suspense fallbacks for all cards.
 
-### 4.2 Routine Modification Permissions (Guarded by `MANAGE_ROUTINES`)
+### 4.2 Routine Modification Permissions (Guarded by `MANAGE_ROUTINES`) — ✅ COMPLETED
 
 - `POST /api/v1/routines` — Add routine slot for assigned batches.
 - `PATCH /api/v1/routines/:routineId` — Edit routine slot time/room/subject.
 - `DELETE /api/v1/routines/:routineId` — Remove routine slot.
-- **To Implement**: Connect `CreateRoutineDialog` and slot edit actions conditionally when `hasPermission("MANAGE_ROUTINES")`.
+- **Implemented**: `canManageRoutines` check seamlessly controls the "Schedule Class" toolbar action, individual slot edit/delete dropdown items, and the `RoutineSlotDialog` & delete confirmation dialogs. Unprivileged teachers see a clean read-only schedule view with full print capability.
 
 ### 4.3 Teacher Personal Attendance History
 
@@ -210,13 +212,13 @@ The following features require frontend implementation to complete the Teacher r
 | **15** | `Get All Batches (QueryBuilder)`                    | `/api/v1/batches`                                            |  `GET`   |        None         |   ✅ **COMPLETED**   | `TeacherBatchesView` on `/dashboard/teacher/batches`                     |
 | **16** | `Get Batch Details by ID`                           | `/api/v1/batches/:batchId`                                   |  `GET`   |        None         |   ✅ **COMPLETED**   | `TeacherBatchDetailView` on `/dashboard/teacher/batches/:batchId`        |
 | **17** | `Get Batch Student Roster (Admin & Teacher)`        | `/api/v1/batches/:batchId/students`                          |  `GET`   |        None         |   ✅ **COMPLETED**   | `TeacherBatchRosterTable` on `/dashboard/teacher/batches/:batchId`       |
-| **18** | `Get My Teaching Schedule (Teacher Only)`           | `/api/v1/routines/my/teacher-schedule`                       |  `GET`   |        None         | ⚠️ _Component Ready_ | `src/api/routines.ts` / Needs `/dashboard/teacher/routines`              |
-| **19** | `Get Teacher Teaching Schedule`                     | `/api/v1/routines/teacher/:teacherUserId`                    |  `GET`   |        None         | ⚠️ _Component Ready_ | `TeacherRoutineView` / Needs `/dashboard/teacher/routines`               |
-| **20** | `Get Batch Timetable (Day-Wise Grouped)`            | `/api/v1/routines/batch/:batchId`                            |  `GET`   |        None         | ⚠️ _Component Ready_ | `src/api/routines.ts` / Needs `/dashboard/teacher/routines`              |
-| **21** | `Download/Preview Batch Routine Schedule PDF`       | `/api/v1/routines/batches/:batchId/pdf`                      |  `GET`   |        None         | ⚠️ _Component Ready_ | `src/api/routines.ts` (Routine PDF Export)                               |
-| **22** | `Create Routine Slot (Admin or Authorized Teacher)` | `/api/v1/routines`                                           |  `POST`  |  `MANAGE_ROUTINES`  | ❌ **UNIMPLEMENTED** | Pending Routine Slot Modal on `/dashboard/teacher/routines`              |
-| **23** | `Update Routine Slot (Admin or Authorized Teacher)` | `/api/v1/routines/:routineId`                                | `PATCH`  |  `MANAGE_ROUTINES`  | ❌ **UNIMPLEMENTED** | Pending Routine Slot Edit on `/dashboard/teacher/routines`               |
-| **24** | `Delete Routine Slot (Admin or Authorized Teacher)` | `/api/v1/routines/:routineId`                                | `DELETE` |  `MANAGE_ROUTINES`  | ❌ **UNIMPLEMENTED** | Pending Routine Slot Delete on `/dashboard/teacher/routines`             |
+| **18** | `Get My Teaching Schedule (Teacher Only)`           | `/api/v1/routines/my/teacher-schedule`                       |  `GET`   |        None         |   ✅ **COMPLETED**   | `RoutinesManagementView` on `/dashboard/teacher/routines`                |
+| **19** | `Get Teacher Teaching Schedule`                     | `/api/v1/routines/teacher/:teacherUserId`                    |  `GET`   |        None         |   ✅ **COMPLETED**   | `RoutinesManagementView` on `/dashboard/teacher/routines`                |
+| **20** | `Get Batch Timetable (Day-Wise Grouped)`            | `/api/v1/routines/batch/:batchId`                            |  `GET`   |        None         |   ✅ **COMPLETED**   | `RoutinesManagementView` on `/dashboard/teacher/routines`                |
+| **21** | `Download/Preview Batch Routine Schedule PDF`       | `/api/v1/routines/batches/:batchId/pdf`                      |  `GET`   |        None         |   ✅ **COMPLETED**   | `RoutinesManagementView` Print & PDF export                              |
+| **22** | `Create Routine Slot (Admin or Authorized Teacher)` | `/api/v1/routines`                                           |  `POST`  |  `MANAGE_ROUTINES`  |   ✅ **COMPLETED**   | `RoutineSlotDialog` on `/dashboard/teacher/routines`                     |
+| **23** | `Update Routine Slot (Admin or Authorized Teacher)` | `/api/v1/routines/:routineId`                                | `PATCH`  |  `MANAGE_ROUTINES`  |   ✅ **COMPLETED**   | `RoutineSlotDialog` edit on `/dashboard/teacher/routines`                |
+| **24** | `Delete Routine Slot (Admin or Authorized Teacher)` | `/api/v1/routines/:routineId`                                | `DELETE` |  `MANAGE_ROUTINES`  |   ✅ **COMPLETED**   | Delete slot modal on `/dashboard/teacher/routines`                       |
 | **25** | `Get Batch Attendance Sheet`                        | `/api/v1/attendance/batches/:batchId`                        |  `GET`   | `MANAGE_ATTENDANCE` |   ✅ **COMPLETED**   | `src/app/dashboard/teacher/attendance/page.tsx`                          |
 | **26** | `Mark Bulk Daily Attendance`                        | `/api/v1/attendance/batches/:batchId`                        |  `POST`  | `MANAGE_ATTENDANCE` |   ✅ **COMPLETED**   | `BatchAttendanceSheet` on `/dashboard/teacher/attendance`                |
 | **27** | `Update Single Attendance Record`                   | `/api/v1/attendance/:attendanceId`                           | `PATCH`  | `MANAGE_ATTENDANCE` |   ✅ **COMPLETED**   | Single student attendance update on `/dashboard/teacher/attendance`      |
@@ -261,12 +263,14 @@ To bring the Teacher role to 100% completion aligned with the Postman collection
 5. **Attendance History Bridge**: Integrated `StudentAttendanceHistoryModal` trigger per enrolled student.
 6. **Suspense-First Skeletons**: `TeacherBatchesPageSkeleton`, `TeacherBatchDetailSkeleton`, and route-level `loading.tsx` wrappers.
 
-### Phase 3: Teacher Class Routines (`/dashboard/teacher/routines`)
+### Phase 3: Teacher Class Routines (`/dashboard/teacher/routines`) — ✅ COMPLETED
 
-1. Create `src/app/dashboard/teacher/routines/page.tsx` and route skeleton.
-2. Embed the existing 7-day `TeacherRoutineView` powered by `GET /routines/my/teacher-schedule` or `GET /routines/teacher/:id`.
-3. If teacher possesses `MANAGE_ROUTINES`: enable `CreateRoutineDialog`, slot editing (`PATCH /routines/:id`), and slot deletion (`DELETE /routines/:id`).
-4. Include batch routine schedule PDF export (`GET /routines/batches/:batchId/pdf`).
+1. **Sidebar Navigation Open**: Removed permission guard from `Class Routine` navigation item in `src/constants/dashboard-navigation.ts` so all active faculty members can access their weekly schedule.
+2. **Unified Role-Aware Architecture**: Enhanced `RoutinesManagementView` (`portalRole="TEACHER"`) eliminating redundant parallel components, auto-defaulting to `"teacher"` view mode with the logged-in teacher pre-selected.
+3. **Teacher Identification**: Added `(You)` badge on the teacher dropdown selector when the authenticated user is listed.
+4. **Granular Permission Enforcement**: Tied "Schedule Class" button, slot card action menus, and `RoutineSlotDialog` to `canManageRoutines` (`portalRole === "ADMIN" || hasPermission("MANAGE_ROUTINES")`).
+5. **Print & PDF Export**: Fully integrated A4 landscape print styles and PDF export accessible to all teachers.
+6. **Suspense-First Skeletons**: Extracted reusable `RoutinesSkeleton` in `src/components/modules/routines/` and wired into `loading.tsx` and `<Suspense>` boundaries.
 
 ### Phase 4: Teacher Profile, Security & Attendance Summary (`/dashboard/teacher/settings`)
 

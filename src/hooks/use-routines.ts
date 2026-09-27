@@ -66,10 +66,11 @@ export function useTeacherSchedule(teacherUserId: string, enabled = true) {
 /**
  * Fetch personal weekly schedule for authenticated teacher
  */
-export function useMyTeacherSchedule() {
+export function useMyTeacherSchedule(enabled = true) {
   return useQuery({
     queryKey: routineKeys.myTeacherSchedule(),
     queryFn: () => getMyTeacherSchedule(),
+    enabled,
   });
 }
 

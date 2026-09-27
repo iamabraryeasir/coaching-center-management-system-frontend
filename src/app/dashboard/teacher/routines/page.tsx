@@ -7,15 +7,15 @@ import {
 import { siteConfig } from "@/config/site";
 
 export const metadata: Metadata = {
-  title: `Class Routines & Timetable | ${siteConfig.name}`,
+  title: `My Class Routine & Timetable | ${siteConfig.name}`,
   description:
-    "Organize 7-day weekly class schedules, manage room allocations, and prevent teacher conflicts.",
+    "View your personal weekly teaching timetable, classroom assignments, and batch routines.",
 };
 
-export default function AdminRoutinesPage() {
+export default function TeacherRoutinesPage() {
   return (
     <Suspense fallback={<RoutinesSkeleton />}>
-      <RoutinesManagementView portalRole="ADMIN" />
+      <RoutinesManagementView portalRole="TEACHER" />
     </Suspense>
   );
 }

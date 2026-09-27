@@ -21,11 +21,12 @@ import type {
 /**
  * Fetch paginated teachers with filters and search
  */
-export function useTeachers(params?: TeacherQueryParams) {
+export function useTeachers(params?: TeacherQueryParams, enabled = true) {
   return useQuery({
     queryKey: teacherKeys.list(params as Record<string, unknown>),
     queryFn: () => getTeachers(params),
     placeholderData: (previousData) => previousData,
+    enabled,
   });
 }
 

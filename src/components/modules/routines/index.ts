@@ -5,4 +5,5 @@ export * from "./routine-slot-card";
 export * from "./routine-slot-dialog";
 export * from "./routine-toolbar";
 export * from "./routines-management-view";
+export * from "./routines-skeleton";
 export * from "./weekly-timetable-grid";

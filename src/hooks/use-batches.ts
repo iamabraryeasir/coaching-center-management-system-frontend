@@ -25,11 +25,12 @@ import type {
 /**
  * Fetch paginated batches
  */
-export function useBatches(params?: BatchQueryParams) {
+export function useBatches(params?: BatchQueryParams, enabled = true) {
   return useQuery({
     queryKey: batchKeys.list(params as Record<string, unknown>),
     queryFn: () => getBatches(params),
     placeholderData: (previousData) => previousData,
+    enabled,
   });
 }
 

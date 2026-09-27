@@ -15,9 +15,11 @@ import {
 import { useSidebar } from "@/components/ui/sidebar";
 import { siteConfig } from "@/config/site";
 import {
+  useAuth,
   useBatches,
   useBatchTimetable,
   useDeleteRoutineMutation,
+  useMyTeacherSchedule,
   useRoutines,
   useTeacherSchedule,
   useTeachers,
@@ -27,14 +29,26 @@ import {
   type DayOfWeek,
   type DayTimetableGroup,
   type RoutineSlot,
+  type User,
 } from "@/types";
 import { RoutineSlotDialog } from "./routine-slot-dialog";
 import { RoutineToolbar, type RoutineViewMode } from "./routine-toolbar";
 import { WeeklyTimetableGrid } from "./weekly-timetable-grid";
 
-export function RoutinesManagementView() {
+interface RoutinesManagementViewProps {
+  portalRole?: "ADMIN" | "TEACHER";
+}
+
+export function RoutinesManagementView({
+  portalRole = "ADMIN",
+}: RoutinesManagementViewProps = {}) {
   const searchParams = useSearchParams();
   const { setOpen } = useSidebar();
+  const { user, hasPermission } = useAuth();
+
+  const isTeacherPortal = portalRole === "TEACHER";
+  const canManageRoutines =
+    portalRole === "ADMIN" || hasPermission("MANAGE_ROUTINES");
 
   // Collapse sidebar by default on the routine route to provide maximum screen real estate for the 7-day grid,
   // and restore when navigating away to other dashboard pages.
@@ -45,13 +59,17 @@ export function RoutinesManagementView() {
     };
   }, [setOpen]);
 
-  const initialViewMode: RoutineViewMode =
-    (searchParams.get("view") as RoutineViewMode) ||
-    (searchParams.get("batchId")
-      ? "batch"
-      : searchParams.get("teacherId")
-        ? "teacher"
-        : "all");
+  // When a teacher does not have MANAGE_ROUTINES, view is strictly "teacher" (their own routine)
+  // When a teacher does not have MANAGE_ROUTINES, view is strictly "teacher" (their own routine).
+  // When they DO have MANAGE_ROUTINES, they get full admin-level view capability (defaulting to "all" master schedule).
+  const initialViewMode: RoutineViewMode = !canManageRoutines
+    ? "teacher"
+    : (searchParams.get("view") as RoutineViewMode) ||
+      (searchParams.get("batchId")
+        ? "batch"
+        : searchParams.get("teacherId")
+          ? "teacher"
+          : "all");
 
   const [viewMode, setViewMode] = useState<RoutineViewMode>(initialViewMode);
   const [selectedBatchId, setSelectedBatchId] = useState<string>(
@@ -61,6 +79,21 @@ export function RoutinesManagementView() {
     searchParams.get("teacherId") || "",
   );
 
+  const effectiveViewMode: RoutineViewMode = !canManageRoutines
+    ? "teacher"
+    : viewMode;
+
+  // Effective teacher ID: in teacher portal, defaults to current teacher
+  const effectiveTeacherId =
+    selectedTeacherId || (isTeacherPortal && user?.id ? user.id : "");
+
+  // Check if viewing the logged-in teacher's personal schedule
+  const isViewingSelf =
+    isTeacherPortal &&
+    (!canManageRoutines ||
+      !selectedTeacherId ||
+      Boolean(user?.id && selectedTeacherId === user.id));
+
   // Dialog states
   const [isSlotDialogOpen, setIsSlotDialogOpen] = useState(false);
   const [slotToEdit, setSlotToEdit] = useState<RoutineSlot | null>(null);
@@ -69,42 +102,107 @@ export function RoutinesManagementView() {
   >(undefined);
   const [slotToDelete, setSlotToDelete] = useState<RoutineSlot | null>(null);
 
-  // Fetch batches & teachers for selectors
-  const { data: batchesResponse, isLoading: isBatchesLoading } = useBatches({
-    limit: 100,
-  });
-  const { data: teachersResponse, isLoading: isTeachersLoading } = useTeachers({
-    limit: 100,
-  });
-
-  const batches = batchesResponse?.data || [];
-  const teachers = teachersResponse?.data || [];
-
-  // Auto-select first batch or first teacher if none selected
-  const activeBatchId = selectedBatchId || batches[0]?.id || "";
-  const activeTeacherId = selectedTeacherId || teachers[0]?.id || "";
+  // Fetch batches & teachers for selectors only if user has management permissions
+  const { data: batchesResponse, isLoading: isBatchesLoading } = useBatches(
+    { limit: 100 },
+    canManageRoutines,
+  );
+  const { data: teachersResponse, isLoading: isTeachersLoading } = useTeachers(
+    { limit: 100 },
+    canManageRoutines,
+  );
 
   // Queries for timetable data
   const { data: allRoutinesResponse, isLoading: isAllRoutinesLoading } =
-    useRoutines({ limit: 100 }, viewMode === "all");
+    useRoutines(
+      { limit: 100 },
+      canManageRoutines && effectiveViewMode === "all",
+    );
+
+  // Combine teachers from teachers API, routine slots, and authenticated user so names are never missing
+  const combinedTeachers: User[] = useMemo(() => {
+    const map = new Map<string, User>();
+
+    // 1. Add teachers from API response
+    for (const t of teachersResponse?.data || []) {
+      if (t?.id) map.set(t.id, t);
+    }
+
+    // 2. Discover teachers from all scheduled routine slots
+    for (const slot of allRoutinesResponse?.data || []) {
+      if (slot.teacher?.id && !map.has(slot.teacher.id)) {
+        map.set(slot.teacher.id, {
+          id: slot.teacher.id,
+          name: slot.teacher.name,
+          email: slot.teacher.email || "",
+          phone: slot.teacher.phone || null,
+          role: "TEACHER",
+          status: "ACTIVE",
+          createdAt: "",
+          teacherProfile: {
+            id: slot.teacher.id,
+            designation: slot.teacher.designation || "Teacher",
+            specialization: slot.teacher.specialization || "",
+            qualification: "",
+            joiningDate: "",
+          },
+        });
+      }
+    }
+
+    // 3. Always include authenticated user with their actual name and profile
+    if (user?.id) {
+      const existing = map.get(user.id);
+      map.set(user.id, {
+        ...(existing || user),
+        name: user.name || existing?.name || "My Routine",
+        teacherProfile: user.teacherProfile ||
+          existing?.teacherProfile || {
+            id: user.id,
+            designation: "Teacher",
+            qualification: "",
+            specialization: "",
+            joiningDate: "",
+          },
+      });
+    }
+
+    return Array.from(map.values());
+  }, [teachersResponse?.data, allRoutinesResponse?.data, user]);
+
+  const batches = batchesResponse?.data || [];
+  const teachers = combinedTeachers;
+
+  // Auto-select first batch or first teacher if none selected
+  const activeBatchId = selectedBatchId || batches[0]?.id || "";
+  const activeTeacherId = effectiveTeacherId || teachers[0]?.id || "";
 
   const { data: batchTimetableResponse, isLoading: isBatchTimetableLoading } =
     useBatchTimetable(
       activeBatchId,
-      viewMode === "batch" && Boolean(activeBatchId),
+      canManageRoutines &&
+        effectiveViewMode === "batch" &&
+        Boolean(activeBatchId),
     );
 
+  // Personal schedule for authenticated teacher (GET /routines/my/teacher-schedule)
+  const { data: myScheduleResponse, isLoading: isMyScheduleLoading } =
+    useMyTeacherSchedule(isTeacherPortal && isViewingSelf);
+
+  // Another teacher's schedule (GET /routines/teacher/:teacherUserId)
   const { data: teacherScheduleResponse, isLoading: isTeacherScheduleLoading } =
     useTeacherSchedule(
       activeTeacherId,
-      viewMode === "teacher" && Boolean(activeTeacherId),
+      effectiveViewMode === "teacher" &&
+        !isViewingSelf &&
+        Boolean(activeTeacherId),
     );
 
   const deleteMutation = useDeleteRoutineMutation();
 
   // Active Schedule payload (grouped Saturday -> Friday)
   const activeSchedule: DayTimetableGroup[] | undefined = useMemo(() => {
-    if (viewMode === "all") {
+    if (effectiveViewMode === "all") {
       const allSlots = allRoutinesResponse?.data || [];
       return ACADEMIC_DAYS_ORDER.map((day) => ({
         dayOfWeek: day,
@@ -113,23 +211,30 @@ export function RoutinesManagementView() {
           .sort((a, b) => a.startTime.localeCompare(b.startTime)),
       }));
     }
-    if (viewMode === "batch") {
+    if (effectiveViewMode === "batch") {
       return batchTimetableResponse?.data?.schedule;
+    }
+    if (isViewingSelf) {
+      return myScheduleResponse?.data?.schedule;
     }
     return teacherScheduleResponse?.data?.schedule;
   }, [
-    viewMode,
+    effectiveViewMode,
+    isViewingSelf,
     allRoutinesResponse?.data,
     batchTimetableResponse?.data?.schedule,
+    myScheduleResponse?.data?.schedule,
     teacherScheduleResponse?.data?.schedule,
   ]);
 
   const isLoadingTimetable =
-    viewMode === "all"
+    effectiveViewMode === "all"
       ? isAllRoutinesLoading
-      : viewMode === "batch"
+      : effectiveViewMode === "batch"
         ? isBatchesLoading || isBatchTimetableLoading
-        : isTeachersLoading || isTeacherScheduleLoading;
+        : isViewingSelf
+          ? isMyScheduleLoading
+          : isTeachersLoading || isTeacherScheduleLoading;
 
   // Selected Entity Name
   const selectedBatchObj = batches.find((b) => b.id === activeBatchId);
@@ -216,15 +321,17 @@ export function RoutinesManagementView() {
       {/* Routine Controls & Filter Toolbar (Screen only) */}
       <div className="print:hidden">
         <RoutineToolbar
-          viewMode={viewMode}
+          viewMode={effectiveViewMode}
           onViewModeChange={(mode) => setViewMode(mode)}
           selectedBatchId={activeBatchId}
           onSelectBatchId={(id) => setSelectedBatchId(id)}
           batches={batches}
-          selectedTeacherId={activeTeacherId}
+          selectedTeacherId={effectiveTeacherId}
           onSelectTeacherId={(id) => setSelectedTeacherId(id)}
           teachers={teachers}
-          onAddSlot={() => handleOpenAddSlot()}
+          currentUserId={user?.id}
+          canManageRoutines={canManageRoutines}
+          onAddSlot={canManageRoutines ? () => handleOpenAddSlot() : undefined}
           onPrint={handlePrint}
         />
       </div>
@@ -235,10 +342,14 @@ export function RoutinesManagementView() {
           {siteConfig.name}
         </h1>
         <h2 className="text-sm font-bold text-neutral-800 mt-1">
-          {viewMode === "batch"
+          {effectiveViewMode === "batch"
             ? `Class Routine — ${selectedBatchObj?.name || "Academic Batch"}`
-            : viewMode === "teacher"
-              ? `Class Routine — ${selectedTeacherObj?.name || "Teacher"}`
+            : effectiveViewMode === "teacher"
+              ? `Class Routine — ${
+                  isViewingSelf
+                    ? user?.name || "My Teaching Schedule"
+                    : selectedTeacherObj?.name || "Teacher"
+                }`
               : "Weekly Class Routine"}
         </h2>
       </div>
@@ -248,83 +359,94 @@ export function RoutinesManagementView() {
         <WeeklyTimetableGrid
           schedule={activeSchedule}
           isLoading={isLoadingTimetable}
-          viewMode={viewMode}
-          onAddSlot={handleOpenAddSlot}
-          onEditSlot={handleOpenEditSlot}
-          onDeleteSlot={(slot) => setSlotToDelete(slot)}
+          viewMode={effectiveViewMode}
+          onAddSlot={canManageRoutines ? handleOpenAddSlot : undefined}
+          onEditSlot={canManageRoutines ? handleOpenEditSlot : undefined}
+          onDeleteSlot={
+            canManageRoutines ? (slot) => setSlotToDelete(slot) : undefined
+          }
           emptyTitle={
-            viewMode === "all"
+            effectiveViewMode === "all"
               ? "No classes scheduled across any batch yet"
-              : viewMode === "batch"
+              : effectiveViewMode === "batch"
                 ? `No classes scheduled for "${selectedBatchObj?.name || "this batch"}"`
-                : `No classes scheduled for "${selectedTeacherObj?.name || "this teacher"}"`
+                : isViewingSelf
+                  ? "No classes scheduled in your personal routine yet"
+                  : `No classes scheduled for "${selectedTeacherObj?.name || "this teacher"}"`
           }
           emptyDescription="Start scheduling regular weekly periods to assign rooms and prevent timetable clashes."
         />
       </div>
 
       {/* Create / Edit Routine Slot Modal */}
-      <RoutineSlotDialog
-        open={isSlotDialogOpen}
-        onOpenChange={setIsSlotDialogOpen}
-        slotToEdit={slotToEdit}
-        defaultBatchId={viewMode === "batch" ? activeBatchId : undefined}
-        defaultDayOfWeek={defaultDayForNewSlot}
-        batches={batches}
-        teachers={teachers}
-      />
+      {canManageRoutines && (
+        <RoutineSlotDialog
+          open={isSlotDialogOpen}
+          onOpenChange={setIsSlotDialogOpen}
+          slotToEdit={slotToEdit}
+          defaultBatchId={
+            effectiveViewMode === "batch" ? activeBatchId : undefined
+          }
+          defaultDayOfWeek={defaultDayForNewSlot}
+          batches={batches}
+          teachers={teachers}
+        />
+      )}
 
       {/* Delete Slot Confirmation Modal */}
-      <Dialog
-        open={Boolean(slotToDelete)}
-        onOpenChange={(open) => {
-          if (!open) setSlotToDelete(null);
-        }}
-      >
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="text-destructive font-heading">
-              Remove Class Slot
-            </DialogTitle>
-            <DialogDescription className="text-xs sm:text-sm pt-1">
-              Are you sure you want to remove the scheduled session for{" "}
-              <strong className="text-foreground">
-                {slotToDelete?.subject || "this class"}
-              </strong>{" "}
-              on{" "}
-              <span className="font-semibold">
-                {slotToDelete?.dayOfWeek} ({slotToDelete?.startTime} –{" "}
-                {slotToDelete?.endTime})
-              </span>
-              ? This will release the allocated classroom and teacher time slot.
-            </DialogDescription>
-          </DialogHeader>
+      {canManageRoutines && (
+        <Dialog
+          open={Boolean(slotToDelete)}
+          onOpenChange={(open) => {
+            if (!open) setSlotToDelete(null);
+          }}
+        >
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle className="text-destructive font-heading">
+                Remove Class Slot
+              </DialogTitle>
+              <DialogDescription className="text-xs sm:text-sm pt-1">
+                Are you sure you want to remove the scheduled session for{" "}
+                <strong className="text-foreground">
+                  {slotToDelete?.subject || "this class"}
+                </strong>{" "}
+                on{" "}
+                <span className="font-semibold">
+                  {slotToDelete?.dayOfWeek} ({slotToDelete?.startTime} –{" "}
+                  {slotToDelete?.endTime})
+                </span>
+                ? This will release the allocated classroom and teacher time
+                slot.
+              </DialogDescription>
+            </DialogHeader>
 
-          <DialogFooter className="gap-2.5 sm:gap-2.5 pt-2">
-            <DialogClose
-              render={
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  disabled={deleteMutation.isPending}
-                >
-                  Cancel
-                </Button>
-              }
-            />
-            <Button
-              type="button"
-              variant="destructive"
-              size="sm"
-              onClick={confirmDelete}
-              disabled={deleteMutation.isPending}
-            >
-              {deleteMutation.isPending ? "Removing..." : "Remove Slot"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+            <DialogFooter className="gap-2.5 sm:gap-2.5 pt-2">
+              <DialogClose
+                render={
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    disabled={deleteMutation.isPending}
+                  >
+                    Cancel
+                  </Button>
+                }
+              />
+              <Button
+                type="button"
+                variant="destructive"
+                size="sm"
+                onClick={confirmDelete}
+                disabled={deleteMutation.isPending}
+              >
+                {deleteMutation.isPending ? "Removing..." : "Remove Slot"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 }
