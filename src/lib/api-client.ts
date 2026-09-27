@@ -145,9 +145,12 @@ async function apiClient<T = unknown>(
         const refreshStatus =
           refreshErrObj?.response?.status || refreshErrObj?.status;
 
-        // ONLY notify that the session expired if the refresh call specifically returned 401 or 403
-        // If it was a network failure, temporary offline drop, or 5xx, do NOT log out the user
-        if (refreshStatus === 401 || refreshStatus === 403) {
+        // If the refresh call returned 400 (no token), 401, or 403, notify session expired
+        if (
+          refreshStatus === 400 ||
+          refreshStatus === 401 ||
+          refreshStatus === 403
+        ) {
           dispatchSessionExpired();
         }
 

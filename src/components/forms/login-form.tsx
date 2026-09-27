@@ -3,12 +3,12 @@
 import { useForm } from "@tanstack/react-form";
 import { useQueryClient } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { loginUser } from "@/api";
+import { GoogleLoginButton } from "@/components/forms/google-login-button";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -205,16 +205,7 @@ export function LoginForm({
               </FieldSeparator>
 
               <Field>
-                <Button variant="outline" type="button" className="w-full">
-                  <Image
-                    src="/google-logo.png"
-                    alt="Google Login"
-                    width={18}
-                    height={18}
-                    className="mr-2"
-                  />
-                  Login with Google
-                </Button>
+                <GoogleLoginButton label="Login with Google" />
               </Field>
             </FieldGroup>
           </form>

@@ -10,12 +10,16 @@ import {
   getCurrentUser,
   logoutAllDevices,
   logoutUser,
+  submitGoogleOnboarding,
   updateMyProfile,
+  verifyGoogleToken,
 } from "@/api/auth";
 import { authKeys } from "@/constants/query-keys";
 import { authChannel } from "@/lib/auth-channel";
 import {
   type ChangePasswordDto,
+  type GoogleAuthPayload,
+  type GoogleOnboardDto,
   getTeacherPermissions,
   type TeacherPermission,
   type UpdateMyProfileDto,
@@ -223,6 +227,41 @@ export function useLogoutAllMutation() {
       queryClient.removeQueries({ queryKey: authKeys.all });
       toast.error(message);
       router.push("/");
+    },
+  });
+}
+
+/**
+ * Mutation to verify Google Identity Services ID token.
+ * If approved user: updates cache and triggers login broadcast.
+ * If new user: returns { isNewUser: true, googleId, email, name, avatarUrl }.
+ */
+export function useGoogleAuthMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (payload: GoogleAuthPayload) => verifyGoogleToken(payload),
+    onSuccess: (res) => {
+      const data = res.data;
+      if (data && !data.isNewUser && data.user) {
+        queryClient.setQueryData(authKeys.currentUser(), data.user);
+        authChannel.postMessage({ type: "LOGIN" });
+      }
+    },
+  });
+}
+
+/**
+ * Mutation for submitting Google student onboarding form.
+ * Puts applicant into PENDING_ACTIVATION state.
+ */
+export function useGoogleOnboardingMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (payload: GoogleOnboardDto) => submitGoogleOnboarding(payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["pending-students"] });
     },
   });
 }

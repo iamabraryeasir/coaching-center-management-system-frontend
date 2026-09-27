@@ -3,7 +3,11 @@ import type {
   ApiResponse,
   AuthTokens,
   ChangePasswordDto,
+  GoogleAuthPayload,
+  GoogleAuthResponseData,
+  GoogleOnboardDto,
   LoginResponse,
+  PendingStudent,
   UpdateMyProfileDto,
   User,
   UserSession,
@@ -18,6 +22,36 @@ export async function loginUser(data: LoginInput): Promise<LoginResponse> {
     method: "POST",
     body: data,
   });
+}
+
+/**
+ * Verify Google Identity Services (GIS) ID token.
+ * If user exists and approved: sets HttpOnly cookies, returns { isNewUser: false, user }
+ * If new user: returns { isNewUser: true, googleId, email, name, avatarUrl }
+ */
+export async function verifyGoogleToken(
+  payload: GoogleAuthPayload,
+): Promise<ApiResponse<GoogleAuthResponseData>> {
+  return await apiClient<ApiResponse<GoogleAuthResponseData>>("/auth/google", {
+    method: "POST",
+    body: payload,
+  });
+}
+
+/**
+ * Submit student onboarding credentials for new Google OAuth applicant.
+ * Puts user account in PENDING_ACTIVATION awaiting administrative approval.
+ */
+export async function submitGoogleOnboarding(
+  payload: GoogleOnboardDto,
+): Promise<ApiResponse<PendingStudent | User>> {
+  return await apiClient<ApiResponse<PendingStudent | User>>(
+    "/auth/google/onboard",
+    {
+      method: "POST",
+      body: payload,
+    },
+  );
 }
 
 /**

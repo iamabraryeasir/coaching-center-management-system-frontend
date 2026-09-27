@@ -106,3 +106,31 @@ export interface UpdateMyProfileDto {
   phone?: string | null;
   gender?: Gender;
 }
+
+export interface GoogleAuthPayload {
+  idToken: string;
+}
+
+export interface GoogleAuthResponseData {
+  isNewUser: boolean;
+  user?: User;
+  tokens?: AuthTokens;
+  googleId?: string;
+  email?: string;
+  name?: string;
+  avatarUrl?: string;
+}
+
+export interface GoogleOnboardDto {
+  googleId: string;
+  email: string;
+  name: string;
+  phone: string;
+  guardianName: string;
+  guardianPhone: string;
+  institutionName: string;
+  classLevel: string;
+  rollNumber: string;
+  avatarUrl?: string | null;
+  gender: NonNullable<Gender>;
+}
