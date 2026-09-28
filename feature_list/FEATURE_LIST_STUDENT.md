@@ -196,7 +196,23 @@ The following capabilities are actively functional in the codebase (**API Client
   - Server Edge Proxy in `src/proxy.ts`: Prevents already-authenticated users with active cookies from accessing `/onboard-student`.
   - Next.js Image optimization configuration for `lh3.googleusercontent.com` and `*.googleusercontent.com` avatars.
 
-### 3.3 Tuition Billing, Stripe Checkout & PDF Receipts (`/dashboard/student/payments`)
+### 3.3 Batches & Self-Enrollment (`/dashboard/student/batches`)
+
+- **Authenticated Student Batches**: `GET /batches/my/enrolled`
+  - Fetches student's enrolled courses with statuses (`ENROLLED`, `APPROVED`, `PENDING`, `REJECTED`), fee information, and enrollment timestamps.
+  - Queried via `useMyEnrolledBatches()` hook with automatic cache invalidation.
+- **Batch Catalog & Course Exploration**: `GET /batches`
+  - Explorable catalog with search filtering and status toggles (`Ongoing`, `Upcoming`).
+  - Queried via `useSuspenseBatches()` hook, cross-referenced with `enrollmentMap` to identify enrollment states.
+- **Self-Enrollment Application Workflow**: `POST /batches/:batchId/enroll`
+  - Student initiates self-enrollment via `RequestEnrollmentDialog`, which confirms batch details, monthly fee in Bengali Taka (`৳`), and review expectations.
+  - Automatically transitions enrollment to `PENDING` state and queues for administrator approval.
+  - Re-apply workflow allows students with rejected applications to quickly submit a new enrollment request.
+- **Dedicated Route & Suspense Architecture**:
+  - Route `/dashboard/student/batches` with route-level `loading.tsx` and `<StudentBatchesSkeleton />` fallback.
+  - Clean tab navigation between "My Batches" and "Explore Catalog" with responsive empty state and quick routing to class routines and tuition payments.
+
+### 3.4 Tuition Billing, Stripe Checkout & PDF Receipts (`/dashboard/student/payments`)
 
 - **Student Monthly Bill Calculation**: `GET /payments/my-bill?month=X&year=YYYY`
   - Real-time tuition ledger displaying base fee, discounts, opening arrears, total payable, and net balance.
@@ -207,7 +223,7 @@ The following capabilities are actively functional in the codebase (**API Client
 - **Payment Receipt PDF Download**: `GET /payments/transactions/:id/pdf`
   - Automated PDF invoice and payment receipt download modal.
 
-### 3.4 Student Dashboard Gateway (`/dashboard/student`)
+### 3.5 Student Dashboard Gateway (`/dashboard/student`)
 
 - **Smart Gateway Navigation**:
   - `/dashboard/page.tsx` evaluates `user.role === "STUDENT"` and redirects to `/dashboard/student`.
@@ -440,7 +456,7 @@ flowchart LR
 |    Phase    | Module Name                              | Scope & Key Deliverables                                                                                                                                                                                                                                                                                                                 | Endpoints Involved                                                                                                             |
 | :---------: | :--------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :----------------------------------------------------------------------------------------------------------------------------- |
 | **Phase 1** | **Google OAuth & Student Onboarding** ✅ | • `@react-oauth/google` provider & `<GoogleLogin />` integration<br>• Seamless direct login for approved students<br>• Protected `/onboard-student` route with automatic redirect for unverified guests<br>• Multi-step admission form with Google identity prefill<br>• Account enters `PENDING_ACTIVATION` state awaiting admin review | `POST /auth/google`<br>`POST /auth/google/onboard`<br>`GET /users/me`                                                          |
-| **Phase 2** | **Batches & Self-Enrollment**            | • Implement `getMyEnrolledBatches` & `requestBatchEnrollment`<br>• Enrolled batches grid with monthly fee & status<br>• Course catalog with 1-click self-enrollment dialog                                                                                                                                                               | `GET /batches/my/enrolled`<br>`POST /batches/:batchId/enroll`<br>`GET /batches`                                                |
+| **Phase 2** | **Batches & Self-Enrollment** ✅         | • Implement `getMyEnrolledBatches` & `requestBatchEnrollment`<br>• Enrolled batches grid with monthly fee, status badges, & routine links<br>• Course catalog with 1-click self-enrollment request dialog & re-apply workflows                                                                                                           | `GET /batches/my/enrolled`<br>`POST /batches/:batchId/enroll`<br>`GET /batches`                                                |
 | **Phase 3** | **Class Routine & Schedule**             | • 7-day responsive academic timetable grid<br>• Today's classes highlight filter<br>• Batch routine timetable modal & PDF schedule download                                                                                                                                                                                              | `GET /routines/my/student-schedule`<br>`GET /routines/batch/:batchId`<br>`GET /routines/batches/:batchId/pdf`                  |
 | **Phase 4** | **Attendance Tracking**                  | • Monthly attendance metrics (Working days, Present, Late, Absent)<br>• Overall attendance compliance rate bar<br>• Chronological check-in log table with remarks                                                                                                                                                                        | `GET /attendance/my/summary`                                                                                                   |
 | **Phase 5** | **Exams, Results & Merit Lists**         | • Published report cards with marks, letter grade, GPA, and rank<br>• Single exam detail modal with performance breakdown<br>• Official report card PDF download & class merit list viewer                                                                                                                                               | `GET /exams/my/results`<br>`GET /exams/my/results/:examId`<br>`GET /exams/:examId/results`<br>`GET /exams/.../report-card/pdf` |

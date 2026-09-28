@@ -79,3 +79,15 @@ export interface BatchEnrollment {
   student?: BatchEnrollmentUser;
   user?: BatchEnrollmentUser;
 }
+
+export interface StudentEnrolledBatch extends BatchEnrollment {
+  batchName?: string;
+  batchFee?: number;
+}
+
+export interface EnrollmentRequestResponse {
+  id: string;
+  batchId: string;
+  status: EnrollmentStatus;
+  createdAt: string;
+}

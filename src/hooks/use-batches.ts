@@ -1,4 +1,9 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+  useSuspenseQuery,
+} from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import {
   approveEnrollment,
@@ -8,9 +13,11 @@ import {
   getBatchById,
   getBatches,
   getBatchStudents,
+  getMyEnrolledBatches,
   getPendingEnrollments,
   rejectEnrollment,
   removeStudentFromBatch,
+  requestBatchEnrollment,
   updateBatch,
 } from "@/api";
 import { batchKeys, studentKeys } from "@/constants";
@@ -31,6 +38,17 @@ export function useBatches(params?: BatchQueryParams, enabled = true) {
     queryFn: () => getBatches(params),
     placeholderData: (previousData) => previousData,
     enabled,
+  });
+}
+
+/**
+ * Suspense query: Fetch paginated batches
+ */
+export function useSuspenseBatches(params?: BatchQueryParams) {
+  return useSuspenseQuery({
+    queryKey: batchKeys.list(params as Record<string, unknown>),
+    queryFn: () => getBatches(params),
+    staleTime: 60 * 1000,
   });
 }
 
@@ -275,6 +293,48 @@ export function useRemoveStudentFromBatchMutation() {
     },
     onError: (error: Error, _vars, toastId) => {
       toast.error(error.message || "Failed to remove student", { id: toastId });
+    },
+  });
+}
+
+/**
+ * Suspense query: Get authenticated student's enrolled batches
+ */
+export function useMyEnrolledBatches() {
+  return useSuspenseQuery({
+    queryKey: batchKeys.myEnrolled(),
+    queryFn: async () => {
+      const res = await getMyEnrolledBatches();
+      return res.data ?? [];
+    },
+    staleTime: 60 * 1000,
+  });
+}
+
+/**
+ * Mutation: Student requests self-enrollment into a batch
+ */
+export function useRequestBatchEnrollmentMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (batchId: string) => requestBatchEnrollment(batchId),
+    onMutate: () => {
+      return toast.loading("Submitting enrollment request...");
+    },
+    onSuccess: (response, _vars, toastId) => {
+      queryClient.invalidateQueries({ queryKey: batchKeys.myEnrolled() });
+      queryClient.invalidateQueries({ queryKey: batchKeys.all });
+      toast.success(
+        response.message ||
+          "Enrollment request submitted! Awaiting administrator approval.",
+        { id: toastId },
+      );
+    },
+    onError: (error: Error, _vars, toastId) => {
+      toast.error(error.message || "Failed to submit enrollment request", {
+        id: toastId,
+      });
     },
   });
 }

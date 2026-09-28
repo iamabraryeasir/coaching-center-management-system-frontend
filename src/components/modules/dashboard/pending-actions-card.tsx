@@ -72,14 +72,14 @@ export function PendingActionsCard() {
       {/* Action rows */}
       <div className="space-y-1">
         <ActionRow
-          href="/dashboard/admin/students"
+          href="/dashboard/admin/students?tab=pending"
           label="Student Applications"
           description="Awaiting approval"
           count={pendingActions.studentApplications}
           icon={UserPlus}
         />
         <ActionRow
-          href="/dashboard/admin/batches"
+          href="/dashboard/admin/batches?tab=pending"
           label="Enrollment Requests"
           description="Pending review"
           count={pendingActions.enrollmentRequests}

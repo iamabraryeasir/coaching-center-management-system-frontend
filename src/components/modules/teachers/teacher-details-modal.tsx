@@ -317,7 +317,7 @@ export function TeacherDetailsModal({
           </div>
         </div>
 
-        <DialogFooter className="gap-2 sm:gap-0 pt-4 border-t border-border/70 flex flex-col-reverse sm:flex-row sm:justify-between items-center w-full">
+        <DialogFooter className="gap-2 pt-4 border-t border-border/70 flex flex-col-reverse sm:flex-row sm:justify-between items-center w-full">
           <div className="w-full sm:w-auto">
             <Button
               type="button"

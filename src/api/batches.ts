@@ -6,8 +6,10 @@ import type {
   BatchQueryParams,
   CreateBatchDto,
   DirectEnrollDto,
+  EnrollmentRequestResponse,
   PaginatedResponse,
   QueryParams,
+  StudentEnrolledBatch,
   UpdateBatchDto,
 } from "@/types";
 
@@ -201,6 +203,34 @@ export async function removeStudentFromBatch(
     `/batches/${batchId}/students/${userId}`,
     {
       method: "DELETE",
+    },
+  );
+}
+
+/**
+ * Get authenticated student's enrolled batches (Student only)
+ */
+export async function getMyEnrolledBatches(): Promise<
+  ApiResponse<StudentEnrolledBatch[]>
+> {
+  return await apiClient<ApiResponse<StudentEnrolledBatch[]>>(
+    "/batches/my/enrolled",
+    {
+      method: "GET",
+    },
+  );
+}
+
+/**
+ * Student requests self-enrollment into a batch (Student only)
+ */
+export async function requestBatchEnrollment(
+  batchId: string,
+): Promise<ApiResponse<EnrollmentRequestResponse>> {
+  return await apiClient<ApiResponse<EnrollmentRequestResponse>>(
+    `/batches/${batchId}/enroll`,
+    {
+      method: "POST",
     },
   );
 }

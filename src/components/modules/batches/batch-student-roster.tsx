@@ -483,7 +483,7 @@ export function BatchStudentRoster({
               </p>
             </div>
 
-            <DialogFooter className="gap-2 sm:gap-0">
+            <DialogFooter className="gap-2">
               <DialogClose
                 render={
                   <Button variant="outline" size="sm" className="text-xs">
