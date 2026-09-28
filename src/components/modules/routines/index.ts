@@ -6,4 +6,6 @@ export * from "./routine-slot-dialog";
 export * from "./routine-toolbar";
 export * from "./routines-management-view";
 export * from "./routines-skeleton";
+export * from "./student-routines-view";
+export * from "./student-today-classes";
 export * from "./weekly-timetable-grid";

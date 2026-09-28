@@ -1,4 +1,9 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+  useSuspenseQuery,
+} from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import {
   createRoutineSlot,
@@ -81,6 +86,20 @@ export function useMyStudentSchedule() {
   return useQuery({
     queryKey: routineKeys.myStudentSchedule(),
     queryFn: () => getMyStudentSchedule(),
+  });
+}
+
+/**
+ * Suspense query: Fetch personal weekly timetable for authenticated student
+ */
+export function useSuspenseMyStudentSchedule() {
+  return useSuspenseQuery({
+    queryKey: routineKeys.myStudentSchedule(),
+    queryFn: async () => {
+      const res = await getMyStudentSchedule();
+      return res.data;
+    },
+    staleTime: 60 * 1000,
   });
 }
 

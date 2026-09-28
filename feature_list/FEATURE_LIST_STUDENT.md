@@ -214,6 +214,27 @@ The following capabilities are actively functional in the codebase (**API Client
 
 ### 3.4 Tuition Billing, Stripe Checkout & PDF Receipts (`/dashboard/student/payments`)
 
+### 3.4 Class Routine & Personal Timetable (`/dashboard/student/routines`)
+
+- **Personal Weekly Timetable**: `GET /routines/my/student-schedule`
+  - Aggregates lecture schedules across all enrolled batches into a single personal calendar.
+  - Queried via `useSuspenseMyStudentSchedule()` hook.
+- **7-Day Academic Weekly Timetable Grid**:
+  - Respects standard Bangladesh academic week sequence: `SATURDAY`, `SUNDAY`, `MONDAY`, `TUESDAY`, `WEDNESDAY`, `THURSDAY`, `FRIDAY`.
+  - Automatically highlights the current day column with distinct visual indicators.
+  - Responsive mobile tab switcher for comfortable touch viewing.
+- **"Today's Agenda" View with Live Status**:
+  - Chronological schedule cards for today with real-time class status (`Live Now` with pulsing indicator, `Upcoming`, `Completed`).
+  - Highlights room assignments, start/end times, subject titles, and instructor names/designations.
+- **Batch Routine Filter & Printable PDF Export**:
+  - Filter entire timetable by individual enrolled batch or view all courses combined.
+  - 1-click official printable PDF routine download via `getBatchRoutinePdfUrl(batchId, true)`.
+  - Printable modal layout via `RoutinePrintModal` with A4 landscape optimization.
+- **Suspense Architecture**:
+  - Wrapped in `<Suspense fallback={<StudentRoutinesSkeleton />}>` with dedicated route-level `loading.tsx`.
+
+### 3.5 Tuition Billing, Stripe Checkout & PDF Receipts (`/dashboard/student/payments`)
+
 - **Student Monthly Bill Calculation**: `GET /payments/my-bill?month=X&year=YYYY`
   - Real-time tuition ledger displaying base fee, discounts, opening arrears, total payable, and net balance.
 - **Online Stripe Checkout**: `POST /payments/create-checkout-session`
@@ -224,6 +245,8 @@ The following capabilities are actively functional in the codebase (**API Client
   - Automated PDF invoice and payment receipt download modal.
 
 ### 3.5 Student Dashboard Gateway (`/dashboard/student`)
+
+### 3.6 Student Dashboard Gateway (`/dashboard/student`)
 
 - **Smart Gateway Navigation**:
   - `/dashboard/page.tsx` evaluates `user.role === "STUDENT"` and redirects to `/dashboard/student`.
@@ -237,6 +260,8 @@ The following capabilities are actively functional in the codebase (**API Client
 The following capabilities have backend endpoints, API client functions, and TanStack Query hooks in place, but need dedicated presentation pages inside `/dashboard/student/*`:
 
 ### 4.1 Class Routines & Personal Timetable (`/dashboard/student/routines`)
+
+### 4.1 Attendance Tracking & Record Log (`/dashboard/student/attendance`)
 
 - `GET /routines/my/student-schedule` $\rightarrow$ `getMyStudentSchedule()` in `api/routines.ts`, `useMyStudentSchedule()` in `hooks/use-routines.ts`.
 - `GET /routines/batch/:batchId` $\rightarrow$ `getBatchTimetable()`, `useBatchTimetable()`.
@@ -458,6 +483,7 @@ flowchart LR
 | **Phase 1** | **Google OAuth & Student Onboarding** ✅ | • `@react-oauth/google` provider & `<GoogleLogin />` integration<br>• Seamless direct login for approved students<br>• Protected `/onboard-student` route with automatic redirect for unverified guests<br>• Multi-step admission form with Google identity prefill<br>• Account enters `PENDING_ACTIVATION` state awaiting admin review | `POST /auth/google`<br>`POST /auth/google/onboard`<br>`GET /users/me`                                                          |
 | **Phase 2** | **Batches & Self-Enrollment** ✅         | • Implement `getMyEnrolledBatches` & `requestBatchEnrollment`<br>• Enrolled batches grid with monthly fee, status badges, & routine links<br>• Course catalog with 1-click self-enrollment request dialog & re-apply workflows                                                                                                           | `GET /batches/my/enrolled`<br>`POST /batches/:batchId/enroll`<br>`GET /batches`                                                |
 | **Phase 3** | **Class Routine & Schedule**             | • 7-day responsive academic timetable grid<br>• Today's classes highlight filter<br>• Batch routine timetable modal & PDF schedule download                                                                                                                                                                                              | `GET /routines/my/student-schedule`<br>`GET /routines/batch/:batchId`<br>`GET /routines/batches/:batchId/pdf`                  |
+| **Phase 3** | **Class Routine & Schedule** ✅          | • 7-day responsive academic timetable grid (Sat–Fri)<br>• Today's classes highlight & live status agenda<br>• Batch routine timetable modal & printable PDF schedule download                                                                                                                                                            | `GET /routines/my/student-schedule`<br>`GET /routines/batch/:batchId`<br>`GET /routines/batches/:batchId/pdf`                  |
 | **Phase 4** | **Attendance Tracking**                  | • Monthly attendance metrics (Working days, Present, Late, Absent)<br>• Overall attendance compliance rate bar<br>• Chronological check-in log table with remarks                                                                                                                                                                        | `GET /attendance/my/summary`                                                                                                   |
 | **Phase 5** | **Exams, Results & Merit Lists**         | • Published report cards with marks, letter grade, GPA, and rank<br>• Single exam detail modal with performance breakdown<br>• Official report card PDF download & class merit list viewer                                                                                                                                               | `GET /exams/my/results`<br>`GET /exams/my/results/:examId`<br>`GET /exams/:examId/results`<br>`GET /exams/.../report-card/pdf` |
 | **Phase 6** | **Settings & Profile**                   | • Student academic & personal info card<br>• Avatar upload/remove integration<br>• Password change form & active sessions manager                                                                                                                                                                                                        | `GET /users/me`<br>`PATCH /users/me`<br>`PATCH /users/me/avatar`<br>`PATCH /users/change-password`<br>`GET /auth/sessions`     |
