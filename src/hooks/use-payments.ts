@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import {
+  adjustBillPreviousDue,
   createCheckoutSession,
   getMonthlyPaymentSheet,
   getMonthlyRevenueStats,
@@ -8,8 +9,9 @@ import {
   getStudentBillingSummary,
   manualCollectPayment,
 } from "@/api";
-import { paymentKeys } from "@/constants";
+import { dashboardKeys, paymentKeys } from "@/constants";
 import type {
+  AdjustPreviousDuePayload,
   CreateCheckoutSessionDto,
   ManualCollectPaymentDto,
   MonthlySheetQueryParams,
@@ -60,8 +62,9 @@ export function useManualCollectPaymentMutation() {
     mutationFn: (payload: ManualCollectPaymentDto) =>
       manualCollectPayment(payload),
     onSuccess: () => {
-      // Invalidate all payment queries (sheet, stats, transactions, student bill)
+      // Invalidate all payment queries (sheet, stats, transactions, student bill, dashboard)
       queryClient.invalidateQueries({ queryKey: paymentKeys.all });
+      queryClient.invalidateQueries({ queryKey: dashboardKeys.all });
     },
     onError: (error: Error) => {
       toast.error(error.message || "Failed to record payment.");
@@ -70,7 +73,31 @@ export function useManualCollectPaymentMutation() {
 }
 
 /**
- * 4. Hook to fetch student billing summary & batch breakdown (Student)
+ * 4. Hook to adjust / set previous dues on a monthly fee bill (Admin)
+ */
+export function useAdjustBillPreviousDueMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      billId,
+      payload,
+    }: {
+      billId: string;
+      payload: AdjustPreviousDuePayload;
+    }) => adjustBillPreviousDue(billId, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: paymentKeys.all });
+      queryClient.invalidateQueries({ queryKey: dashboardKeys.all });
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || "Failed to adjust previous dues.");
+    },
+  });
+}
+
+/**
+ * 5. Hook to fetch student billing summary & batch breakdown (Student)
  */
 export function useStudentBillingSummary(
   params?: {
@@ -88,7 +115,7 @@ export function useStudentBillingSummary(
 }
 
 /**
- * 5. Hook to create a Stripe hosted checkout session (Student)
+ * 6. Hook to create a Stripe hosted checkout session (Student)
  */
 export function useCreateCheckoutSessionMutation() {
   return useMutation({
@@ -101,7 +128,7 @@ export function useCreateCheckoutSessionMutation() {
 }
 
 /**
- * 6. Hook to fetch payment transactions ledger (Admin & Student)
+ * 7. Hook to fetch payment transactions ledger (Admin & Student)
  */
 export function usePaymentTransactions(
   params?: TransactionQueryParams,

@@ -2,6 +2,7 @@
 
 import {
   CreditCard,
+  History,
   Layers,
   PlusCircle,
   Search,
@@ -28,6 +29,7 @@ import {
 import { useBatches, useDebounce, useMonthlyPaymentSheet } from "@/hooks";
 import type { BillStatus, MonthlyFeeBill } from "@/types";
 import { StudentPagination } from "../students/student-pagination";
+import { AdjustPreviousDueDialog } from "./adjust-previous-due-dialog";
 import { ManualCollectDialog } from "./manual-collect-dialog";
 import { MonthlyPaymentSheetTableSkeleton } from "./payment-skeletons";
 import { BillStatusBadge } from "./payment-status-badge";
@@ -53,6 +55,11 @@ export function MonthlyPaymentSheetTable({
     null,
   );
   const [isCollectOpen, setIsCollectOpen] = useState(false);
+
+  const [adjustingBill, setAdjustingBill] = useState<MonthlyFeeBill | null>(
+    null,
+  );
+  const [isAdjustDueOpen, setIsAdjustDueOpen] = useState(false);
 
   const debouncedSearch = useDebounce(searchTerm, 400);
 
@@ -81,6 +88,11 @@ export function MonthlyPaymentSheetTable({
   const handleOpenCollect = (bill: MonthlyFeeBill) => {
     setCollectingBill(bill);
     setIsCollectOpen(true);
+  };
+
+  const handleOpenAdjustDue = (bill: MonthlyFeeBill) => {
+    setAdjustingBill(bill);
+    setIsAdjustDueOpen(true);
   };
 
   return (
@@ -198,7 +210,7 @@ export function MonthlyPaymentSheetTable({
                 Status
               </TableHead>
               <TableHead className="text-xs font-semibold text-right">
-                Action
+                Actions
               </TableHead>
             </TableRow>
           </TableHeader>
@@ -302,23 +314,31 @@ export function MonthlyPaymentSheetTable({
                       <BillStatusBadge status={bill.status} />
                     </TableCell>
 
-                    {/* Action Button */}
+                    {/* Action Buttons */}
                     <TableCell className="text-right">
-                      {canCollect ? (
+                      <div className="flex items-center justify-end gap-1.5">
+                        {canCollect && (
+                          <Button
+                            size="xs"
+                            variant="outline"
+                            className="gap-1 text-xs font-semibold border-primary/30 text-primary hover:bg-primary/10 h-7"
+                            onClick={() => handleOpenCollect(bill)}
+                          >
+                            <PlusCircle className="size-3.5" />
+                            <span>Collect</span>
+                          </Button>
+                        )}
                         <Button
                           size="xs"
-                          variant="outline"
-                          className="gap-1 text-xs font-medium border-primary/30 text-primary hover:bg-primary/10"
-                          onClick={() => handleOpenCollect(bill)}
+                          variant="ghost"
+                          className="gap-1 text-xs text-muted-foreground hover:text-foreground h-7"
+                          title="Adjust Opening Arrears / Previous Dues"
+                          onClick={() => handleOpenAdjustDue(bill)}
                         >
-                          <PlusCircle className="size-3.5" />
-                          <span>Collect</span>
+                          <History className="size-3.5" />
+                          <span className="hidden xl:inline">Adjust Dues</span>
                         </Button>
-                      ) : (
-                        <span className="text-xs text-muted-foreground/80 italic pr-2">
-                          Cleared
-                        </span>
-                      )}
+                      </div>
                     </TableCell>
                   </TableRow>
                 );
@@ -348,6 +368,13 @@ export function MonthlyPaymentSheetTable({
         onOpenChange={setIsCollectOpen}
         billingMonth={month}
         billingYear={year}
+      />
+
+      {/* Adjust Previous Due Dialog */}
+      <AdjustPreviousDueDialog
+        bill={adjustingBill}
+        open={isAdjustDueOpen}
+        onOpenChange={setIsAdjustDueOpen}
       />
     </div>
   );

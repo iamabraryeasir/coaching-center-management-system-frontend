@@ -1,5 +1,6 @@
 import apiClient from "@/lib/api-client";
 import type {
+  AdjustPreviousDuePayload,
   ApiResponse,
   CheckoutSessionResponse,
   CreateCheckoutSessionDto,
@@ -167,4 +168,21 @@ export function getPaymentReceiptPdfUrl(
     process.env.NEXT_PUBLIC_API_BASE_URL ||
     "http://localhost:5000/api/v1";
   return `${baseUrl}/payments/transactions/${transactionId}/pdf?download=${download}`;
+}
+
+/**
+ * 8. Adjust / set previous dues on a monthly fee bill (Admin only)
+ * PATCH /payments/bills/:billId/previous-due
+ */
+export async function adjustBillPreviousDue(
+  billId: string,
+  payload: AdjustPreviousDuePayload,
+): Promise<ApiResponse<MonthlyFeeBill>> {
+  return await apiClient<ApiResponse<MonthlyFeeBill>>(
+    `/payments/bills/${billId}/previous-due`,
+    {
+      method: "PATCH",
+      body: payload,
+    },
+  );
 }

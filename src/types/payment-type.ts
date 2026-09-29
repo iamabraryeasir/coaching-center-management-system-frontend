@@ -123,6 +123,14 @@ export interface ManualCollectPaymentDto {
 }
 
 /**
+ * Admin adjust previous due payload
+ */
+export interface AdjustPreviousDuePayload {
+  previousDue: number;
+  remarks?: string;
+}
+
+/**
  * Itemized batch fee breakdown in student billing summary
  */
 export interface StudentBillingBatchItem {

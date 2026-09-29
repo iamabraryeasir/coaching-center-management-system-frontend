@@ -60,6 +60,20 @@ export type ManualCollectPaymentInput = z.infer<
   typeof manualCollectPaymentSchema
 >;
 
+export const adjustPreviousDueSchema = z.object({
+  previousDue: z
+    .number({ message: "Previous due must be a valid number." })
+    .min(0, "Previous due cannot be negative.")
+    .max(1000000, "Amount exceeds allowable limit."),
+  remarks: z
+    .string()
+    .max(255, "Remarks cannot exceed 255 characters.")
+    .optional()
+    .or(z.literal("")),
+});
+
+export type AdjustPreviousDueInput = z.infer<typeof adjustPreviousDueSchema>;
+
 export const createCheckoutSessionSchema = z.object({
   billingMonth: z
     .number()
