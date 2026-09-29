@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { UserAvatarUploadDialog } from "@/components/modules/media";
+import { StudentPagination } from "@/components/modules/students";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -52,7 +53,6 @@ import {
   type User,
   type UserStatus,
 } from "@/types";
-import { StudentPagination } from "../students/student-pagination";
 import { TeacherPermissionsBadges } from "./teacher-permissions-badges";
 import { TeacherStatusBadge } from "./teacher-status-badge";
 

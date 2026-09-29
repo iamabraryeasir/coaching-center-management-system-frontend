@@ -3,6 +3,7 @@
 import { startOfDay, subDays } from "date-fns";
 import { Eye, FilterX, Globe, RotateCcw, ScrollText, X } from "lucide-react";
 import { useMemo, useState } from "react";
+import { StudentPagination } from "@/components/modules/students";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -26,7 +27,6 @@ import {
 } from "@/components/ui/table";
 import { useAuditLogStats, useAuditLogs } from "@/hooks";
 import type { AuditLog } from "@/types";
-import { StudentPagination } from "../students/student-pagination";
 import {
   AuditActionBadge,
   AuditEntityBadge,

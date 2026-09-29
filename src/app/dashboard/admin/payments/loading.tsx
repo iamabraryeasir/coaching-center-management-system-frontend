@@ -1,4 +1,4 @@
-import { AdminPaymentsViewSkeleton } from "@/components/modules/payments/payment-skeletons";
+import { AdminPaymentsViewSkeleton } from "@/components/modules/payments";
 
 export default function AdminPaymentsLoading() {
   return <AdminPaymentsViewSkeleton />;

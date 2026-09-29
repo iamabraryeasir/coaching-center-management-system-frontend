@@ -1,4 +1,4 @@
-import { RoutinesSkeleton } from "@/components/modules/routines/routines-skeleton";
+import { RoutinesSkeleton } from "@/components/modules/routines";
 
 export default function TeacherRoutinesLoading() {
   return <RoutinesSkeleton />;

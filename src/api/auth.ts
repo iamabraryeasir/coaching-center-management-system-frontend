@@ -129,3 +129,29 @@ export async function updateMyProfile(
     body: payload,
   });
 }
+
+/**
+ * Initiate password recovery link via email
+ */
+export async function forgotPassword(payload: {
+  email: string;
+}): Promise<ApiResponse<null>> {
+  return await apiClient<ApiResponse<null>>("/auth/forgot-password", {
+    method: "POST",
+    body: payload,
+  });
+}
+
+/**
+ * Reset user password using token from email link
+ */
+export async function resetPassword(payload: {
+  password: string;
+  token?: string;
+}): Promise<ApiResponse<null>> {
+  return await apiClient<ApiResponse<null>>("/auth/reset-password", {
+    method: "POST",
+    body: payload,
+  });
+}
+

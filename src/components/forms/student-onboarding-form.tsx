@@ -40,6 +40,8 @@ import type { GoogleOnboardDto } from "@/types";
 import { type GoogleOnboardInput, googleOnboardSchema } from "@/validators";
 
 interface GoogleProfile {
+  // TODO(security): Backend should issue an HttpOnly onboarding_session cookie
+  // on isNewUser response so googleId does not need to pass through sessionStorage (C-1).
   googleId: string;
   email: string;
   name: string;
@@ -79,7 +81,7 @@ export function StudentOnboardingForm() {
       const stored = sessionStorage.getItem("pending_google_user");
       if (stored) {
         const parsed = JSON.parse(stored) as GoogleProfile;
-        if (parsed.googleId && parsed.email) {
+        if (parsed.email) {
           setGoogleProfile(parsed);
           setIsCheckingAuth(false);
           return;
@@ -116,7 +118,8 @@ export function StudentOnboardingForm() {
 
       try {
         const payload: GoogleOnboardDto = {
-          googleId: value.googleId || googleProfile?.googleId || "",
+          // googleId: backend derives this from its own OAuth/session state (C-1)
+          googleId: googleProfile?.googleId || "",
           email: (value.email || googleProfile?.email || "")
             .trim()
             .toLowerCase(),

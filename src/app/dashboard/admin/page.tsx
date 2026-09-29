@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 
-import { AdminDashboardView } from "@/components/modules/dashboard";
-import { DashboardPageSkeleton } from "@/components/modules/dashboard/dashboard-skeletons";
+import {
+  AdminDashboardView,
+  DashboardPageSkeleton,
+} from "@/components/modules/dashboard";
 import { siteConfig } from "@/config/site";
 
 export const metadata: Metadata = {

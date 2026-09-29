@@ -1,4 +1,4 @@
-import { StudentPaymentsViewSkeleton } from "@/components/modules/payments/payment-skeletons";
+import { StudentPaymentsViewSkeleton } from "@/components/modules/payments";
 
 export default function StudentPaymentsLoading() {
   return <StudentPaymentsViewSkeleton />;

@@ -28,6 +28,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { authKeys } from "@/constants/query-keys";
 import { authChannel } from "@/lib/auth-channel";
+import { getSafeRedirect } from "@/lib/safe-redirect";
 import { cn } from "@/lib/utils";
 import { loginSchema } from "@/validators";
 
@@ -65,12 +66,8 @@ export function LoginForm({
           id: toastId,
         });
 
-        // Determine destination URL preserving original query context
-        const redirectParam = searchParams.get("redirect");
-        const safeDestination =
-          redirectParam?.startsWith("/") && !redirectParam.startsWith("//")
-            ? redirectParam
-            : "/dashboard";
+        // Determine destination URL — validate against same-origin to prevent open redirect
+        const safeDestination = getSafeRedirect(searchParams.get("redirect"));
 
         router.push(safeDestination);
       } catch (error: unknown) {

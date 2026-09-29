@@ -6,6 +6,7 @@ import { useCallback } from "react";
 import toast from "react-hot-toast";
 
 import { useGoogleAuthMutation } from "@/hooks/use-auth";
+import { getSafeRedirect } from "@/lib/safe-redirect";
 import { cn } from "@/lib/utils";
 import type { GoogleAuthResponseData } from "@/types";
 
@@ -39,9 +40,13 @@ export function GoogleLoginButton({
             id: toastId,
           });
 
-          // Store temporary Google identity for onboarding page
+          // TODO(security): Backend should issue a short-lived HttpOnly
+          // `onboarding_session` cookie on `isNewUser` responses so this
+          // sessionStorage usage can be removed entirely (Security Review C-1).
+          // When the backend is updated, remove this block and rely on the cookie.
           const onboardingData = {
-            googleId: data.googleId || "",
+            // googleId intentionally NOT stored here — minimise PII in sessionStorage.
+            // The backend must derive identity from its own session on form submit.
             email: data.email || "",
             name: data.name || "",
             avatarUrl: data.avatarUrl || null,
@@ -58,8 +63,11 @@ export function GoogleLoginButton({
             id: toastId,
           });
 
-          const target =
-            redirectUrl || searchParams.get("redirect") || "/dashboard";
+          // Validate the redirect target to prevent open redirect attacks (C-2)
+          const target = getSafeRedirect(
+            redirectUrl ?? searchParams.get("redirect"),
+            "/dashboard",
+          );
           router.push(target);
         }
       } catch (err: unknown) {

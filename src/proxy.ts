@@ -9,8 +9,9 @@ import { type NextRequest, NextResponse } from "next/server";
 export function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
 
-  const hasAuthCookie =
-    request.cookies.has("accessToken") || request.cookies.has("refreshToken");
+  const accessToken = request.cookies.get("accessToken")?.value?.trim();
+  const refreshToken = request.cookies.get("refreshToken")?.value?.trim();
+  const hasAuthCookie = Boolean(accessToken || refreshToken);
 
   // Protected Route Guard (/dashboard/*)
   if (pathname.startsWith("/dashboard")) {

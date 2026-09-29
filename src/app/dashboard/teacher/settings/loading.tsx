@@ -1,4 +1,4 @@
-import { TeacherSettingsSkeleton } from "@/components/modules/settings/teacher-settings-skeleton";
+import { TeacherSettingsSkeleton } from "@/components/modules/settings";
 
 export default function TeacherSettingsLoading() {
   return <TeacherSettingsSkeleton />;
