@@ -4,6 +4,7 @@ import type {
   DashboardMonthlySummary,
   DashboardRevenueTrend,
   DashboardTodaySnapshot,
+  StudentDashboardSummary,
 } from "@/types";
 
 /**
@@ -47,5 +48,18 @@ export async function getRevenueTrend(
   return await apiClient<ApiResponse<DashboardRevenueTrend>>(
     "/payments/revenue-trend",
     { method: "GET", query: { months } },
+  );
+}
+
+/**
+ * GET /api/v1/dashboard/student
+ * Student aggregated dashboard: hero stats, KPIs, today's schedule, billing alert, recent exams, enrolled batches
+ */
+export async function getStudentDashboard(): Promise<
+  ApiResponse<StudentDashboardSummary>
+> {
+  return await apiClient<ApiResponse<StudentDashboardSummary>>(
+    "/dashboard/student",
+    { method: "GET" },
   );
 }

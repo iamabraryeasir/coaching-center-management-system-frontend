@@ -5,6 +5,7 @@ import {
   getDashboardMonthlySummary,
   getDashboardToday,
   getRevenueTrend,
+  getStudentDashboard,
 } from "@/api";
 import { dashboardKeys } from "@/constants/query-keys";
 
@@ -54,5 +55,21 @@ export function useDashboardRevenueTrend(months = 6) {
       return res.data;
     },
     staleTime: 5 * 60_000, // 5 minutes
+  });
+}
+
+/**
+ * Fetches the aggregated student dashboard summary: KPIs, today's schedule, billing alert, recent exams, enrolled batches.
+ * Uses Suspense — wrap with <Suspense fallback={...}>.
+ */
+export function useStudentDashboard() {
+  return useSuspenseQuery({
+    queryKey: dashboardKeys.student(),
+    queryFn: async () => {
+      const res = await getStudentDashboard();
+      return res.data;
+    },
+    staleTime: 60_000, // 1 minute
+    refetchInterval: 120_000, // auto-refresh every 2 minutes
   });
 }

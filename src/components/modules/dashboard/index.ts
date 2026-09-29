@@ -6,4 +6,5 @@ export * from "./pending-actions-card";
 export * from "./quick-actions-bar";
 export * from "./recent-transactions-card";
 export * from "./revenue-trend-chart";
+export * from "./student";
 export * from "./teacher";
