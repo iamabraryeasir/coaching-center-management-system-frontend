@@ -1,4 +1,9 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+  useSuspenseQuery,
+} from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import {
   getBatchAttendanceSheet,
@@ -141,6 +146,19 @@ export function useMyStudentAttendanceSummary(
     queryFn: () => getMyStudentAttendanceSummary(params),
     enabled,
     placeholderData: (previousData) => previousData,
+  });
+}
+
+/**
+ * Suspense hook: Fetch My Student Attendance Summary (for Student role)
+ */
+export function useSuspenseMyStudentAttendanceSummary(params?: {
+  page?: number;
+  limit?: number;
+}) {
+  return useSuspenseQuery({
+    queryKey: attendanceKeys.mySummary(params),
+    queryFn: () => getMyStudentAttendanceSummary(params),
   });
 }
 
