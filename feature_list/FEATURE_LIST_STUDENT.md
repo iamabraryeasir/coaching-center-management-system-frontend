@@ -11,9 +11,9 @@
 | Metric                                                          | Count  | Percentage |
 | :-------------------------------------------------------------- | :----: | :--------: |
 | **Total Student-Relevant Endpoints in Postman Collection**      | **38** |    100%    |
-| **Fully Implemented Features (API + Hooks + Dedicated UI)**     | **14** | **36.8%**  |
-| **API Ready / Hook Ready (Pending Dedicated Student UI Route)** | **20** | **52.6%**  |
-| **Unimplemented / Backlog Endpoints & Client Flows**            | **4**  | **10.5%**  |
+| **Fully Implemented Features (API + Hooks + Dedicated UI)**     | **19** | **50.0%**  |
+| **API Ready / Hook Ready (Pending Dedicated Student UI Route)** | **16** | **42.1%**  |
+| **System & Webhook Endpoints (Backend Native)**                 | **3**  |  **7.9%**  |
 
 ---
 
@@ -212,8 +212,6 @@ The following capabilities are actively functional in the codebase (**API Client
   - Route `/dashboard/student/batches` with route-level `loading.tsx` and `<StudentBatchesSkeleton />` fallback.
   - Clean tab navigation between "My Batches" and "Explore Catalog" with responsive empty state and quick routing to class routines and tuition payments.
 
-### 3.4 Tuition Billing, Stripe Checkout & PDF Receipts (`/dashboard/student/payments`)
-
 ### 3.4 Class Routine & Personal Timetable (`/dashboard/student/routines`)
 
 - **Personal Weekly Timetable**: `GET /routines/my/student-schedule`
@@ -233,7 +231,24 @@ The following capabilities are actively functional in the codebase (**API Client
 - **Suspense Architecture**:
   - Wrapped in `<Suspense fallback={<StudentRoutinesSkeleton />}>` with dedicated route-level `loading.tsx`.
 
-### 3.5 Tuition Billing, Stripe Checkout & PDF Receipts (`/dashboard/student/payments`)
+### 3.5 Student Attendance Tracking & Record Log (`/dashboard/student/attendance`)
+
+- **Minimal Attendance Overview Card**:
+  - Minimal, un-highlighted design matching standard system card tokens (`rounded-xl border border-border/80 bg-card p-4 sm:p-5 shadow-2xs`).
+  - Clean overall attendance rate display and session ratio ("Attended X of Y conducted sessions").
+  - Slim accent progress bar showing session completion.
+- **5 KPI Attendance Metric Cards**:
+  - Total Classes, Present, Late, Absent, Leaves/Excused with themed icons, colors, and contextual percentage badges.
+  - Mobile-responsive grid with balanced card spanning.
+- **Chronological Check-in History Table**:
+  - Mobile-responsive view: Compact card list on `< sm` screens and full tabular view on `sm+` screens.
+  - Date, batch name, status badge (`Present`, `Late`, `Absent`, `Excused`, `Leave`), instructor name, and remarks.
+  - Real-time client-side search, status filter chips, batch selector, and pagination controls.
+- **Suspense-First Loading Architecture**:
+  - Powered by `useSuspenseMyStudentAttendanceSummary()`.
+  - Route-level `loading.tsx` and `<StudentAttendanceSkeleton />` matching full dashboard layout.
+
+### 3.6 Tuition Billing, Stripe Checkout & PDF Receipts (`/dashboard/student/payments`)
 
 - **Student Monthly Bill Calculation**: `GET /payments/my-bill?month=X&year=YYYY`
   - Real-time tuition ledger displaying base fee, discounts, opening arrears, total payable, and net balance.
@@ -244,9 +259,7 @@ The following capabilities are actively functional in the codebase (**API Client
 - **Payment Receipt PDF Download**: `GET /payments/transactions/:id/pdf`
   - Automated PDF invoice and payment receipt download modal.
 
-### 3.5 Student Dashboard Gateway (`/dashboard/student`)
-
-### 3.6 Student Dashboard Gateway (`/dashboard/student`)
+### 3.7 Student Dashboard Gateway (`/dashboard/student`)
 
 - **Smart Gateway Navigation**:
   - `/dashboard/page.tsx` evaluates `user.role === "STUDENT"` and redirects to `/dashboard/student`.
@@ -259,21 +272,7 @@ The following capabilities are actively functional in the codebase (**API Client
 
 The following capabilities have backend endpoints, API client functions, and TanStack Query hooks in place, but need dedicated presentation pages inside `/dashboard/student/*`:
 
-### 4.1 Class Routines & Personal Timetable (`/dashboard/student/routines`)
-
-### 4.1 Attendance Tracking & Record Log (`/dashboard/student/attendance`)
-
-- `GET /routines/my/student-schedule` $\rightarrow$ `getMyStudentSchedule()` in `api/routines.ts`, `useMyStudentSchedule()` in `hooks/use-routines.ts`.
-- `GET /routines/batch/:batchId` $\rightarrow$ `getBatchTimetable()`, `useBatchTimetable()`.
-- `GET /routines/batches/:batchId/pdf` $\rightarrow$ `getBatchRoutinePdfUrl()`.
-- **Needed**: A responsive 7-day academic weekly timetable grid (Saturday to Friday) with today's classes highlight and PDF routine export.
-
-### 4.2 Attendance Tracking & Record Log (`/dashboard/student/attendance`)
-
-- `GET /attendance/my/summary?page=1&limit=20` $\rightarrow$ `getMyStudentAttendanceSummary()` in `api/attendance.ts`, `useMyStudentAttendanceSummary()` in `hooks/use-attendance.ts`.
-- **Needed**: Attendance health ribbon (% rate vs minimum threshold), metric counter cards (Working Days, Present, Late, Absent, Leaves), and chronological check-in table.
-
-### 4.3 Exams, Results & Report Cards (`/dashboard/student/exams`)
+### 4.1 Exams, Results & Report Cards (`/dashboard/student/exams`)
 
 - `GET /exams` $\rightarrow$ `getExams()`, `useExams()`.
 - `GET /exams/my/results` $\rightarrow$ `getMyExamResults()`, `useMyExamResults()`.
@@ -282,7 +281,7 @@ The following capabilities have backend endpoints, API client functions, and Tan
 - `GET /exams/:examId/students/:studentId/report-card/pdf` $\rightarrow `getReportCardPdfUrl()`.
 - **Needed**: Academic performance summary (GPA, total exams, pass rate), exam results table with grade badges and batch rank (`#1 / 45`), report card modal, and 1-click PDF download.
 
-### 4.4 Student Profile & Settings (`/dashboard/student/settings`)
+### 4.2 Student Profile & Settings (`/dashboard/student/settings`)
 
 - `PATCH /users/me` $\rightarrow$ `updateMyProfile()`, `useUpdateMyProfileMutation()`.
 - `PATCH /users/change-password` $\rightarrow$ `changePassword()`, `useChangePasswordMutation()`.
@@ -338,24 +337,22 @@ The following endpoints require new client methods in `src/api` and `src/hooks`:
 | **9**  | `Logout`                                   | `/api/v1/auth/logout`                                |  `POST`  | 🟢 **COMPLETED** | Header User Menu & `useAuth()`                                          |
 | **10** | `Logout from All Devices`                  | `/api/v1/auth/logout-all`                            |  `POST`  |   🟡 API Ready   | `ActiveSessionsCard` on `/dashboard/student/settings`                   |
 | **11** | `List Active Login Sessions`               | `/api/v1/auth/sessions`                              |  `GET`   |   🟡 API Ready   | `ActiveSessionsCard` on `/dashboard/student/settings`                   |
-| **14** | `Google ID Token Verification & Login`     | `/api/v1/auth/google`                                |  `POST`  |  🔴 **BACKLOG**  | Pending GIS Client + `verifyGoogleToken` API                            |
-| **15** | `Google Student Onboarding`                | `/api/v1/auth/google/onboard`                        |  `POST`  |  🔴 **BACKLOG**  | Pending `/onboard-student` Form + API Integration                       |
 | **14** | `Google ID Token Verification & Login`     | `/api/v1/auth/google`                                |  `POST`  | 🟢 **COMPLETED** | `GoogleLoginButton` in `login-form.tsx` & `useGoogleAuthMutation()`     |
 | **15** | `Google Student Onboarding`                | `/api/v1/auth/google/onboard`                        |  `POST`  | 🟢 **COMPLETED** | `StudentOnboardingForm` on `/onboard-student` & `useGoogleOnboarding()` |
 | **19** | `Get Institution Profile & Stats`          | `/api/v1/institution`                                |  `GET`   |   🟡 API Ready   | `src/api/institution.ts` $\rightarrow$ `useInstitutionProfile()`        |
 | **21** | `Get Current User Profile (/me)`           | `/api/v1/users/me`                                   |  `GET`   | 🟢 **COMPLETED** | `useAuth()` in `src/hooks/use-auth.ts`                                  |
 | **22** | `Update Current User Profile (/me)`        | `/api/v1/users/me`                                   | `PATCH`  |   🟡 API Ready   | `StudentProfileCard` on `/dashboard/student/settings`                   |
 | **23** | `Change Password`                          | `/api/v1/users/change-password`                      | `PATCH`  |   🟡 API Ready   | `ChangePasswordCard` on `/dashboard/student/settings`                   |
-| **32** | `Get All Batches (QueryBuilder)`           | `/api/v1/batches`                                    |  `GET`   |   🟡 API Ready   | `src/api/batches.ts` $\rightarrow$ `useBatches()`                       |
+| **32** | `Get All Batches (QueryBuilder)`           | `/api/v1/batches`                                    |  `GET`   | 🟢 **COMPLETED** | `src/app/dashboard/student/batches/page.tsx` & `useSuspenseBatches()`   |
 | **33** | `Get Batch Details by ID`                  | `/api/v1/batches/:batchId`                           |  `GET`   |   🟡 API Ready   | `src/api/batches.ts` $\rightarrow$ `useBatch()`                         |
-| **36** | `Student Request Self-Enrollment`          | `/api/v1/batches/:batchId/enroll`                    |  `POST`  |  🔴 **BACKLOG**  | Pending in `src/api/batches.ts` & `src/hooks/use-batches.ts`            |
-| **43** | `Get My Enrolled Batches`                  | `/api/v1/batches/my/enrolled`                        |  `GET`   |  🔴 **BACKLOG**  | Pending in `src/api/batches.ts` & `src/hooks/use-batches.ts`            |
+| **36** | `Student Request Self-Enrollment`          | `/api/v1/batches/:batchId/enroll`                    |  `POST`  | 🟢 **COMPLETED** | `RequestEnrollmentDialog` & `useRequestBatchEnrollmentMutation()`       |
+| **43** | `Get My Enrolled Batches`                  | `/api/v1/batches/my/enrolled`                        |  `GET`   | 🟢 **COMPLETED** | `src/app/dashboard/student/batches/page.tsx` & `useMyEnrolledBatches()` |
 | **45** | `Get All Routines (QueryBuilder)`          | `/api/v1/routines`                                   |  `GET`   |   🟡 API Ready   | `src/api/routines.ts` $\rightarrow$ `useRoutines()`                     |
 | **46** | `Get Routine Slot by ID`                   | `/api/v1/routines/:routineId`                        |  `GET`   |   🟡 API Ready   | `src/api/routines.ts` $\rightarrow$ `useRoutine()`                      |
-| **47** | `Get Batch Timetable (Day-Wise Grouped)`   | `/api/v1/routines/batch/:batchId`                    |  `GET`   |   🟡 API Ready   | `src/api/routines.ts` $\rightarrow$ `useBatchTimetable()`               |
-| **50** | `Get My Class Timetable (Student Only)`    | `/api/v1/routines/my/student-schedule`               |  `GET`   |   🟡 API Ready   | `src/api/routines.ts` $\rightarrow$ `useMyStudentSchedule()`            |
-| **53** | `Download Batch Routine Schedule PDF`      | `/api/v1/routines/batches/:batchId/pdf`              |  `GET`   |   🟡 API Ready   | `src/api/routines.ts` $\rightarrow$ `getBatchRoutinePdfUrl()`           |
-| **58** | `Get My Attendance Summary (Student)`      | `/api/v1/attendance/my/summary`                      |  `GET`   |   🟡 API Ready   | `src/api/attendance.ts` $\rightarrow$ `useMyStudentAttendanceSummary()` |
+| **47** | `Get Batch Timetable (Day-Wise Grouped)`   | `/api/v1/routines/batch/:batchId`                    |  `GET`   | 🟢 **COMPLETED** | `RoutineScheduleModal` & `useBatchTimetable()`                          |
+| **50** | `Get My Class Timetable (Student Only)`    | `/api/v1/routines/my/student-schedule`               |  `GET`   | 🟢 **COMPLETED** | `src/app/dashboard/student/routines/page.tsx`                           |
+| **53** | `Download Batch Routine Schedule PDF`      | `/api/v1/routines/batches/:batchId/pdf`              |  `GET`   | 🟢 **COMPLETED** | `RoutinePrintModal` & `getBatchRoutinePdfUrl()`                         |
+| **58** | `Get My Attendance Summary (Student)`      | `/api/v1/attendance/my/summary`                      |  `GET`   | 🟢 **COMPLETED** | `src/app/dashboard/student/attendance/page.tsx`                         |
 | **66** | `Get Exams List (All Roles)`               | `/api/v1/exams`                                      |  `GET`   |   🟡 API Ready   | `src/api/exam.ts` $\rightarrow$ `useExams()`                            |
 | **67** | `Get Single Exam Details (All Roles)`      | `/api/v1/exams/:examId`                              |  `GET`   |   🟡 API Ready   | `src/api/exam.ts` $\rightarrow$ `useExamDetails()`                      |
 | **72** | `Get Batch Exam Results / Merit List`      | `/api/v1/exams/:examId/results`                      |  `GET`   |   🟡 API Ready   | `src/api/exam.ts` $\rightarrow$ `useBatchExamResults()`                 |
@@ -481,10 +478,8 @@ flowchart LR
 |    Phase    | Module Name                              | Scope & Key Deliverables                                                                                                                                                                                                                                                                                                                 | Endpoints Involved                                                                                                             |
 | :---------: | :--------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :----------------------------------------------------------------------------------------------------------------------------- |
 | **Phase 1** | **Google OAuth & Student Onboarding** ✅ | • `@react-oauth/google` provider & `<GoogleLogin />` integration<br>• Seamless direct login for approved students<br>• Protected `/onboard-student` route with automatic redirect for unverified guests<br>• Multi-step admission form with Google identity prefill<br>• Account enters `PENDING_ACTIVATION` state awaiting admin review | `POST /auth/google`<br>`POST /auth/google/onboard`<br>`GET /users/me`                                                          |
-| **Phase 2** | **Batches & Self-Enrollment** ✅         | • Implement `getMyEnrolledBatches` & `requestBatchEnrollment`<br>• Enrolled batches grid with monthly fee, status badges, & routine links<br>• Course catalog with 1-click self-enrollment request dialog & re-apply workflows                                                                                                           | `GET /batches/my/enrolled`<br>`POST /batches/:batchId/enroll`<br>`GET /batches`                                                |
-| **Phase 3** | **Class Routine & Schedule**             | • 7-day responsive academic timetable grid<br>• Today's classes highlight filter<br>• Batch routine timetable modal & PDF schedule download                                                                                                                                                                                              | `GET /routines/my/student-schedule`<br>`GET /routines/batch/:batchId`<br>`GET /routines/batches/:batchId/pdf`                  |
 | **Phase 3** | **Class Routine & Schedule** ✅          | • 7-day responsive academic timetable grid (Sat–Fri)<br>• Today's classes highlight & live status agenda<br>• Batch routine timetable modal & printable PDF schedule download                                                                                                                                                            | `GET /routines/my/student-schedule`<br>`GET /routines/batch/:batchId`<br>`GET /routines/batches/:batchId/pdf`                  |
-| **Phase 4** | **Attendance Tracking**                  | • Monthly attendance metrics (Working days, Present, Late, Absent)<br>• Overall attendance compliance rate bar<br>• Chronological check-in log table with remarks                                                                                                                                                                        | `GET /attendance/my/summary`                                                                                                   |
+| **Phase 4** | **Attendance Tracking** ✅               | • Minimal overall attendance overview card with session count ratio<br>• 5 KPI attendance metric cards (Total classes, Present, Late, Absent, Leaves)<br>• Mobile-responsive chronological check-in log (card view on mobile, table on desktop) with filters                                                                           | `GET /attendance/my/summary`                                                                                                   |
 | **Phase 5** | **Exams, Results & Merit Lists**         | • Published report cards with marks, letter grade, GPA, and rank<br>• Single exam detail modal with performance breakdown<br>• Official report card PDF download & class merit list viewer                                                                                                                                               | `GET /exams/my/results`<br>`GET /exams/my/results/:examId`<br>`GET /exams/:examId/results`<br>`GET /exams/.../report-card/pdf` |
 | **Phase 6** | **Settings & Profile**                   | • Student academic & personal info card<br>• Avatar upload/remove integration<br>• Password change form & active sessions manager                                                                                                                                                                                                        | `GET /users/me`<br>`PATCH /users/me`<br>`PATCH /users/me/avatar`<br>`PATCH /users/change-password`<br>`GET /auth/sessions`     |
 | **Phase 7** | **Real-Time Dashboard Hub**              | • Upgrade `/dashboard/student/page.tsx` with live data ribbons<br>• Today's scheduled classes widget<br>• Dues notification banner with quick Stripe checkout CTA                                                                                                                                                                        | Aggregated overview across all student queries                                                                                 |

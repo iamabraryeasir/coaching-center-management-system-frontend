@@ -186,7 +186,7 @@ export function StudentAttendanceView() {
           {/* Search Input & Batch Dropdown */}
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
             {/* Search Input */}
-            <div className="relative min-w-[200px] sm:min-w-[220px]">
+            <div className="relative min-w-50 sm:min-w-55">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
               <Input
                 id={searchInputId}

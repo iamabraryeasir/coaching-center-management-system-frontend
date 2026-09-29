@@ -149,7 +149,7 @@ export function StudentAttendanceHistoryTable({
                   {markedByName}
                 </span>
                 {record.remarks && (
-                  <span className="italic truncate max-w-[140px]">
+                  <span className="italic truncate max-w-35">
                     "{record.remarks}"
                   </span>
                 )}
@@ -165,13 +165,13 @@ export function StudentAttendanceHistoryTable({
           <Table>
             <TableHeader className="bg-muted/40">
               <TableRow>
-                <TableHead className="w-[180px] font-semibold text-foreground">
+                <TableHead className="w-45 font-semibold text-foreground">
                   Date
                 </TableHead>
                 <TableHead className="font-semibold text-foreground">
                   Enrolled Course / Batch
                 </TableHead>
-                <TableHead className="w-[150px] font-semibold text-foreground">
+                <TableHead className="w-37.5 font-semibold text-foreground">
                   Status
                 </TableHead>
                 <TableHead className="font-semibold text-foreground">
