@@ -11,8 +11,8 @@
 | Metric                                                          | Count  | Percentage |
 | :-------------------------------------------------------------- | :----: | :--------: |
 | **Total Student-Relevant Endpoints in Postman Collection**      | **38** |    100%    |
-| **Fully Implemented Features (API + Hooks + Dedicated UI)**     | **19** | **50.0%**  |
-| **API Ready / Hook Ready (Pending Dedicated Student UI Route)** | **16** | **42.1%**  |
+| **Fully Implemented Features (API + Hooks + Dedicated UI)**     | **23** | **60.5%**  |
+| **API Ready / Hook Ready (Pending Dedicated Student UI Route)** | **12** | **31.6%**  |
 | **System & Webhook Endpoints (Backend Native)**                 | **3**  |  **7.9%**  |
 
 ---
@@ -248,7 +248,26 @@ The following capabilities are actively functional in the codebase (**API Client
   - Powered by `useSuspenseMyStudentAttendanceSummary()`.
   - Route-level `loading.tsx` and `<StudentAttendanceSkeleton />` matching full dashboard layout.
 
-### 3.6 Tuition Billing, Stripe Checkout & PDF Receipts (`/dashboard/student/payments`)
+### 3.6 Student Exams, Results & Report Cards (`/dashboard/student/exams`)
+
+- **Academic Performance Summary Ribbon**:
+  - 4 KPI metric cards: Cumulative GPA (`4.85 / 5.00`), Total Evaluated Exams, Overall Pass Rate (%), and Top Batch Rank (`#1 in Batch`).
+- **Dual Responsive Layout**:
+  - **Mobile Card View (`sm:hidden`)**: Touch-optimized scorecard cards featuring score ratios, grade pills, batch ranks, and direct actions.
+  - **Desktop Table View (`hidden sm:block`)**: Detailed results table with exam title, date, score, letter grade, GPA, rank, and status badges.
+- **Deep-Dive Scorecard Modal**:
+  - Single exam score breakdown, passing threshold comparison, class average mark, and highest mark in batch.
+  - Teacher evaluation remarks and direct official PDF report card download CTA.
+- **Official Batch Merit List Modal**:
+  - Complete peer rankings with gold, silver, and bronze podium badges for toppers.
+  - Highlights the authenticated student's row for quick self-identification.
+  - Class statistics: Total examinees, class highest, class average, pass percentage.
+- **Official PDF Report Card Generation**:
+  - Direct 1-click download via backend PDF generator (`getReportCardPdfUrl(examId, studentId, true)`).
+- **Suspense Architecture**:
+  - Powered by `useSuspenseMyExamResults()`, route-level `loading.tsx`, and `<StudentExamsSkeleton />`.
+
+### 3.7 Tuition Billing, Stripe Checkout & PDF Receipts (`/dashboard/student/payments`)
 
 - **Student Monthly Bill Calculation**: `GET /payments/my-bill?month=X&year=YYYY`
   - Real-time tuition ledger displaying base fee, discounts, opening arrears, total payable, and net balance.
@@ -259,7 +278,7 @@ The following capabilities are actively functional in the codebase (**API Client
 - **Payment Receipt PDF Download**: `GET /payments/transactions/:id/pdf`
   - Automated PDF invoice and payment receipt download modal.
 
-### 3.7 Student Dashboard Gateway (`/dashboard/student`)
+### 3.8 Student Dashboard Gateway (`/dashboard/student`)
 
 - **Smart Gateway Navigation**:
   - `/dashboard/page.tsx` evaluates `user.role === "STUDENT"` and redirects to `/dashboard/student`.
@@ -272,16 +291,7 @@ The following capabilities are actively functional in the codebase (**API Client
 
 The following capabilities have backend endpoints, API client functions, and TanStack Query hooks in place, but need dedicated presentation pages inside `/dashboard/student/*`:
 
-### 4.1 Exams, Results & Report Cards (`/dashboard/student/exams`)
-
-- `GET /exams` $\rightarrow$ `getExams()`, `useExams()`.
-- `GET /exams/my/results` $\rightarrow$ `getMyExamResults()`, `useMyExamResults()`.
-- `GET /exams/my/results/:examId` $\rightarrow$ `getMySingleExamResult()`, `useMySingleExamResult()`.
-- `GET /exams/:examId/results` $\rightarrow$ `getBatchExamResults()`, `useBatchExamResults()`.
-- `GET /exams/:examId/students/:studentId/report-card/pdf` $\rightarrow `getReportCardPdfUrl()`.
-- **Needed**: Academic performance summary (GPA, total exams, pass rate), exam results table with grade badges and batch rank (`#1 / 45`), report card modal, and 1-click PDF download.
-
-### 4.2 Student Profile & Settings (`/dashboard/student/settings`)
+### 4.1 Student Profile & Settings (`/dashboard/student/settings`)
 
 - `PATCH /users/me` $\rightarrow$ `updateMyProfile()`, `useUpdateMyProfileMutation()`.
 - `PATCH /users/change-password` $\rightarrow$ `changePassword()`, `useChangePasswordMutation()`.
@@ -355,10 +365,10 @@ The following endpoints require new client methods in `src/api` and `src/hooks`:
 | **58** | `Get My Attendance Summary (Student)`      | `/api/v1/attendance/my/summary`                      |  `GET`   | 🟢 **COMPLETED** | `src/app/dashboard/student/attendance/page.tsx`                         |
 | **66** | `Get Exams List (All Roles)`               | `/api/v1/exams`                                      |  `GET`   |   🟡 API Ready   | `src/api/exam.ts` $\rightarrow$ `useExams()`                            |
 | **67** | `Get Single Exam Details (All Roles)`      | `/api/v1/exams/:examId`                              |  `GET`   |   🟡 API Ready   | `src/api/exam.ts` $\rightarrow$ `useExamDetails()`                      |
-| **72** | `Get Batch Exam Results / Merit List`      | `/api/v1/exams/:examId/results`                      |  `GET`   |   🟡 API Ready   | `src/api/exam.ts` $\rightarrow$ `useBatchExamResults()`                 |
-| **74** | `Get My Report Card (Student Only)`        | `/api/v1/exams/my/results`                           |  `GET`   |   🟡 API Ready   | `src/api/exam.ts` $\rightarrow$ `useMyExamResults()`                    |
-| **75** | `Get My Single Exam Result (Student Only)` | `/api/v1/exams/my/results/:examId`                   |  `GET`   |   🟡 API Ready   | `src/api/exam.ts` $\rightarrow$ `useMySingleExamResult()`               |
-| **77** | `Download Student Report Card PDF`         | `/api/v1/exams/:examId/students/:id/report-card/pdf` |  `GET`   |   🟡 API Ready   | `src/api/exam.ts` $\rightarrow$ `getReportCardPdfUrl()`                 |
+| **72** | `Get Batch Exam Results / Merit List`      | `/api/v1/exams/:examId/results`                      |  `GET`   | 🟢 **COMPLETED** | `StudentBatchMeritListModal` & `useBatchExamResults()`                 |
+| **74** | `Get My Report Card (Student Only)`        | `/api/v1/exams/my/results`                           |  `GET`   | 🟢 **COMPLETED** | `src/app/dashboard/student/exams/page.tsx` & `useSuspenseMyExamResults()` |
+| **75** | `Get My Single Exam Result (Student Only)` | `/api/v1/exams/my/results/:examId`                   |  `GET`   | 🟢 **COMPLETED** | `StudentExamScorecardModal` & `useMySingleExamResult()`                |
+| **77** | `Download Student Report Card PDF`         | `/api/v1/exams/:examId/students/:id/report-card/pdf` |  `GET`   | 🟢 **COMPLETED** | `getReportCardPdfUrl()` (Direct 1-click PDF download)                  |
 | **79** | `Upload My Avatar (All Roles)`             | `/api/v1/users/me/avatar`                            | `PATCH`  |   🟡 API Ready   | `src/api/media.ts` $\rightarrow$ `useUploadMyAvatarMutation()`          |
 | **80** | `Delete My Avatar (All Roles)`             | `/api/v1/users/me/avatar`                            | `DELETE` |   🟡 API Ready   | `src/api/media.ts` $\rightarrow$ `useDeleteMyAvatarMutation()`          |
 | **85** | `Get Student Billing Summary & Dues`       | `/api/v1/payments/my-bill`                           |  `GET`   | 🟢 **COMPLETED** | `src/components/modules/payments/student-payment-view.tsx`              |
@@ -478,9 +488,10 @@ flowchart LR
 |    Phase    | Module Name                              | Scope & Key Deliverables                                                                                                                                                                                                                                                                                                                 | Endpoints Involved                                                                                                             |
 | :---------: | :--------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :----------------------------------------------------------------------------------------------------------------------------- |
 | **Phase 1** | **Google OAuth & Student Onboarding** ✅ | • `@react-oauth/google` provider & `<GoogleLogin />` integration<br>• Seamless direct login for approved students<br>• Protected `/onboard-student` route with automatic redirect for unverified guests<br>• Multi-step admission form with Google identity prefill<br>• Account enters `PENDING_ACTIVATION` state awaiting admin review | `POST /auth/google`<br>`POST /auth/google/onboard`<br>`GET /users/me`                                                          |
+| **Phase 2** | **Batches & Self-Enrollment** ✅         | • Implement `getMyEnrolledBatches` & `requestBatchEnrollment`<br>• Enrolled batches grid with monthly fee, status badges, & routine links<br>• Course catalog with 1-click self-enrollment request dialog & re-apply workflows                                                                                                           | `GET /batches/my/enrolled`<br>`POST /batches/:batchId/enroll`<br>`GET /batches`                                                |
 | **Phase 3** | **Class Routine & Schedule** ✅          | • 7-day responsive academic timetable grid (Sat–Fri)<br>• Today's classes highlight & live status agenda<br>• Batch routine timetable modal & printable PDF schedule download                                                                                                                                                            | `GET /routines/my/student-schedule`<br>`GET /routines/batch/:batchId`<br>`GET /routines/batches/:batchId/pdf`                  |
 | **Phase 4** | **Attendance Tracking** ✅               | • Minimal overall attendance overview card with session count ratio<br>• 5 KPI attendance metric cards (Total classes, Present, Late, Absent, Leaves)<br>• Mobile-responsive chronological check-in log (card view on mobile, table on desktop) with filters                                                                           | `GET /attendance/my/summary`                                                                                                   |
-| **Phase 5** | **Exams, Results & Merit Lists**         | • Published report cards with marks, letter grade, GPA, and rank<br>• Single exam detail modal with performance breakdown<br>• Official report card PDF download & class merit list viewer                                                                                                                                               | `GET /exams/my/results`<br>`GET /exams/my/results/:examId`<br>`GET /exams/:examId/results`<br>`GET /exams/.../report-card/pdf` |
+| **Phase 5** | **Exams, Results & Merit Lists** ✅      | • Published report cards with marks, letter grade, GPA, and rank<br>• Single exam scorecard modal with performance breakdown vs class average<br>• Official batch merit list rankings with toppers podium<br>• 1-click official report card PDF download                                                                               | `GET /exams/my/results`<br>`GET /exams/my/results/:examId`<br>`GET /exams/:examId/results`<br>`GET /exams/.../report-card/pdf` |
 | **Phase 6** | **Settings & Profile**                   | • Student academic & personal info card<br>• Avatar upload/remove integration<br>• Password change form & active sessions manager                                                                                                                                                                                                        | `GET /users/me`<br>`PATCH /users/me`<br>`PATCH /users/me/avatar`<br>`PATCH /users/change-password`<br>`GET /auth/sessions`     |
 | **Phase 7** | **Real-Time Dashboard Hub**              | • Upgrade `/dashboard/student/page.tsx` with live data ribbons<br>• Today's scheduled classes widget<br>• Dues notification banner with quick Stripe checkout CTA                                                                                                                                                                        | Aggregated overview across all student queries                                                                                 |
 

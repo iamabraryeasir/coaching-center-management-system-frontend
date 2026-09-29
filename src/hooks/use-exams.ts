@@ -1,4 +1,9 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+  useSuspenseQuery,
+} from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import {
   bulkSubmitMarks,
@@ -69,6 +74,16 @@ export function useMyExamResults(enabled = true) {
     queryFn: () => getMyExamResults(),
     enabled,
     placeholderData: (previousData) => previousData,
+  });
+}
+
+/**
+ * Suspense hook: Fetch My Student Report Card (All Exams)
+ */
+export function useSuspenseMyExamResults() {
+  return useSuspenseQuery({
+    queryKey: examKeys.myResults(),
+    queryFn: () => getMyExamResults(),
   });
 }
 

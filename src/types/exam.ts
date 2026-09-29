@@ -77,9 +77,22 @@ export interface StudentExamResultItem {
 }
 
 export interface StudentReportCard {
-  student: User;
-  results: StudentExamResultItem[];
-  cumulativeStats: {
+  student:
+    | User
+    | {
+        id: string;
+        name: string;
+        email: string;
+        phone?: string;
+        rollNumber?: string | null;
+        classLevel?: string | null;
+      };
+  totalExams?: number;
+  passedExams?: number;
+  failedExams?: number;
+  overallPassRate?: number;
+  results: Array<StudentExamResultItem | Record<string, unknown>>;
+  cumulativeStats?: {
     totalExams: number;
     gpaAverage: number;
     overallPassRate: number;
