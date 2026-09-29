@@ -6,6 +6,7 @@ import type {
   QueryParams,
   RegisterStudentDto,
   StudentQueryParams,
+  UpdateStudentDto,
   User,
   UserStatus,
 } from "@/types";
@@ -45,6 +46,19 @@ export async function getStudentById(
 ): Promise<ApiResponse<User>> {
   return await apiClient<ApiResponse<User>>(`/users/${userId}`, {
     method: "GET",
+  });
+}
+
+/**
+ * Update student profile and academic info (Admin only)
+ */
+export async function updateStudent(
+  userId: string,
+  payload: UpdateStudentDto,
+): Promise<ApiResponse<User>> {
+  return await apiClient<ApiResponse<User>>(`/users/students/${userId}`, {
+    method: "PATCH",
+    body: payload,
   });
 }
 

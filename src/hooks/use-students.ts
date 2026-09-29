@@ -8,6 +8,7 @@ import {
   getStudents,
   registerStudent,
   rejectPendingStudent,
+  updateStudent,
   updateStudentStatus,
 } from "@/api";
 import { studentKeys, userKeys } from "@/constants";
@@ -15,6 +16,7 @@ import type {
   QueryParams,
   RegisterStudentDto,
   StudentQueryParams,
+  UpdateStudentDto,
   UserStatus,
 } from "@/types";
 
@@ -71,6 +73,44 @@ export function useRegisterStudentMutation() {
     },
     onError: (error: Error, _vars, toastId) => {
       toast.error(error.message || "Failed to admit student", { id: toastId });
+    },
+  });
+}
+
+/**
+ * Mutation: Update student profile details (Admin only)
+ */
+export function useUpdateStudentMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      userId,
+      payload,
+    }: {
+      userId: string;
+      payload: UpdateStudentDto;
+    }) => updateStudent(userId, payload),
+    onMutate: () => {
+      return toast.loading("Updating student profile...");
+    },
+    onSuccess: (response, vars, toastId) => {
+      queryClient.invalidateQueries({ queryKey: studentKeys.all });
+      queryClient.invalidateQueries({
+        queryKey: studentKeys.detail(vars.userId),
+      });
+      queryClient.invalidateQueries({ queryKey: userKeys.all });
+      toast.success(
+        response.message || "Student profile updated successfully!",
+        {
+          id: toastId,
+        },
+      );
+    },
+    onError: (error: Error, _vars, toastId) => {
+      toast.error(error.message || "Failed to update student profile", {
+        id: toastId,
+      });
     },
   });
 }

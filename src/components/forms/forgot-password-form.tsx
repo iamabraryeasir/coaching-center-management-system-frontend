@@ -270,11 +270,10 @@ export function ForgotPasswordForm({
           <div className="mx-auto mb-3 flex size-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
             <Mail className="size-6" />
           </div>
-          <CardTitle className="font-heading text-xl">
-            Reset Password
-          </CardTitle>
+          <CardTitle className="font-heading text-xl">Reset Password</CardTitle>
           <CardDescription className="text-xs">
-            Enter your registered email address and we will send you a link to reset your password.
+            Enter your registered email address and we will send you a link to
+            reset your password.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -301,7 +300,9 @@ export function ForgotPasswordForm({
 
                   return (
                     <Field>
-                      <FieldLabel htmlFor={field.name}>Email Address</FieldLabel>
+                      <FieldLabel htmlFor={field.name}>
+                        Email Address
+                      </FieldLabel>
                       <Input
                         id={field.name}
                         name={field.name}

@@ -23,6 +23,18 @@ export interface RegisterStudentDto {
   gender: NonNullable<Gender>;
 }
 
+export interface UpdateStudentDto {
+  name?: string;
+  email?: string;
+  phone?: string;
+  guardianName?: string;
+  guardianPhone?: string;
+  institutionName?: string;
+  classLevel?: string;
+  rollNumber?: string;
+  gender?: Gender;
+}
+
 export interface PendingStudent {
   id: string;
   name: string;
