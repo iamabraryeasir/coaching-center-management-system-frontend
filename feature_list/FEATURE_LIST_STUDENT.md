@@ -11,8 +11,8 @@
 | Metric                                                          | Count  | Percentage |
 | :-------------------------------------------------------------- | :----: | :--------: |
 | **Total Student-Relevant Endpoints in Postman Collection**      | **38** |    100%    |
-| **Fully Implemented Features (API + Hooks + Dedicated UI)**     | **23** | **60.5%**  |
-| **API Ready / Hook Ready (Pending Dedicated Student UI Route)** | **12** | **31.6%**  |
+| **Fully Implemented Features (API + Hooks + Dedicated UI)**     | **30** | **78.9%**  |
+| **API Ready / Hook Ready (Pending Dedicated Student UI Route)** | **5**  | **13.2%**  |
 | **System & Webhook Endpoints (Backend Native)**                 | **3**  |  **7.9%**  |
 
 ---
@@ -278,7 +278,24 @@ The following capabilities are actively functional in the codebase (**API Client
 - **Payment Receipt PDF Download**: `GET /payments/transactions/:id/pdf`
   - Automated PDF invoice and payment receipt download modal.
 
-### 3.8 Student Dashboard Gateway (`/dashboard/student`)
+### 3.8 Student Profile, Avatar & Settings (`/dashboard/student/settings`) — ✅ COMPLETED
+
+- **Personal Profile & Contact Editing**: `PATCH /api/v1/users/me`
+  - Allows editing Name, Mobile Contact, and Gender identity with real-time Zod schema validation.
+- **Cloudinary Avatar Upload & Removal**: `PATCH /api/v1/users/me/avatar` & `DELETE /api/v1/users/me/avatar`
+  - Drag-and-drop avatar upload dropzone with preview and colorful initials avatar fallback.
+- **Official Academic Credentials Inspection**: `GET /api/v1/users/me`
+  - Displays Roll Number, Target Class Level, School/College Institution, Guardian Name & Contact, and Admission Status.
+- **Academic Enrolled Batches Summary**: `GET /api/v1/batches/my/enrolled`
+  - Visual summary cards of all active enrolled cohorts with direct schedule and attendance shortcuts.
+- **Password Security Management**: `PATCH /api/v1/users/change-password`
+  - Self-service password change with visibility toggles and strict password criteria.
+- **Active Login Sessions Manager**: `GET /api/v1/auth/sessions` & `POST /api/v1/auth/logout-all`
+  - Inspect active devices, operating systems, browsers, IP addresses, and revoke individual or all other sessions.
+- **Coaching Center Directory & Support**: `GET /api/v1/institution`
+  - Campus address, official student helpline, and support coordinator email.
+
+### 3.9 Student Dashboard Gateway (`/dashboard/student`)
 
 - **Smart Gateway Navigation**:
   - `/dashboard/page.tsx` evaluates `user.role === "STUDENT"` and redirects to `/dashboard/student`.
@@ -291,13 +308,11 @@ The following capabilities are actively functional in the codebase (**API Client
 
 The following capabilities have backend endpoints, API client functions, and TanStack Query hooks in place, but need dedicated presentation pages inside `/dashboard/student/*`:
 
-### 4.1 Student Profile & Settings (`/dashboard/student/settings`)
+### 4.1 Batch Detail Modal / Inspection Route
 
-- `PATCH /users/me` $\rightarrow$ `updateMyProfile()`, `useUpdateMyProfileMutation()`.
-- `PATCH /users/change-password` $\rightarrow$ `changePassword()`, `useChangePasswordMutation()`.
-- `PATCH /users/me/avatar` & `DELETE /users/me/avatar` $\rightarrow$ `uploadMyAvatar()`, `deleteMyAvatar()`.
-- `GET /auth/sessions` & `POST /auth/logout-all` $\rightarrow$ `getActiveSessions()`, `useLogoutAllMutation()`.
-- **Needed**: Student profile card (personal & guardian contact), avatar upload/remove, password change form, and active session manager.
+- `GET /api/v1/batches/:batchId` $\rightarrow$ `getBatchById()`, `useBatch()`.
+- `GET /api/v1/routines` $\rightarrow$ `getRoutines()`, `useRoutines()`.
+- `GET /api/v1/routines/:routineId` $\rightarrow$ `getRoutineById()`, `useRoutine()`.
 
 ---
 
@@ -345,14 +360,14 @@ The following endpoints require new client methods in `src/api` and `src/hooks`:
 | **7**  | `Forgot Password`                          | `/api/v1/auth/forgot-password`                       |  `POST`  | 🟢 **COMPLETED** | `src/app/(public)/(auth)/forgot-password`                               |
 | **8**  | `Reset Password`                           | `/api/v1/auth/reset-password`                        |  `POST`  | 🟢 **COMPLETED** | `src/app/(public)/(auth)/reset-password`                                |
 | **9**  | `Logout`                                   | `/api/v1/auth/logout`                                |  `POST`  | 🟢 **COMPLETED** | Header User Menu & `useAuth()`                                          |
-| **10** | `Logout from All Devices`                  | `/api/v1/auth/logout-all`                            |  `POST`  |   🟡 API Ready   | `ActiveSessionsCard` on `/dashboard/student/settings`                   |
-| **11** | `List Active Login Sessions`               | `/api/v1/auth/sessions`                              |  `GET`   |   🟡 API Ready   | `ActiveSessionsCard` on `/dashboard/student/settings`                   |
+| **10** | `Logout from All Devices`                  | `/api/v1/auth/logout-all`                            |  `POST`  | 🟢 **COMPLETED** | `ActiveSessionsCard` on `/dashboard/student/settings`                   |
+| **11** | `List Active Login Sessions`               | `/api/v1/auth/sessions`                              |  `GET`   | 🟢 **COMPLETED** | `ActiveSessionsCard` on `/dashboard/student/settings`                   |
 | **14** | `Google ID Token Verification & Login`     | `/api/v1/auth/google`                                |  `POST`  | 🟢 **COMPLETED** | `GoogleLoginButton` in `login-form.tsx` & `useGoogleAuthMutation()`     |
 | **15** | `Google Student Onboarding`                | `/api/v1/auth/google/onboard`                        |  `POST`  | 🟢 **COMPLETED** | `StudentOnboardingForm` on `/onboard-student` & `useGoogleOnboarding()` |
-| **19** | `Get Institution Profile & Stats`          | `/api/v1/institution`                                |  `GET`   |   🟡 API Ready   | `src/api/institution.ts` $\rightarrow$ `useInstitutionProfile()`        |
+| **19** | `Get Institution Profile & Stats`          | `/api/v1/institution`                                |  `GET`   | 🟢 **COMPLETED** | `StudentInstitutionCard` on `/dashboard/student/settings`               |
 | **21** | `Get Current User Profile (/me)`           | `/api/v1/users/me`                                   |  `GET`   | 🟢 **COMPLETED** | `useAuth()` in `src/hooks/use-auth.ts`                                  |
-| **22** | `Update Current User Profile (/me)`        | `/api/v1/users/me`                                   | `PATCH`  |   🟡 API Ready   | `StudentProfileCard` on `/dashboard/student/settings`                   |
-| **23** | `Change Password`                          | `/api/v1/users/change-password`                      | `PATCH`  |   🟡 API Ready   | `ChangePasswordCard` on `/dashboard/student/settings`                   |
+| **22** | `Update Current User Profile (/me)`        | `/api/v1/users/me`                                   | `PATCH`  | 🟢 **COMPLETED** | `StudentProfileCard` on `/dashboard/student/settings`                   |
+| **23** | `Change Password`                          | `/api/v1/users/change-password`                      | `PATCH`  | 🟢 **COMPLETED** | `ChangePasswordCard` on `/dashboard/student/settings`                   |
 | **32** | `Get All Batches (QueryBuilder)`           | `/api/v1/batches`                                    |  `GET`   | 🟢 **COMPLETED** | `src/app/dashboard/student/batches/page.tsx` & `useSuspenseBatches()`   |
 | **33** | `Get Batch Details by ID`                  | `/api/v1/batches/:batchId`                           |  `GET`   |   🟡 API Ready   | `src/api/batches.ts` $\rightarrow$ `useBatch()`                         |
 | **36** | `Student Request Self-Enrollment`          | `/api/v1/batches/:batchId/enroll`                    |  `POST`  | 🟢 **COMPLETED** | `RequestEnrollmentDialog` & `useRequestBatchEnrollmentMutation()`       |
@@ -369,8 +384,8 @@ The following endpoints require new client methods in `src/api` and `src/hooks`:
 | **74** | `Get My Report Card (Student Only)`        | `/api/v1/exams/my/results`                           |  `GET`   | 🟢 **COMPLETED** | `src/app/dashboard/student/exams/page.tsx` & `useSuspenseMyExamResults()` |
 | **75** | `Get My Single Exam Result (Student Only)` | `/api/v1/exams/my/results/:examId`                   |  `GET`   | 🟢 **COMPLETED** | `StudentExamScorecardModal` & `useMySingleExamResult()`                |
 | **77** | `Download Student Report Card PDF`         | `/api/v1/exams/:examId/students/:id/report-card/pdf` |  `GET`   | 🟢 **COMPLETED** | `getReportCardPdfUrl()` (Direct 1-click PDF download)                  |
-| **79** | `Upload My Avatar (All Roles)`             | `/api/v1/users/me/avatar`                            | `PATCH`  |   🟡 API Ready   | `src/api/media.ts` $\rightarrow$ `useUploadMyAvatarMutation()`          |
-| **80** | `Delete My Avatar (All Roles)`             | `/api/v1/users/me/avatar`                            | `DELETE` |   🟡 API Ready   | `src/api/media.ts` $\rightarrow$ `useDeleteMyAvatarMutation()`          |
+| **79** | `Upload My Avatar (All Roles)`             | `/api/v1/users/me/avatar`                            | `PATCH`  | 🟢 **COMPLETED** | `StudentAvatarCard` on `/dashboard/student/settings`                    |
+| **80** | `Delete My Avatar (All Roles)`             | `/api/v1/users/me/avatar`                            | `DELETE` | 🟢 **COMPLETED** | `StudentAvatarCard` on `/dashboard/student/settings`                    |
 | **85** | `Get Student Billing Summary & Dues`       | `/api/v1/payments/my-bill`                           |  `GET`   | 🟢 **COMPLETED** | `src/components/modules/payments/student-payment-view.tsx`              |
 | **86** | `Create Stripe Checkout Session`           | `/api/v1/payments/create-checkout-session`           |  `POST`  | 🟢 **COMPLETED** | `src/components/modules/payments/student-payment-view.tsx`              |
 | **87** | `Stripe Payment Webhook`                   | `/api/v1/payments/webhook`                           |  `POST`  |    🟢 Backend    | Server-to-server webhook handler                                        |
@@ -492,7 +507,7 @@ flowchart LR
 | **Phase 3** | **Class Routine & Schedule** ✅          | • 7-day responsive academic timetable grid (Sat–Fri)<br>• Today's classes highlight & live status agenda<br>• Batch routine timetable modal & printable PDF schedule download                                                                                                                                                            | `GET /routines/my/student-schedule`<br>`GET /routines/batch/:batchId`<br>`GET /routines/batches/:batchId/pdf`                  |
 | **Phase 4** | **Attendance Tracking** ✅               | • Minimal overall attendance overview card with session count ratio<br>• 5 KPI attendance metric cards (Total classes, Present, Late, Absent, Leaves)<br>• Mobile-responsive chronological check-in log (card view on mobile, table on desktop) with filters                                                                           | `GET /attendance/my/summary`                                                                                                   |
 | **Phase 5** | **Exams, Results & Merit Lists** ✅      | • Published report cards with marks, letter grade, GPA, and rank<br>• Single exam scorecard modal with performance breakdown vs class average<br>• Official batch merit list rankings with toppers podium<br>• 1-click official report card PDF download                                                                               | `GET /exams/my/results`<br>`GET /exams/my/results/:examId`<br>`GET /exams/:examId/results`<br>`GET /exams/.../report-card/pdf` |
-| **Phase 6** | **Settings & Profile**                   | • Student academic & personal info card<br>• Avatar upload/remove integration<br>• Password change form & active sessions manager                                                                                                                                                                                                        | `GET /users/me`<br>`PATCH /users/me`<br>`PATCH /users/me/avatar`<br>`PATCH /users/change-password`<br>`GET /auth/sessions`     |
+| **Phase 6** | **Settings & Profile** ✅                | • Student academic & personal info card<br>• Avatar upload/remove integration<br>• Password change form & active sessions manager                                                                                                                                                                                                        | `GET /users/me`<br>`PATCH /users/me`<br>`PATCH /users/me/avatar`<br>`PATCH /users/change-password`<br>`GET /auth/sessions`     |
 | **Phase 7** | **Real-Time Dashboard Hub**              | • Upgrade `/dashboard/student/page.tsx` with live data ribbons<br>• Today's scheduled classes widget<br>• Dues notification banner with quick Stripe checkout CTA                                                                                                                                                                        | Aggregated overview across all student queries                                                                                 |
 
 ---

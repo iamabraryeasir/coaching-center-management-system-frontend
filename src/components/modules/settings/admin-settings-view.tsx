@@ -5,9 +5,7 @@ import {
   Calendar,
   CheckCircle2,
   DollarSign,
-  GraduationCap,
   KeyRound,
-  Layers,
   Loader2,
   Mail,
   MapPin,
@@ -16,7 +14,6 @@ import {
   Save,
   Settings,
   ShieldCheck,
-  UserCheck,
   User as UserIcon,
 } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -51,7 +48,7 @@ function getErrorMessage(error: unknown): string {
 }
 
 export function AdminSettingsView() {
-  const { data: profileResponse, isLoading } = useInstitutionProfile();
+  const { data: profileResponse } = useInstitutionProfile();
   const updateMutation = useUpdateInstitutionMutation();
 
   const profile = profileResponse?.data;
@@ -141,12 +138,6 @@ export function AdminSettingsView() {
     }
   };
 
-  const stats = profile?.stats || {
-    totalStudents: profile?.totalStudents ?? 0,
-    totalTeachers: profile?.totalTeachers ?? 0,
-    totalBatches: profile?.totalBatches ?? 0,
-  };
-
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       {/* 1. Header */}
@@ -156,59 +147,26 @@ export function AdminSettingsView() {
             <Settings className="size-3" />
             <span>Settings & Security</span>
           </div>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground font-heading">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground font-heading">
             Admin Settings
           </h1>
-          <p className="text-xs text-muted-foreground">
-            Manage your coaching center branding, campus profile, account
-            credentials, and active sessions.
+          <p className="text-xs sm:text-sm text-muted-foreground">
+            Manage your personal profile, institution branding, and account
+            security.
           </p>
         </div>
       </div>
 
-      {/* 2. Operational Statistics Ribbon */}
-      <div className="grid grid-cols-3 gap-3.5">
-        <div className="rounded-xl border border-border/80 bg-card p-3.5 shadow-2xs space-y-1">
-          <div className="flex items-center justify-between text-muted-foreground">
-            <span className="text-[11px] font-medium">Total Students</span>
-            <GraduationCap className="size-4 text-primary" />
-          </div>
-          <p className="text-lg font-bold text-foreground font-heading">
-            {isLoading ? "..." : (stats.totalStudents ?? 0).toLocaleString()}
-          </p>
-        </div>
-
-        <div className="rounded-xl border border-border/80 bg-card p-3.5 shadow-2xs space-y-1">
-          <div className="flex items-center justify-between text-muted-foreground">
-            <span className="text-[11px] font-medium">Total Teachers</span>
-            <UserCheck className="size-4 text-primary" />
-          </div>
-          <p className="text-lg font-bold text-foreground font-heading">
-            {isLoading ? "..." : (stats.totalTeachers ?? 0).toLocaleString()}
-          </p>
-        </div>
-
-        <div className="rounded-xl border border-border/80 bg-card p-3.5 shadow-2xs space-y-1">
-          <div className="flex items-center justify-between text-muted-foreground">
-            <span className="text-[11px] font-medium">Active Batches</span>
-            <Layers className="size-4 text-primary" />
-          </div>
-          <p className="text-lg font-bold text-foreground font-heading">
-            {isLoading ? "..." : (stats.totalBatches ?? 0).toLocaleString()}
-          </p>
-        </div>
-      </div>
-
-      {/* 3. Settings Navigation Tabs */}
-      <Tabs defaultValue="institution" className="space-y-6">
+      {/* 2. Settings Navigation Tabs */}
+      <Tabs defaultValue="profile" className="space-y-6">
         <TabsList className="grid w-full grid-cols-3 max-w-md">
+          <TabsTrigger value="profile" className="gap-1.5 text-xs">
+            <UserIcon className="size-3.5" />
+            <span>My Profile</span>
+          </TabsTrigger>
           <TabsTrigger value="institution" className="gap-1.5 text-xs">
             <Building2 className="size-3.5" />
             <span>Institution</span>
-          </TabsTrigger>
-          <TabsTrigger value="account" className="gap-1.5 text-xs">
-            <UserIcon className="size-3.5" />
-            <span>My Profile</span>
           </TabsTrigger>
           <TabsTrigger value="security" className="gap-1.5 text-xs">
             <KeyRound className="size-3.5" />
@@ -216,14 +174,20 @@ export function AdminSettingsView() {
           </TabsTrigger>
         </TabsList>
 
-        {/* Tab 1: Institution Branding & Campus */}
+        {/* Tab 1: Personal Profile & Avatar */}
+        <TabsContent value="profile" className="space-y-6">
+          <AdminAvatarCard />
+          <AdminProfileCard />
+        </TabsContent>
+
+        {/* Tab 2: Institution Branding & Campus */}
         <TabsContent value="institution" className="space-y-6">
           <form
             id="institution-settings-form"
             onSubmit={handleSave}
             className="space-y-6"
           >
-            <Card className="p-6 bg-card border-border/80 shadow-2xs space-y-6">
+            <Card className="p-5 sm:p-6 bg-card border-border/80 shadow-2xs space-y-6">
               {/* Brand & Identity */}
               <div>
                 <div className="flex items-center justify-between border-b border-border/60 pb-2 mb-4">
@@ -453,12 +417,6 @@ export function AdminSettingsView() {
               </div>
             </Card>
           </form>
-        </TabsContent>
-
-        {/* Tab 2: Personal Profile & Avatar */}
-        <TabsContent value="account" className="space-y-6">
-          <AdminAvatarCard />
-          <AdminProfileCard />
         </TabsContent>
 
         {/* Tab 3: Security, Password & Active Sessions */}

@@ -1,6 +1,6 @@
 import { Skeleton } from "@/components/ui/skeleton";
 
-export function TeacherSettingsSkeleton() {
+export function StudentSettingsSkeleton() {
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div className="space-y-2">

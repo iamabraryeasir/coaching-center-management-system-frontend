@@ -9,7 +9,6 @@ import {
   Settings,
   ShieldCheck,
   UserCheck,
-  UserCircle,
   Users,
 } from "lucide-react";
 import type { TeacherPermission } from "@/types";
@@ -218,12 +217,12 @@ export const STUDENT_NAV_GROUPS: readonly DashboardNavGroup[] = [
     ],
   },
   {
-    label: "Account",
+    label: "Settings",
     items: [
       {
-        title: "Student Profile",
-        href: "/dashboard/student/profile",
-        icon: UserCircle,
+        title: "Settings",
+        href: "/dashboard/student/settings",
+        icon: Settings,
       },
     ],
   },
