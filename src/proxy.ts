@@ -22,13 +22,15 @@ export function proxy(request: NextRequest) {
     }
   }
 
-  // Auth Page Guard (/login, /forgot-password, /onboard-student)
+  // Auth Page Guard (/login, /forgot-password, /reset-password, /onboard-student)
   // If user is already authenticated, redirect them away from auth screens to dashboard
   if (
     hasAuthCookie &&
     (pathname === "/login" ||
       pathname === "/forgot-password" ||
-      pathname === "/onboard-student")
+      pathname === "/onboard-student" ||
+      (pathname === "/reset-password" &&
+        !request.nextUrl.searchParams.has("token")))
   ) {
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }
@@ -43,6 +45,7 @@ export const config = {
     "/dashboard/:path*",
     "/login",
     "/forgot-password",
+    "/reset-password",
     "/onboard-student",
   ],
 };

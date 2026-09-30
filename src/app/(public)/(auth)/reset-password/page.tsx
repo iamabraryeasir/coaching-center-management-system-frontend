@@ -1,0 +1,35 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { Suspense } from "react";
+import AppLogo from "@/assets/svg/logo";
+import { ResetPasswordForm } from "@/components/forms/reset-password-form";
+import { siteConfig } from "@/config/site";
+
+export const metadata: Metadata = {
+  title: `Set New Password | ${siteConfig.name}`,
+  description:
+    "Set a new password for your account using your secure verification link.",
+};
+
+export default function ResetPasswordPage() {
+  return (
+    <div className="flex min-h-svh flex-col items-center justify-center gap-6 bg-muted p-6 md:p-10">
+      <div className="flex w-full max-w-sm flex-col gap-6">
+        <Link
+          href="/"
+          className="flex items-center gap-2 self-center font-medium"
+        >
+          <AppLogo size={0.5} />
+          {siteConfig.name}
+        </Link>
+        <Suspense
+          fallback={
+            <div className="h-96 w-full animate-pulse rounded-xl bg-card" />
+          }
+        >
+          <ResetPasswordForm />
+        </Suspense>
+      </div>
+    </div>
+  );
+}

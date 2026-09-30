@@ -148,9 +148,21 @@ export async function forgotPassword(payload: {
 export async function resetPassword(payload: {
   password: string;
   token?: string;
+  newPassword?: string;
 }): Promise<ApiResponse<null>> {
+  const headers: Record<string, string> = {};
+  if (payload.token) {
+    headers.Authorization = payload.token.startsWith("Bearer ")
+      ? payload.token
+      : `Bearer ${payload.token}`;
+  }
   return await apiClient<ApiResponse<null>>("/auth/reset-password", {
     method: "POST",
-    body: payload,
+    headers,
+    body: {
+      password: payload.password,
+      newPassword: payload.password,
+      token: payload.token,
+    },
   });
 }
