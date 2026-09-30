@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { strongPasswordSchema } from "./auth-validator";
 
 /**
  * Validates Bangladeshi mobile phone numbers:
@@ -20,10 +21,7 @@ export const registerTeacherSchema = z.object({
     .trim()
     .min(1, "Email address is required.")
     .email("Please enter a valid email address (e.g. teacher@example.com)."),
-  password: z
-    .string()
-    .min(6, "Temporary password must be at least 6 characters.")
-    .max(50, "Password cannot exceed 50 characters."),
+  password: strongPasswordSchema,
   phone: z
     .string()
     .trim()

@@ -23,6 +23,8 @@ import {
 } from "@/components/ui/dialog";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
+import { PasswordStrengthIndicator } from "@/components/ui/password-strength-indicator";
 import {
   Select,
   SelectContent,
@@ -292,9 +294,9 @@ export function RegisterTeacherDialog({
               <div className="sm:col-span-2">
                 <form.Field name="password">
                   {(field) => {
-                    const errorMsg = getErrorMessage(
-                      field.state.meta.errors[0],
-                    );
+                    const errorMsg = field.state.meta.errors?.[0]
+                      ? getErrorMessage(field.state.meta.errors[0])
+                      : null;
                     return (
                       <Field
                         data-invalid={
@@ -306,16 +308,21 @@ export function RegisterTeacherDialog({
                           Initial Temporary Password{" "}
                           <span className="text-destructive">*</span>
                         </FieldLabel>
-                        <Input
+                        <PasswordInput
                           name={field.name}
-                          type="password"
                           value={field.state.value}
                           onBlur={field.handleBlur}
                           onChange={(e) => field.handleChange(e.target.value)}
-                          placeholder="Minimum 6 characters (e.g. Teacher@123)"
+                          placeholder="Must contain uppercase, lowercase, digit, and symbol"
                           className="h-9 text-xs"
                         />
                         {errorMsg && <FieldError>{errorMsg}</FieldError>}
+                        {field.state.value.length > 0 && (
+                          <PasswordStrengthIndicator
+                            password={field.state.value}
+                            className="mt-2"
+                          />
+                        )}
                       </Field>
                     );
                   }}

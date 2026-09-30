@@ -15,6 +15,8 @@ import {
 } from "@/components/ui/dialog";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
+import { PasswordStrengthIndicator } from "@/components/ui/password-strength-indicator";
 import {
   Select,
   SelectContent,
@@ -242,38 +244,45 @@ export function StudentAdmissionDialog({
                 }}
               </form.Field>
 
-              <form.Field name="password">
-                {(field) => {
-                  const errorMsg = field.state.meta.errors?.[0]
-                    ? getErrorMessage(field.state.meta.errors[0])
-                    : null;
-                  return (
-                    <Field data-invalid={Boolean(errorMsg)}>
-                      <FieldLabel
-                        htmlFor={field.name}
-                        className="text-xs font-medium"
-                      >
-                        Temporary Password *
-                      </FieldLabel>
-                      <Input
-                        id={field.name}
-                        type="password"
-                        placeholder="Min 6 characters"
-                        value={field.state.value}
-                        onBlur={field.handleBlur}
-                        onChange={(e) => field.handleChange(e.target.value)}
-                        aria-invalid={Boolean(errorMsg)}
-                        className="h-9 text-sm"
-                      />
-                      {errorMsg && (
-                        <FieldError className="text-[11px] text-destructive">
-                          {errorMsg}
-                        </FieldError>
-                      )}
-                    </Field>
-                  );
-                }}
-              </form.Field>
+              <div className="sm:col-span-2">
+                <form.Field name="password">
+                  {(field) => {
+                    const errorMsg = field.state.meta.errors?.[0]
+                      ? getErrorMessage(field.state.meta.errors[0])
+                      : null;
+                    return (
+                      <Field data-invalid={Boolean(errorMsg)}>
+                        <FieldLabel
+                          htmlFor={field.name}
+                          className="text-xs font-medium"
+                        >
+                          Temporary Password *
+                        </FieldLabel>
+                        <PasswordInput
+                          id={field.name}
+                          placeholder="Must contain uppercase, lowercase, digit, and symbol"
+                          value={field.state.value}
+                          onBlur={field.handleBlur}
+                          onChange={(e) => field.handleChange(e.target.value)}
+                          aria-invalid={Boolean(errorMsg)}
+                          className="h-9 text-sm"
+                        />
+                        {errorMsg && (
+                          <FieldError className="text-[11px] text-destructive">
+                            {errorMsg}
+                          </FieldError>
+                        )}
+                        {field.state.value.length > 0 && (
+                          <PasswordStrengthIndicator
+                            password={field.state.value}
+                            className="mt-2"
+                          />
+                        )}
+                      </Field>
+                    );
+                  }}
+                </form.Field>
+              </div>
 
               <form.Field name="gender">
                 {(field) => {
