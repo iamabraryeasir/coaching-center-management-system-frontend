@@ -169,3 +169,74 @@ export interface StudentDashboardSummary {
   recentExams: StudentRecentExamResult[];
   enrolledBatches: StudentEnrolledBatchSummary[];
 }
+
+// ==========================================
+// Teacher Dashboard Analytics Types
+// ==========================================
+
+export interface TeacherDashboardKpis {
+  assignedBatchesCount: number;
+  activeBatchesCount: number;
+  classesTodayCount: number;
+  attendanceCompletedClassesCount: number;
+  upcomingExamsCount: number;
+  pendingMarksExamsCount: number;
+  personalAttendanceRate: number;
+  isCheckedInToday: boolean;
+  totalStudentsTaught: number;
+}
+
+export interface TeacherTodayClass {
+  id: string;
+  batchId: string;
+  batchName: string;
+  subject: string;
+  startTime: string; // e.g. "10:00"
+  endTime: string; // e.g. "11:30"
+  room: string;
+  totalStudents: number;
+  isAttendanceTaken: boolean;
+  status?: "UPCOMING" | "IN_PROGRESS" | "COMPLETED";
+}
+
+export interface TeacherAssignedBatchSummary {
+  batchId: string;
+  batchName: string;
+  subject: string;
+  studentCount: number;
+  status: "UPCOMING" | "ONGOING" | "COMPLETED" | "CANCELLED";
+  weeklyClassesCount: number;
+}
+
+export interface TeacherPendingExamTask {
+  examId: string;
+  title: string;
+  batchId: string;
+  batchName: string;
+  examDate: string;
+  totalMarks: number;
+  passMarks: number;
+  status: "UPCOMING" | "ONGOING" | "COMPLETED" | "CANCELLED";
+  resultStatus: "DRAFT" | "PUBLISHED";
+  evaluatedCount: number;
+  totalStudents: number;
+}
+
+export interface TeacherAttendanceSnapshot {
+  isCheckedInToday: boolean;
+  checkInTime: string | null;
+  attendanceRate: number;
+  presentDays: number;
+  lateDays: number;
+  absentDays: number;
+  leaveDays: number;
+}
+
+export interface TeacherDashboardSummary {
+  kpis: TeacherDashboardKpis;
+  todayClasses: TeacherTodayClass[];
+  assignedBatches: TeacherAssignedBatchSummary[];
+  pendingExamTasks: TeacherPendingExamTask[];
+  personalAttendance: TeacherAttendanceSnapshot;
+  permissions?: string[];
+}

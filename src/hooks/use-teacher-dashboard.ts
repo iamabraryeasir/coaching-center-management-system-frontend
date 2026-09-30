@@ -1,4 +1,4 @@
-"use client";
+export { useTeacherDashboard } from "./use-dashboard";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
 import {

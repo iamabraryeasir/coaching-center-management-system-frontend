@@ -4,6 +4,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 const FOUR_KEYS = ["kpi-1", "kpi-2", "kpi-3", "kpi-4"];
 const THREE_KEYS = ["row-1", "row-2", "row-3"];
+const TWO_KEYS = ["batch-1", "batch-2"];
 
 export function TeacherKpiCardsSkeleton() {
   return (
@@ -72,6 +73,57 @@ export function TeacherPermissionsSkeleton() {
   );
 }
 
+export function TeacherPendingExamsSkeleton() {
+  return (
+    <div className="space-y-4 rounded-xl border border-border/80 bg-card p-6">
+      <div className="space-y-1">
+        <Skeleton className="h-5 w-44" />
+        <Skeleton className="h-3.5 w-60" />
+      </div>
+      <div className="space-y-3">
+        {THREE_KEYS.map((k) => (
+          <div
+            key={k}
+            className="flex items-center justify-between rounded-lg border border-border/60 p-3.5"
+          >
+            <div className="space-y-1.5">
+              <Skeleton className="h-4 w-40" />
+              <Skeleton className="h-3 w-48" />
+            </div>
+            <Skeleton className="h-7 w-24 rounded-md" />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export function TeacherAssignedBatchesSkeleton() {
+  return (
+    <div className="space-y-4 rounded-xl border border-border/80 bg-card p-6">
+      <div className="space-y-1">
+        <Skeleton className="h-5 w-40" />
+        <Skeleton className="h-3.5 w-56" />
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        {TWO_KEYS.map((k) => (
+          <div
+            key={k}
+            className="space-y-3 rounded-xl border border-border/60 p-4"
+          >
+            <Skeleton className="h-4 w-32" />
+            <Skeleton className="h-3 w-24" />
+            <div className="flex gap-2">
+              <Skeleton className="h-7 flex-1 rounded-md" />
+              <Skeleton className="h-7 flex-1 rounded-md" />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export function TeacherDashboardPageSkeleton() {
   return (
     <div className="space-y-6">
@@ -90,10 +142,16 @@ export function TeacherDashboardPageSkeleton() {
       {/* KPI Cards Skeleton */}
       <TeacherKpiCardsSkeleton />
 
-      {/* Grid Row */}
+      {/* Schedule & Permissions Grid */}
       <div className="grid gap-6 lg:grid-cols-2">
         <TeacherTodayScheduleSkeleton />
         <TeacherPermissionsSkeleton />
+      </div>
+
+      {/* Exams & Assigned Batches Grid */}
+      <div className="grid gap-6 lg:grid-cols-2">
+        <TeacherPendingExamsSkeleton />
+        <TeacherAssignedBatchesSkeleton />
       </div>
     </div>
   );

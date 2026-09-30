@@ -17,36 +17,46 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useAuth } from "@/hooks";
+import { useAuth, useTeacherDashboard } from "@/hooks";
 import { cn } from "@/lib/utils";
+import type { TeacherPermission } from "@/types";
 
 export function TeacherPermissionsCard() {
+  const { data } = useTeacherDashboard();
   const { hasPermission } = useAuth();
+
+  const permissionsList = data?.permissions;
 
   const permissions = [
     {
-      key: "MANAGE_ATTENDANCE" as const,
+      key: "MANAGE_ATTENDANCE" as TeacherPermission,
       title: "Attendance Management",
       description: "Take and modify daily student attendance sheets",
       icon: UserCheck,
       href: "/dashboard/teacher/attendance",
-      isGranted: hasPermission("MANAGE_ATTENDANCE"),
+      isGranted:
+        Boolean(permissionsList?.includes("MANAGE_ATTENDANCE")) ||
+        hasPermission("MANAGE_ATTENDANCE"),
     },
     {
-      key: "MANAGE_EXAMS" as const,
+      key: "MANAGE_EXAMS" as TeacherPermission,
       title: "Exams & Marks Entry",
       description: "Create exams, enter bulk marks & publish gradebooks",
       icon: GraduationCap,
       href: "/dashboard/teacher/exams",
-      isGranted: hasPermission("MANAGE_EXAMS"),
+      isGranted:
+        Boolean(permissionsList?.includes("MANAGE_EXAMS")) ||
+        hasPermission("MANAGE_EXAMS"),
     },
     {
-      key: "MANAGE_ROUTINES" as const,
+      key: "MANAGE_ROUTINES" as TeacherPermission,
       title: "Routine Modification",
       description: "Create, edit and adjust weekly timetable slots",
       icon: CalendarDays,
       href: "/dashboard/teacher/routines",
-      isGranted: hasPermission("MANAGE_ROUTINES"),
+      isGranted:
+        Boolean(permissionsList?.includes("MANAGE_ROUTINES")) ||
+        hasPermission("MANAGE_ROUTINES"),
     },
   ];
 

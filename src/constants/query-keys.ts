@@ -147,4 +147,5 @@ export const dashboardKeys = {
   revenueTrend: (months?: number) =>
     [...dashboardKeys.all, "revenue-trend", months] as const,
   student: () => [...dashboardKeys.all, "student"] as const,
+  teacher: () => [...dashboardKeys.all, "teacher"] as const,
 } as const;

@@ -5,6 +5,7 @@ import type {
   DashboardRevenueTrend,
   DashboardTodaySnapshot,
   StudentDashboardSummary,
+  TeacherDashboardSummary,
 } from "@/types";
 
 /**
@@ -60,6 +61,19 @@ export async function getStudentDashboard(): Promise<
 > {
   return await apiClient<ApiResponse<StudentDashboardSummary>>(
     "/dashboard/student",
+    { method: "GET" },
+  );
+}
+
+/**
+ * GET /api/v1/dashboard/teacher
+ * Teacher aggregated dashboard: KPIs, today's classes, assigned batches, pending exams, attendance snapshot, permissions
+ */
+export async function getTeacherDashboard(): Promise<
+  ApiResponse<TeacherDashboardSummary>
+> {
+  return await apiClient<ApiResponse<TeacherDashboardSummary>>(
+    "/dashboard/teacher",
     { method: "GET" },
   );
 }

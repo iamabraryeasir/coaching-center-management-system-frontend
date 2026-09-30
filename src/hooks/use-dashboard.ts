@@ -6,6 +6,7 @@ import {
   getDashboardToday,
   getRevenueTrend,
   getStudentDashboard,
+  getTeacherDashboard,
 } from "@/api";
 import { dashboardKeys } from "@/constants/query-keys";
 
@@ -67,6 +68,22 @@ export function useStudentDashboard() {
     queryKey: dashboardKeys.student(),
     queryFn: async () => {
       const res = await getStudentDashboard();
+      return res.data;
+    },
+    staleTime: 60_000, // 1 minute
+    refetchInterval: 120_000, // auto-refresh every 2 minutes
+  });
+}
+
+/**
+ * Fetches the aggregated teacher dashboard summary: KPIs, today's classes, assigned batches, pending exams, attendance snapshot, permissions.
+ * Uses Suspense — wrap with <Suspense fallback={...}>.
+ */
+export function useTeacherDashboard() {
+  return useSuspenseQuery({
+    queryKey: dashboardKeys.teacher(),
+    queryFn: async () => {
+      const res = await getTeacherDashboard();
       return res.data;
     },
     staleTime: 60_000, // 1 minute

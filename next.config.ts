@@ -1,75 +1,87 @@
 import type { NextConfig } from "next";
 
-// Extract API hostname at build time for Content-Security-Policy connect-src.
-// NEXT_PUBLIC_API_BASE_URL must be set in your CI/CD build environment.
-const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
-const apiDomain = apiBaseUrl
-  ? (() => {
-      try {
-        return new URL(apiBaseUrl).hostname;
-      } catch {
-        return "";
-      }
-    })()
-  : "";
+const isProd = process.env.NODE_ENV === "production";
 
+// Extract backend API origin for Content-Security-Policy connect-src
+const rawApiUrl =
+  process.env.NEXT_PUBLIC_API_BASE_URL ||
+  process.env.NEXT_PUBLIC_BASE_URL ||
+  "http://localhost:5000/api/v1";
+
+const apiOrigin = (() => {
+  try {
+    return new URL(rawApiUrl).origin;
+  } catch {
+    return "";
+  }
+})();
+
+// Build production-hardened CSP directives
 const cspDirectives = [
   "default-src 'self'",
-  // Google Accounts needed for OAuth button iframe + script
-  "script-src 'self' https://accounts.google.com",
-  "frame-src https://accounts.google.com",
-  // Self + Google profile photos + Cloudinary user avatars
-  "img-src 'self' data: https://lh3.googleusercontent.com https://res.cloudinary.com",
-  // Restrict fetch/XHR to same origin + the configured API domain
-  `connect-src 'self'${apiDomain ? ` https://${apiDomain}` : ""}`,
-  // Tailwind CSS v4 uses inline styles — 'unsafe-inline' required
-  "style-src 'self' 'unsafe-inline'",
-  "font-src 'self' https://fonts.gstatic.com",
+  // Next.js App Router hydration & Google OAuth ('unsafe-eval' only in development)
+  isProd
+    ? "script-src 'self' 'unsafe-inline' https://accounts.google.com"
+    : "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://accounts.google.com",
+  "frame-src 'self' https://accounts.google.com",
+  // Avatars, profile images, data URIs, Cloudinary CDN
+  "img-src 'self' data: blob: https://lh3.googleusercontent.com https://res.cloudinary.com https://*.googleusercontent.com https://*.cloudinary.com",
+  // Connect-src: strictly scoped to same-origin + configured API + Google APIs (local ports only in dev)
+  [
+    "connect-src 'self'",
+    apiOrigin,
+    apiOrigin?.startsWith("http:") ? apiOrigin.replace(/^http/, "ws") : "",
+    apiOrigin?.startsWith("https:") ? apiOrigin.replace(/^https/, "wss") : "",
+    !isProd
+      ? "http://localhost:* ws://localhost:* http://127.0.0.1:* ws://127.0.0.1:*"
+      : "",
+    "https://accounts.google.com",
+    "https://*.googleapis.com",
+  ]
+    .filter(Boolean)
+    .join(" "),
+  // Tailwind CSS v4 & Google Fonts
+  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+  "font-src 'self' data: https://fonts.gstatic.com",
 ].join("; ");
 
 const nextConfig: NextConfig = {
   reactCompiler: true,
 
   /**
-   * HTTP Security Headers
-   *
-   * Applied to every route. These headers protect against:
-   * - Clickjacking (X-Frame-Options)
-   * - MIME sniffing attacks (X-Content-Type-Options)
-   * - XSS via injected scripts (Content-Security-Policy)
-   * - Referrer leakage of auth URLs (Referrer-Policy)
-   * - Unnecessary browser API exposure (Permissions-Policy)
-   * - HTTP downgrade attacks (Strict-Transport-Security)
+   * Enterprise HTTP Security Headers
    */
   async headers() {
+    const securityHeaders = [
+      { key: "X-Frame-Options", value: "SAMEORIGIN" },
+      { key: "X-Content-Type-Options", value: "nosniff" },
+      { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+      {
+        key: "Permissions-Policy",
+        value: "camera=(), microphone=(), geolocation=(), payment=(self)",
+      },
+      { key: "Content-Security-Policy", value: cspDirectives },
+    ];
+
+    // Enforce HSTS (HTTP Strict Transport Security) in production
+    if (isProd) {
+      securityHeaders.push({
+        key: "Strict-Transport-Security",
+        value: "max-age=31536000; includeSubDomains",
+      });
+    }
+
     return [
       {
         source: "/:path*",
-        headers: [
-          { key: "X-Frame-Options", value: "DENY" },
-          { key: "X-Content-Type-Options", value: "nosniff" },
-          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
-          {
-            key: "Permissions-Policy",
-            value: "camera=(), microphone=(), geolocation=(), payment=(self)",
-          },
-          { key: "Content-Security-Policy", value: cspDirectives },
-          {
-            // HSTS: enforce HTTPS for 1 year, including subdomains
-            // Only set this if your app is exclusively served over HTTPS
-            key: "Strict-Transport-Security",
-            value: "max-age=31536000; includeSubDomains",
-          },
-        ],
+        headers: securityHeaders,
       },
     ];
   },
 
   images: {
     remotePatterns: [
-      // Google OAuth profile photos — specific subdomain, NOT wildcard
       { protocol: "https", hostname: "lh3.googleusercontent.com" },
-      // Cloudinary CDN — user-uploaded avatar storage
       { protocol: "https", hostname: "res.cloudinary.com" },
     ],
   },

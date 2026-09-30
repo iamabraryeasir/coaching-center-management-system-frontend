@@ -1,85 +1,65 @@
 "use client";
 
-import { CalendarDays, GraduationCap, Layers, UserCheck } from "lucide-react";
-import Link from "next/link";
 import {
-  useTeacherDashboardAttendanceSummary,
-  useTeacherDashboardBatches,
-  useTeacherDashboardExams,
-  useTeacherDashboardSchedule,
-} from "@/hooks";
-import type { DayOfWeek } from "@/types";
-
-const DAYS_MAP: Record<number, DayOfWeek> = {
-  0: "SUNDAY",
-  1: "MONDAY",
-  2: "TUESDAY",
-  3: "WEDNESDAY",
-  4: "THURSDAY",
-  5: "FRIDAY",
-  6: "SATURDAY",
-};
+  CalendarDays,
+  CheckCircle2,
+  Clock,
+  GraduationCap,
+  Layers,
+  UserCheck,
+} from "lucide-react";
+import Link from "next/link";
+import { useTeacherDashboard } from "@/hooks";
 
 export function TeacherKpiCards() {
-  const { data: batches } = useTeacherDashboardBatches();
-  const { data: scheduleData } = useTeacherDashboardSchedule();
-  const { data: exams } = useTeacherDashboardExams();
-  const { data: attendanceSummary } = useTeacherDashboardAttendanceSummary();
+  const { data } = useTeacherDashboard();
+
+  const kpis = data?.kpis;
+  const todayClasses = data?.todayClasses || [];
+  const personalAttendance = data?.personalAttendance;
 
   // 1. Assigned Batches
-  const activeBatchesCount = batches.filter(
-    (b) => b.status === "ONGOING" || b.status === "UPCOMING",
-  ).length;
-  const totalBatchesCount = batches.length;
+  const totalBatches = kpis?.assignedBatchesCount ?? 0;
+  const activeBatches = kpis?.activeBatchesCount ?? totalBatches;
+  const totalStudents = kpis?.totalStudentsTaught;
 
-  // 2. Classes Today
-  const todayDayOfWeek = DAYS_MAP[new Date().getDay()];
-  const todayScheduleGroup = scheduleData?.schedule?.find(
-    (g) => g.dayOfWeek === todayDayOfWeek,
-  );
-  const todaySlots = todayScheduleGroup?.slots || [];
-
-  // Determine next class
-  const now = new Date();
-  const currentMinutes = now.getHours() * 60 + now.getMinutes();
-
-  const nextSlot = todaySlots
-    .map((slot) => {
-      const [h, m] = slot.startTime.split(":").map(Number);
-      return { slot, startMinutes: h * 60 + m };
-    })
-    .filter((s) => s.startMinutes > currentMinutes)
-    .sort((a, b) => a.startMinutes - b.startMinutes)[0]?.slot;
+  // 2. Classes Today & Attendance Progress
+  const totalClassesToday = kpis?.classesTodayCount ?? todayClasses.length;
+  const attendanceCompleted =
+    kpis?.attendanceCompletedClassesCount ??
+    todayClasses.filter((c) => c.isAttendanceTaken).length;
 
   let classesTodaySubtext = "No classes scheduled today";
-  if (todaySlots.length > 0) {
-    if (nextSlot) {
-      classesTodaySubtext = `Next: ${nextSlot.subject || "Lecture"} at ${nextSlot.startTime}`;
+  if (totalClassesToday > 0) {
+    if (attendanceCompleted === totalClassesToday) {
+      classesTodaySubtext = `All ${totalClassesToday} attendance marked`;
     } else {
-      classesTodaySubtext = `All ${todaySlots.length} lectures completed`;
+      classesTodaySubtext = `${attendanceCompleted} of ${totalClassesToday} attendance marked`;
     }
   }
 
-  // 3. Upcoming Exams
-  const upcomingExams = exams.filter((e) => e.status === "UPCOMING");
-  const draftExamsNeedingMarks = exams.filter(
-    (e) => e.status === "COMPLETED" && e.resultStatus === "DRAFT",
-  );
+  // 3. Upcoming Exams & Pending Marks
+  const upcomingExams = kpis?.upcomingExamsCount ?? 0;
+  const pendingMarksExams = kpis?.pendingMarksExamsCount ?? 0;
 
-  let examsSubtext = `${draftExamsNeedingMarks.length} pending grading`;
-  if (draftExamsNeedingMarks.length === 0) {
-    examsSubtext = `${exams.length} total scheduled`;
+  let examsSubtext = `${upcomingExams} upcoming tests`;
+  if (pendingMarksExams > 0) {
+    examsSubtext = `${pendingMarksExams} pending marks entry`;
   }
 
-  // 4. Personal Attendance
-  const stats = attendanceSummary?.stats;
+  // 4. Personal Attendance Rate
   const attendanceRate =
-    stats && stats.attendanceRate !== undefined
-      ? `${stats.attendanceRate.toFixed(0)}%`
-      : "100%";
-  const attendanceSubtext = stats
-    ? `${stats.presentDays} Present · ${stats.lateDays} Late`
-    : "On-time check-in record";
+    kpis?.personalAttendanceRate !== undefined
+      ? `${kpis.personalAttendanceRate.toFixed(0)}%`
+      : personalAttendance?.attendanceRate !== undefined
+        ? `${personalAttendance.attendanceRate.toFixed(0)}%`
+        : "100%";
+
+  const attendanceSubtext = personalAttendance
+    ? `${personalAttendance.presentDays} Present · ${personalAttendance.lateDays} Late`
+    : kpis?.isCheckedInToday
+      ? "Checked in today"
+      : "On-time check-in record";
 
   return (
     <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
@@ -97,10 +77,12 @@ export function TeacherKpiCards() {
           </div>
         </div>
         <p className="font-heading text-2xl font-bold text-foreground">
-          {totalBatchesCount}
+          {totalBatches}
         </p>
-        <p className="text-xs text-muted-foreground">
-          {activeBatchesCount} active classroom groups
+        <p className="text-xs text-muted-foreground truncate">
+          {totalStudents !== undefined
+            ? `${totalStudents} students · ${activeBatches} active`
+            : `${activeBatches} active classroom groups`}
         </p>
       </Link>
 
@@ -118,14 +100,20 @@ export function TeacherKpiCards() {
           </div>
         </div>
         <p className="font-heading text-2xl font-bold text-foreground">
-          {todaySlots.length}
+          {totalClassesToday}
         </p>
-        <p className="truncate text-xs text-muted-foreground">
-          {classesTodaySubtext}
-        </p>
+        <div className="flex items-center gap-1.5 truncate text-xs text-muted-foreground">
+          {totalClassesToday > 0 &&
+          attendanceCompleted === totalClassesToday ? (
+            <CheckCircle2 className="size-3 text-emerald-600 shrink-0" />
+          ) : totalClassesToday > 0 ? (
+            <Clock className="size-3 text-blue-600 shrink-0" />
+          ) : null}
+          <span className="truncate">{classesTodaySubtext}</span>
+        </div>
       </Link>
 
-      {/* 3. Upcoming Exams */}
+      {/* 3. Upcoming Exams & Marks Pending */}
       <Link
         href="/dashboard/teacher/exams"
         className="group space-y-3 rounded-xl border border-border/80 bg-card p-5 shadow-2xs transition-all hover:border-primary/40 hover:bg-muted/30"
@@ -139,9 +127,17 @@ export function TeacherKpiCards() {
           </div>
         </div>
         <p className="font-heading text-2xl font-bold text-foreground">
-          {upcomingExams.length}
+          {upcomingExams}
         </p>
-        <p className="truncate text-xs text-muted-foreground">{examsSubtext}</p>
+        <p
+          className={`truncate text-xs ${
+            pendingMarksExams > 0
+              ? "text-amber-600 dark:text-amber-400 font-medium"
+              : "text-muted-foreground"
+          }`}
+        >
+          {examsSubtext}
+        </p>
       </Link>
 
       {/* 4. Personal Attendance Rate */}
