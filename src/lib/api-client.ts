@@ -31,7 +31,7 @@ const processQueue = (error: unknown = null) => {
 /**
  * Underlying un-intercepted HTTP client instance
  */
-export const rawApiClient = ofetch.create({
+const rawApiClient = ofetch.create({
   baseURL: BASE_URL,
   credentials: "include",
 });

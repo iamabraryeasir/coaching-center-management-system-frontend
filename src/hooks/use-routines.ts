@@ -11,7 +11,6 @@ import {
   getBatchTimetable,
   getMyStudentSchedule,
   getMyTeacherSchedule,
-  getRoutineById,
   getRoutines,
   getTeacherSchedule,
   updateRoutineSlot,
@@ -32,17 +31,6 @@ export function useRoutines(params?: RoutineQueryParams, enabled = true) {
     queryFn: () => getRoutines(params),
     placeholderData: (previousData) => previousData,
     enabled,
-  });
-}
-
-/**
- * Fetch a single routine slot by ID
- */
-export function useRoutine(routineId: string) {
-  return useQuery({
-    queryKey: routineKeys.detail(routineId),
-    queryFn: () => getRoutineById(routineId),
-    enabled: Boolean(routineId),
   });
 }
 
@@ -76,16 +64,6 @@ export function useMyTeacherSchedule(enabled = true) {
     queryKey: routineKeys.myTeacherSchedule(),
     queryFn: () => getMyTeacherSchedule(),
     enabled,
-  });
-}
-
-/**
- * Fetch personal weekly timetable for authenticated student
- */
-export function useMyStudentSchedule() {
-  return useQuery({
-    queryKey: routineKeys.myStudentSchedule(),
-    queryFn: () => getMyStudentSchedule(),
   });
 }
 

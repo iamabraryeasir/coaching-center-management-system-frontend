@@ -47,6 +47,7 @@ import {
   useDeleteTeacherMutation,
   useUpdateTeacherStatusMutation,
 } from "@/hooks";
+import { formatDateSafe } from "@/lib/utils";
 import {
   type ApiMeta,
   getTeacherPermissions,
@@ -198,14 +199,9 @@ export function TeacherTable({
                         .toUpperCase()
                     : "T";
 
-                  const joinDate = profile?.joiningDate || teacher.createdAt;
-                  const formattedJoinDate = joinDate
-                    ? new Date(joinDate).toLocaleDateString(undefined, {
-                        year: "numeric",
-                        month: "short",
-                        day: "numeric",
-                      })
-                    : "—";
+                  const formattedJoinDate = formatDateSafe(
+                    profile?.joiningDate || teacher.createdAt,
+                  );
 
                   return (
                     <TableRow

@@ -10,19 +10,6 @@ import type {
 } from "@/types";
 
 /**
- * Suspense-enabled hook to retrieve paginated audit logs
- * Triggers React <Suspense> boundary during initial load
- * GET /audit-logs
- */
-export function useSuspenseAuditLogs(params?: AuditLogQueryParams) {
-  return useSuspenseQuery<PaginatedResponse<AuditLog>>({
-    queryKey: auditLogKeys.list(params as Record<string, unknown>),
-    queryFn: () => getAuditLogs(params),
-    staleTime: 1000 * 30, // 30 seconds
-  });
-}
-
-/**
  * Suspense-enabled hook to retrieve aggregate audit activity statistics
  * Triggers React <Suspense> boundary during load
  * GET /audit-logs/stats

@@ -1,6 +1,5 @@
 "use client";
 
-import { format, parseISO } from "date-fns";
 import {
   Award,
   CheckCircle2,
@@ -23,7 +22,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { cn } from "@/lib/utils";
+import { cn, formatDateSafe } from "@/lib/utils";
 import type { StudentExamResultItem } from "@/types";
 import { formatGpa } from "../shared/exam-utils";
 
@@ -50,18 +49,6 @@ export function StudentExamsResultsList({
   onSelectScorecard,
   onSelectMeritList,
 }: StudentExamsResultsListProps) {
-  const formatDateSafe = (dateStr?: string | null) => {
-    if (!dateStr) return "—";
-    try {
-      const date = dateStr.includes("T")
-        ? parseISO(dateStr)
-        : new Date(dateStr);
-      return format(date, "EEE, MMM d, yyyy");
-    } catch {
-      return dateStr || "—";
-    }
-  };
-
   const startIndex = (currentPage - 1) * pageSize + 1;
   const endIndex = Math.min(currentPage * pageSize, totalRecords);
 

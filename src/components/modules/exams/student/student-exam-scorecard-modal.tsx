@@ -1,6 +1,5 @@
 "use client";
 
-import { format, parseISO } from "date-fns";
 import {
   Award,
   BarChart3,
@@ -21,7 +20,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { cn } from "@/lib/utils";
+import { cn, formatDateSafe } from "@/lib/utils";
 import type { StudentExamResultItem } from "@/types";
 import { formatGpa } from "../shared/exam-utils";
 
@@ -41,18 +40,6 @@ export function StudentExamScorecardModal({
   onViewMeritList,
 }: StudentExamScorecardModalProps) {
   if (!result) return null;
-
-  const formatDateSafe = (dateStr?: string | null) => {
-    if (!dateStr) return "—";
-    try {
-      const date = dateStr.includes("T")
-        ? parseISO(dateStr)
-        : new Date(dateStr);
-      return format(date, "EEEE, MMMM d, yyyy");
-    } catch {
-      return dateStr || "—";
-    }
-  };
 
   const scorePct =
     result.totalMarks > 0

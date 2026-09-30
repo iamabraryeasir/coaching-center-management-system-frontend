@@ -2,7 +2,7 @@
 
 import { KeyRound, ShieldCheck, UserPlus, Users } from "lucide-react";
 import { useSearchParams } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useTeachers } from "@/hooks";
 import { getTeacherPermissions, type User, type UserStatus } from "@/types";
@@ -48,15 +48,12 @@ export function TeachersManagementView() {
   const teachersMeta = teachersResponse?.meta;
 
   // Compute stat highlights
-  const stats = useMemo(() => {
-    const total = teachersMeta?.total ?? teachers.length;
-    const active = teachers.filter((t) => t.status === "ACTIVE").length;
-    const privileged = teachers.filter(
-      (t) => getTeacherPermissions(t).length > 0,
-    ).length;
-
-    return { total, active, privileged };
-  }, [teachers, teachersMeta]);
+  const total = teachersMeta?.total ?? teachers.length;
+  const active = teachers.filter((t) => t.status === "ACTIVE").length;
+  const privileged = teachers.filter(
+    (t) => getTeacherPermissions(t).length > 0,
+  ).length;
+  const stats = { total, active, privileged };
 
   return (
     <div className="space-y-6">

@@ -19,7 +19,7 @@ import {
   CardFooter,
   CardHeader,
 } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
+import { cn, formatCurrency, formatDateSafe } from "@/lib/utils";
 import type { EnrollmentStatus, StudentEnrolledBatch } from "@/types";
 import { BatchStatusBadge } from "../shared/batch-status-badge";
 
@@ -37,14 +37,9 @@ export function StudentEnrolledBatchCard({
   const batchFee = enrollment.batch?.fee ?? enrollment.batchFee ?? 0;
   const batchStatus = enrollment.batch?.status;
 
-  const enrollmentDate = enrollment.enrolledAt || enrollment.createdAt;
-  const formattedDate = enrollmentDate
-    ? new Date(enrollmentDate).toLocaleDateString(undefined, {
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-      })
-    : null;
+  const formattedDate = formatDateSafe(
+    enrollment.enrolledAt || enrollment.createdAt,
+  );
 
   const isEnrolled =
     enrollment.status === "ENROLLED" || enrollment.status === "APPROVED";
@@ -81,7 +76,7 @@ export function StudentEnrolledBatchCard({
           <div>
             <span className="text-muted-foreground block">Monthly Tuition</span>
             <span className="font-semibold text-sm text-foreground">
-              ৳ {batchFee.toLocaleString("en-BD")}
+              {formatCurrency(batchFee)}
             </span>
           </div>
           <div>

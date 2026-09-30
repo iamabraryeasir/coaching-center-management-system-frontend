@@ -26,7 +26,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { cn } from "@/lib/utils";
+import { cn, formatCurrency, formatDateSafe } from "@/lib/utils";
 import type { Batch } from "@/types";
 import { BatchStatusBadge } from "./batch-status-badge";
 
@@ -46,13 +46,7 @@ export function BatchCard({
   const isAdmin = portalRole === "ADMIN";
   const basePath = `/dashboard/${portalRole.toLowerCase()}/batches/${batch.id}`;
 
-  const formattedDate = batch.createdAt
-    ? new Date(batch.createdAt).toLocaleDateString(undefined, {
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-      })
-    : "—";
+  const formattedDate = formatDateSafe(batch.createdAt);
 
   return (
     <Card className="flex flex-col justify-between overflow-hidden transition-all duration-200 hover:shadow-md hover:border-primary/40 border-border/80 bg-card">
@@ -131,7 +125,7 @@ export function BatchCard({
           <div className="flex items-center gap-1 text-sm font-semibold text-foreground">
             <CreditCard className="size-3.5 text-muted-foreground" />
             <Banknote className="size-3.5 text-muted-foreground" />
-            <span>৳ {batch.fee.toLocaleString()}</span>
+            <span>{formatCurrency(batch.fee)}</span>
           </div>
         </div>
 

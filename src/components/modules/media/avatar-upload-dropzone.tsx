@@ -2,7 +2,7 @@
 
 import { Image as ImageIcon, UploadCloud, X } from "lucide-react";
 import Image from "next/image";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -45,23 +45,20 @@ export function AvatarUploadDropzone({
     };
   }, [selectedFile]);
 
-  const validateAndSelect = useCallback(
-    (file: File) => {
-      if (!ACCEPTED_TYPES.includes(file.type)) {
-        toast.error("Please upload a valid image (JPEG, PNG, or WebP).");
-        return;
-      }
+  const validateAndSelect = (file: File) => {
+    if (!ACCEPTED_TYPES.includes(file.type)) {
+      toast.error("Please upload a valid image (JPEG, PNG, or WebP).");
+      return;
+    }
 
-      const maxBytes = maxSizeMb * 1024 * 1024;
-      if (file.size > maxBytes) {
-        toast.error(`File size exceeds maximum limit of ${maxSizeMb}MB.`);
-        return;
-      }
+    const maxBytes = maxSizeMb * 1024 * 1024;
+    if (file.size > maxBytes) {
+      toast.error(`File size exceeds maximum limit of ${maxSizeMb}MB.`);
+      return;
+    }
 
-      onFileSelect(file);
-    },
-    [maxSizeMb, onFileSelect],
-  );
+    onFileSelect(file);
+  };
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();

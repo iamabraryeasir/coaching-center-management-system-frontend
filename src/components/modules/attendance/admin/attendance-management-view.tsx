@@ -2,7 +2,7 @@
 
 import { Calendar, CalendarX2, GraduationCap, Users } from "lucide-react";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -34,7 +34,7 @@ export function AttendanceManagementView({
   allowTeacherView = true,
 }: AttendanceManagementViewProps) {
   const searchParams = useSearchParams();
-  const todayStr = useMemo(() => new Date().toISOString().split("T")[0], []);
+  const todayStr = new Date().toISOString().split("T")[0];
 
   const [viewMode, setViewMode] = useState<AttendanceViewMode>(
     (searchParams.get("view") as AttendanceViewMode) || defaultView,
@@ -220,20 +220,20 @@ export function AttendanceManagementView({
   };
 
   // Filtered rows for search query
-  const filteredRows = useMemo(() => {
-    if (!debouncedSearch.trim()) return studentRows;
-    const q = debouncedSearch.toLowerCase();
-    return studentRows.filter(
-      (r) =>
-        r.student.name.toLowerCase().includes(q) ||
-        r.student.email.toLowerCase().includes(q) ||
-        r.student.studentProfile?.rollNumber?.toLowerCase().includes(q) ||
-        r.student.studentProfile?.guardianPhone?.includes(q),
-    );
-  }, [studentRows, debouncedSearch]);
+  const filteredRows = !debouncedSearch.trim()
+    ? studentRows
+    : studentRows.filter((r) => {
+        const q = debouncedSearch.toLowerCase();
+        return (
+          r.student.name.toLowerCase().includes(q) ||
+          r.student.email.toLowerCase().includes(q) ||
+          r.student.studentProfile?.rollNumber?.toLowerCase().includes(q) ||
+          r.student.studentProfile?.guardianPhone?.includes(q)
+        );
+      });
 
   // Real-time KPI counts across 5 statuses
-  const stats = useMemo(() => {
+  const stats = (() => {
     if (isReadOnly && !hasExistingRecords) {
       return {
         total: enrolledStudents.length,
@@ -254,7 +254,7 @@ export function AttendanceManagementView({
     const leave = studentRows.filter((r) => r.status === "LEAVE").length;
     const rate = total > 0 ? (present / total) * 100 : 0;
     return { total, present, absent, late, excused, leave, rate };
-  }, [studentRows, isReadOnly, hasExistingRecords, enrolledStudents.length]);
+  })();
 
   const activeBatchObj = batches.find((b) => b.id === activeBatchId);
   const isLoading =

@@ -1,7 +1,7 @@
 "use client";
 
 import { Check, CheckCircle2, Loader2, Search, UserPlus } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -52,17 +52,14 @@ export function DirectEnrollDialog({
     { limit: 200 },
   );
 
-  const enrolledStudentIds = useMemo(() => {
-    const set = new Set<string>();
-    const roster = rosterResponse?.data || [];
-    for (const enrollment of roster) {
-      if (enrollment.studentId) set.add(enrollment.studentId);
-      if (enrollment.userId) set.add(enrollment.userId);
-      if (enrollment.student?.id) set.add(enrollment.student.id);
-      if (enrollment.user?.id) set.add(enrollment.user.id);
-    }
-    return set;
-  }, [rosterResponse]);
+  const enrolledStudentIds = new Set<string>();
+  const roster = rosterResponse?.data || [];
+  for (const enrollment of roster) {
+    if (enrollment.studentId) enrolledStudentIds.add(enrollment.studentId);
+    if (enrollment.userId) enrolledStudentIds.add(enrollment.userId);
+    if (enrollment.student?.id) enrolledStudentIds.add(enrollment.student.id);
+    if (enrollment.user?.id) enrolledStudentIds.add(enrollment.user.id);
+  }
 
   // 2. Search active students
   const { data, isLoading: isLoadingStudents } = useStudents({

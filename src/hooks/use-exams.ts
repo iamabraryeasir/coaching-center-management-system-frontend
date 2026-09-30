@@ -10,15 +10,12 @@ import {
   createExam,
   deleteExam,
   getBatchExamResults,
-  getExamById,
   getExams,
   getMyExamResults,
-  getMySingleExamResult,
   publishExamResults,
   sendReportCardEmail,
   unpublishExamResults,
   updateExam,
-  updateStudentMark,
 } from "@/api";
 import { examKeys } from "@/constants";
 import type {
@@ -26,7 +23,6 @@ import type {
   CreateExamDto,
   ExamQueryParams,
   UpdateExamDto,
-  UpdateStudentMarkDto,
 } from "@/types";
 
 /**
@@ -42,19 +38,7 @@ export function useExams(params?: ExamQueryParams, enabled = true) {
 }
 
 /**
- * 2. Fetch Single Exam Details
- */
-export function useExamDetails(examId: string, enabled = true) {
-  return useQuery({
-    queryKey: examKeys.detail(examId),
-    queryFn: () => getExamById(examId),
-    enabled: Boolean(examId) && enabled,
-    placeholderData: (previousData) => previousData,
-  });
-}
-
-/**
- * 3. Fetch Batch Exam Results / Merit List
+ * 2. Fetch Batch Exam Results / Merit List
  */
 export function useBatchExamResults(examId: string, enabled = true) {
   return useQuery({
@@ -66,7 +50,7 @@ export function useBatchExamResults(examId: string, enabled = true) {
 }
 
 /**
- * 4. Fetch My Student Report Card (All Exams)
+ * 3. Fetch My Student Report Card (All Exams)
  */
 export function useMyExamResults(enabled = true) {
   return useQuery({
@@ -88,19 +72,7 @@ export function useSuspenseMyExamResults() {
 }
 
 /**
- * 5. Fetch My Single Exam Scorecard
- */
-export function useMySingleExamResult(examId: string, enabled = true) {
-  return useQuery({
-    queryKey: examKeys.myResult(examId),
-    queryFn: () => getMySingleExamResult(examId),
-    enabled: Boolean(examId) && enabled,
-    placeholderData: (previousData) => previousData,
-  });
-}
-
-/**
- * 6. Mutation: Create Exam
+ * 4. Mutation: Create Exam
  */
 export function useCreateExamMutation() {
   const queryClient = useQueryClient();
@@ -221,45 +193,7 @@ export function useBulkSubmitMarksMutation() {
 }
 
 /**
- * 10. Mutation: Update Single Student Mark
- */
-export function useUpdateStudentMarkMutation() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: ({
-      examId,
-      studentId,
-      payload,
-    }: {
-      examId: string;
-      studentId: string;
-      payload: UpdateStudentMarkDto;
-    }) => updateStudentMark(examId, studentId, payload),
-    onMutate: () => {
-      return toast.loading("Updating student mark...");
-    },
-    onSuccess: (response, variables, toastId) => {
-      queryClient.invalidateQueries({
-        queryKey: examKeys.detail(variables.examId),
-      });
-      queryClient.invalidateQueries({
-        queryKey: examKeys.results(variables.examId),
-      });
-      toast.success(response.message || "Student mark updated successfully!", {
-        id: toastId,
-      });
-    },
-    onError: (error: Error, _vars, toastId) => {
-      toast.error(error.message || "Failed to update student mark", {
-        id: toastId,
-      });
-    },
-  });
-}
-
-/**
- * 11. Mutation: Publish Exam Results
+ * 8. Mutation: Publish Exam Results
  */
 export function usePublishExamResultsMutation() {
   const queryClient = useQueryClient();

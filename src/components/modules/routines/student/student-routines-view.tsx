@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { getBatchRoutinePdfUrl } from "@/api";
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
@@ -82,26 +82,20 @@ export function StudentRoutinesView() {
   };
 
   // Determine current day of week
-  const todayDayOfWeek = useMemo(() => {
-    return DAYS_MAP[new Date().getDay()] || "SATURDAY";
-  }, []);
-
-  const todayDayName = useMemo(() => {
-    return new Date().toLocaleDateString(undefined, { weekday: "long" });
-  }, []);
-
-  const todayDateFormatted = useMemo(() => {
-    return new Date().toLocaleDateString(undefined, {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
-  }, []);
+  const todayDayOfWeek = DAYS_MAP[new Date().getDay()] || "SATURDAY";
+  const todayDayName = new Date().toLocaleDateString(undefined, {
+    weekday: "long",
+  });
+  const todayDateFormatted = new Date().toLocaleDateString(undefined, {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
 
   // Filter schedule by selected batch
-  const filteredSchedule: DayTimetableGroup[] = useMemo(() => {
-    const baseSchedule = scheduleData.schedule || [];
-    return ACADEMIC_DAYS_ORDER.map((day) => {
+  const baseSchedule = scheduleData.schedule || [];
+  const filteredSchedule: DayTimetableGroup[] = ACADEMIC_DAYS_ORDER.map(
+    (day) => {
       const match = baseSchedule.find((g) => g.dayOfWeek === day);
       if (!match) return { dayOfWeek: day, slots: [] };
       if (selectedBatchId === "ALL") return match;
@@ -109,24 +103,23 @@ export function StudentRoutinesView() {
         dayOfWeek: day,
         slots: match.slots.filter((s) => s.batchId === selectedBatchId),
       };
-    });
-  }, [scheduleData.schedule, selectedBatchId]);
+    },
+  );
 
   // Extract slots for today from filtered schedule
-  const todaySlots: RoutineSlot[] = useMemo(() => {
-    const todayGroup = filteredSchedule.find(
-      (g) => g.dayOfWeek === todayDayOfWeek,
-    );
-    return todayGroup?.slots || [];
-  }, [filteredSchedule, todayDayOfWeek]);
+  const todayGroup = filteredSchedule.find(
+    (g) => g.dayOfWeek === todayDayOfWeek,
+  );
+  const todaySlots: RoutineSlot[] = todayGroup?.slots || [];
 
   // Total slots across the active schedule
-  const totalWeeklySlots = useMemo(() => {
-    return filteredSchedule.reduce((acc, d) => acc + (d.slots?.length || 0), 0);
-  }, [filteredSchedule]);
+  const totalWeeklySlots = filteredSchedule.reduce(
+    (acc, d) => acc + (d.slots?.length || 0),
+    0,
+  );
 
   // Next class calculation
-  const nextClassInfo = useMemo(() => {
+  const nextClassInfo = (() => {
     const now = new Date();
     const currentMinutes = now.getHours() * 60 + now.getMinutes();
 
@@ -152,14 +145,14 @@ export function StudentRoutinesView() {
     }
 
     return "No classes today";
-  }, [todaySlots]);
+  })();
 
   // Batch name for print/PDF
-  const selectedBatchName = useMemo(() => {
+  const selectedBatchName = (() => {
     if (selectedBatchId === "ALL") return undefined;
     const found = enrolledBatches.find((b) => b.batchId === selectedBatchId);
     return found?.batch?.name || found?.batchName || "Academic Batch";
-  }, [selectedBatchId, enrolledBatches]);
+  })();
 
   // If student is not enrolled in any batch at all
   if (enrolledBatches.length === 0) {

@@ -15,7 +15,7 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useBatch, useBatchStudents } from "@/hooks";
-import { cn } from "@/lib/utils";
+import { cn, formatCurrency, formatDateSafe } from "@/lib/utils";
 import { CreateBatchDialog } from "../admin/create-batch-dialog";
 import { BatchStatusBadge } from "./batch-status-badge";
 import { BatchStudentRoster } from "./batch-student-roster";
@@ -39,13 +39,7 @@ export function BatchDetailView({
   const batch = batchResponse?.data;
   const enrolledCount = studentsResponse?.meta?.total ?? 0;
 
-  const formattedDate = batch?.createdAt
-    ? new Date(batch.createdAt).toLocaleDateString(undefined, {
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-      })
-    : "—";
+  const formattedDate = formatDateSafe(batch?.createdAt);
 
   if (isBatchLoading) {
     return (
@@ -163,7 +157,7 @@ export function BatchDetailView({
             <div>
               <p className="text-xs text-muted-foreground">Course Fee</p>
               <p className="font-heading text-xl font-bold text-foreground">
-                ৳ {batch.fee.toLocaleString()}
+                {formatCurrency(batch.fee)}
               </p>
             </div>
           </CardContent>

@@ -42,6 +42,7 @@ import {
   useDeleteStudentMutation,
   useUpdateStudentStatusMutation,
 } from "@/hooks";
+import { formatDateSafe } from "@/lib/utils";
 import type { User, UserStatus } from "@/types";
 import { StudentStatusBadge } from "./student-status-badge";
 
@@ -166,16 +167,7 @@ export function StudentTable({
                     ? student.name.charAt(0).toUpperCase()
                     : "S";
 
-                  const formattedDate = student.createdAt
-                    ? new Date(student.createdAt).toLocaleDateString(
-                        undefined,
-                        {
-                          year: "numeric",
-                          month: "short",
-                          day: "numeric",
-                        },
-                      )
-                    : "—";
+                  const formattedDate = formatDateSafe(student.createdAt);
 
                   return (
                     <TableRow

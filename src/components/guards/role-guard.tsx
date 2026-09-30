@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import { type ReactNode, useEffect, useMemo } from "react";
+import { type ReactNode, useEffect } from "react";
 import { useAuth } from "@/hooks";
 import type { UserRole } from "@/types";
 
@@ -30,10 +30,9 @@ export function RoleGuard({
   const pathname = usePathname();
 
   // Determine if the current authenticated user's role is permitted
-  const isAuthorized = useMemo(() => {
-    if (!isAuthenticated || !role) return false;
-    return allowedRoles.includes(role);
-  }, [isAuthenticated, role, allowedRoles]);
+  const isAuthorized = Boolean(
+    isAuthenticated && role && allowedRoles.includes(role),
+  );
 
   useEffect(() => {
     if (!isLoading) {

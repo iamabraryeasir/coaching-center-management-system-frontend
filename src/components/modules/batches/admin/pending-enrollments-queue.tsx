@@ -14,7 +14,7 @@ import {
   UserCheck,
   XCircle,
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -43,6 +43,7 @@ import {
   usePendingEnrollments,
   useRejectEnrollmentMutation,
 } from "@/hooks";
+import { formatDateSafe } from "@/lib/utils";
 import type { BatchEnrollment } from "@/types";
 import { BatchStatusBadge } from "../shared/batch-status-badge";
 
@@ -61,17 +62,23 @@ export function PendingEnrollmentsQueue() {
   const pendingList = (data?.data as BatchEnrollment[]) || [];
 
   // Filter client-side by student name, email, or batch name
-  const filteredList = useMemo(() => {
-    if (!debouncedSearch.trim()) return pendingList;
-    const q = debouncedSearch.toLowerCase();
-    return pendingList.filter(
-      (item) =>
-        item.student?.name?.toLowerCase().includes(q) ||
-        item.student?.email?.toLowerCase().includes(q) ||
-        item.student?.phone?.toLowerCase().includes(q) ||
-        item.batch?.name?.toLowerCase().includes(q),
-    );
-  }, [pendingList, debouncedSearch]);
+  const filteredList = !debouncedSearch.trim()
+    ? pendingList
+    : pendingList.filter(
+        (item) =>
+          item.student?.name
+            ?.toLowerCase()
+            .includes(debouncedSearch.toLowerCase()) ||
+          item.student?.email
+            ?.toLowerCase()
+            .includes(debouncedSearch.toLowerCase()) ||
+          item.student?.phone
+            ?.toLowerCase()
+            .includes(debouncedSearch.toLowerCase()) ||
+          item.batch?.name
+            ?.toLowerCase()
+            .includes(debouncedSearch.toLowerCase()),
+      );
 
   const handleApprove = (enrollment: BatchEnrollment) => {
     approveMutation.mutate(enrollment.id);
@@ -207,14 +214,9 @@ export function PendingEnrollmentsQueue() {
                 filteredList.map((enrollment) => {
                   const student = enrollment.student;
                   const batch = enrollment.batch;
-                  const dateRaw = enrollment.enrolledAt || enrollment.createdAt;
-                  const formattedDate = dateRaw
-                    ? new Date(dateRaw).toLocaleDateString(undefined, {
-                        year: "numeric",
-                        month: "short",
-                        day: "numeric",
-                      })
-                    : "—";
+                  const formattedDate = formatDateSafe(
+                    enrollment.enrolledAt || enrollment.createdAt,
+                  );
 
                   const isApproving =
                     approveMutation.isPending &&

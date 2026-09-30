@@ -1,7 +1,7 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -120,55 +120,53 @@ export function RoutinesManagementView({
     );
 
   // Combine teachers from teachers API, routine slots, and authenticated user so names are never missing
-  const combinedTeachers: User[] = useMemo(() => {
-    const map = new Map<string, User>();
+  const teacherMap = new Map<string, User>();
 
-    // 1. Add teachers from API response
-    for (const t of teachersResponse?.data || []) {
-      if (t?.id) map.set(t.id, t);
-    }
+  // 1. Add teachers from API response
+  for (const t of teachersResponse?.data || []) {
+    if (t?.id) teacherMap.set(t.id, t);
+  }
 
-    // 2. Discover teachers from all scheduled routine slots
-    for (const slot of allRoutinesResponse?.data || []) {
-      if (slot.teacher?.id && !map.has(slot.teacher.id)) {
-        map.set(slot.teacher.id, {
+  // 2. Discover teachers from all scheduled routine slots
+  for (const slot of allRoutinesResponse?.data || []) {
+    if (slot.teacher?.id && !teacherMap.has(slot.teacher.id)) {
+      teacherMap.set(slot.teacher.id, {
+        id: slot.teacher.id,
+        name: slot.teacher.name,
+        email: slot.teacher.email || "",
+        phone: slot.teacher.phone || null,
+        role: "TEACHER",
+        status: "ACTIVE",
+        createdAt: "",
+        teacherProfile: {
           id: slot.teacher.id,
-          name: slot.teacher.name,
-          email: slot.teacher.email || "",
-          phone: slot.teacher.phone || null,
-          role: "TEACHER",
-          status: "ACTIVE",
-          createdAt: "",
-          teacherProfile: {
-            id: slot.teacher.id,
-            designation: slot.teacher.designation || "Teacher",
-            specialization: slot.teacher.specialization || "",
-            qualification: "",
-            joiningDate: "",
-          },
-        });
-      }
-    }
-
-    // 3. Always include authenticated user with their actual name and profile
-    if (user?.id) {
-      const existing = map.get(user.id);
-      map.set(user.id, {
-        ...(existing || user),
-        name: user.name || existing?.name || "My Routine",
-        teacherProfile: user.teacherProfile ||
-          existing?.teacherProfile || {
-            id: user.id,
-            designation: "Teacher",
-            qualification: "",
-            specialization: "",
-            joiningDate: "",
-          },
+          designation: slot.teacher.designation || "Teacher",
+          specialization: slot.teacher.specialization || "",
+          qualification: "",
+          joiningDate: "",
+        },
       });
     }
+  }
 
-    return Array.from(map.values());
-  }, [teachersResponse?.data, allRoutinesResponse?.data, user]);
+  // 3. Always include authenticated user with their actual name and profile
+  if (user?.id) {
+    const existing = teacherMap.get(user.id);
+    teacherMap.set(user.id, {
+      ...(existing || user),
+      name: user.name || existing?.name || "My Routine",
+      teacherProfile: user.teacherProfile ||
+        existing?.teacherProfile || {
+          id: user.id,
+          designation: "Teacher",
+          qualification: "",
+          specialization: "",
+          joiningDate: "",
+        },
+    });
+  }
+
+  const combinedTeachers: User[] = Array.from(teacherMap.values());
 
   const batches = batchesResponse?.data || [];
   const teachers = combinedTeachers;
@@ -201,31 +199,19 @@ export function RoutinesManagementView({
   const deleteMutation = useDeleteRoutineMutation();
 
   // Active Schedule payload (grouped Saturday -> Friday)
-  const activeSchedule: DayTimetableGroup[] | undefined = useMemo(() => {
-    if (effectiveViewMode === "all") {
-      const allSlots = allRoutinesResponse?.data || [];
-      return ACADEMIC_DAYS_ORDER.map((day) => ({
-        dayOfWeek: day,
-        slots: allSlots
-          .filter((slot) => slot.dayOfWeek === day)
-          .sort((a, b) => a.startTime.localeCompare(b.startTime)),
-      }));
-    }
-    if (effectiveViewMode === "batch") {
-      return batchTimetableResponse?.data?.schedule;
-    }
-    if (isViewingSelf) {
-      return myScheduleResponse?.data?.schedule;
-    }
-    return teacherScheduleResponse?.data?.schedule;
-  }, [
-    effectiveViewMode,
-    isViewingSelf,
-    allRoutinesResponse?.data,
-    batchTimetableResponse?.data?.schedule,
-    myScheduleResponse?.data?.schedule,
-    teacherScheduleResponse?.data?.schedule,
-  ]);
+  const activeSchedule: DayTimetableGroup[] | undefined =
+    effectiveViewMode === "all"
+      ? ACADEMIC_DAYS_ORDER.map((day) => ({
+          dayOfWeek: day,
+          slots: (allRoutinesResponse?.data || [])
+            .filter((slot) => slot.dayOfWeek === day)
+            .sort((a, b) => a.startTime.localeCompare(b.startTime)),
+        }))
+      : effectiveViewMode === "batch"
+        ? batchTimetableResponse?.data?.schedule
+        : isViewingSelf
+          ? myScheduleResponse?.data?.schedule
+          : teacherScheduleResponse?.data?.schedule;
 
   const isLoadingTimetable =
     effectiveViewMode === "all"

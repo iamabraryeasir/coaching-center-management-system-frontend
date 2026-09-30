@@ -27,6 +27,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useUpdateStudentStatusMutation } from "@/hooks";
+import { formatDateSafe } from "@/lib/utils";
 import type { User, UserStatus } from "@/types";
 import { StudentStatusBadge } from "./student-status-badge";
 
@@ -47,14 +48,11 @@ export function StudentDetailsModal({
   if (!student) return null;
 
   const profile = student.studentProfile;
-  const formattedJoinDate = new Date(student.createdAt).toLocaleDateString(
-    "en-US",
-    {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    },
-  );
+  const formattedJoinDate = formatDateSafe(student.createdAt, {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
 
   const handleStatusToggle = () => {
     const nextStatus: UserStatus =

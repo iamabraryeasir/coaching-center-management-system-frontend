@@ -2,7 +2,7 @@
 
 import { startOfDay, subDays } from "date-fns";
 import { Eye, FilterX, Globe, RotateCcw, ScrollText, X } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { StudentPagination } from "@/components/modules/students";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -26,6 +26,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useAuditLogStats, useAuditLogs } from "@/hooks";
+import { formatDateSafe } from "@/lib/utils";
 import type { AuditLog } from "@/types";
 import {
   AuditActionBadge,
@@ -309,19 +310,14 @@ export function AuditLogsTable() {
   const { data: statsResponse } = useAuditLogStats();
 
   // Search parameter when category is selected
-  const querySearch = useMemo(() => {
-    if (selectedAction.startsWith("CAT:")) {
-      return selectedAction.replace("CAT:", "");
-    }
-    return undefined;
-  }, [selectedAction]);
+  const querySearch = selectedAction.startsWith("CAT:")
+    ? selectedAction.replace("CAT:", "")
+    : undefined;
 
-  const queryAction = useMemo(() => {
-    if (selectedAction === "ALL" || selectedAction.startsWith("CAT:")) {
-      return undefined;
-    }
-    return selectedAction;
-  }, [selectedAction]);
+  const queryAction =
+    selectedAction === "ALL" || selectedAction.startsWith("CAT:")
+      ? undefined
+      : selectedAction;
 
   // Use standard TanStack Query with placeholderData to maintain stable UI
   const {
@@ -344,101 +340,91 @@ export function AuditLogsTable() {
   const meta = logsResponse?.meta;
 
   // Dynamically extract any extra actions from backend data/stats not in predefined list
-  const dynamicActions = useMemo(() => {
-    const set = new Set<string>();
-    for (const log of rawLogs) {
-      if (log.action && !KNOWN_ACTION_VALUES.has(log.action)) {
-        set.add(log.action);
+  const dynamicActionSet = new Set<string>();
+  for (const log of rawLogs) {
+    if (log.action && !KNOWN_ACTION_VALUES.has(log.action)) {
+      dynamicActionSet.add(log.action);
+    }
+  }
+  const breakdown = statsResponse?.data?.actionBreakdown;
+  if (Array.isArray(breakdown)) {
+    for (const item of breakdown) {
+      if (item.action && !KNOWN_ACTION_VALUES.has(item.action)) {
+        dynamicActionSet.add(item.action);
       }
     }
-    const breakdown = statsResponse?.data?.actionBreakdown;
-    if (Array.isArray(breakdown)) {
-      for (const item of breakdown) {
-        if (item.action && !KNOWN_ACTION_VALUES.has(item.action)) {
-          set.add(item.action);
-        }
-      }
-    } else if (breakdown && typeof breakdown === "object") {
-      for (const key of Object.keys(breakdown)) {
-        if (!KNOWN_ACTION_VALUES.has(key)) {
-          set.add(key);
-        }
+  } else if (breakdown && typeof breakdown === "object") {
+    for (const key of Object.keys(breakdown)) {
+      if (!KNOWN_ACTION_VALUES.has(key)) {
+        dynamicActionSet.add(key);
       }
     }
-    return Array.from(set);
-  }, [rawLogs, statsResponse]);
+  }
+  const dynamicActions = Array.from(dynamicActionSet);
 
   // In-memory filtering for instant 0ms response and rock-solid stability
-  const logs = useMemo(() => {
-    return rawLogs.filter((log) => {
-      // 1. Action filtering
-      if (selectedAction !== "ALL") {
-        const logAction = (log.action || "").toUpperCase();
-        if (selectedAction.startsWith("CAT:")) {
-          const cat = selectedAction.replace("CAT:", "").toUpperCase();
-          if (!logAction.includes(cat)) {
-            return false;
-          }
-        } else if (logAction !== selectedAction.toUpperCase()) {
+  const logs = rawLogs.filter((log) => {
+    // 1. Action filtering
+    if (selectedAction !== "ALL") {
+      const logAction = (log.action || "").toUpperCase();
+      if (selectedAction.startsWith("CAT:")) {
+        const cat = selectedAction.replace("CAT:", "").toUpperCase();
+        if (!logAction.includes(cat)) {
           return false;
         }
+      } else if (logAction !== selectedAction.toUpperCase()) {
+        return false;
       }
+    }
 
-      // 2. Entity filtering
-      if (selectedEntity !== "ALL") {
-        const logEntity = (log.entity || "").toUpperCase();
-        const target = selectedEntity.toUpperCase();
-        if (logEntity !== target && !logEntity.includes(target)) {
-          return false;
-        }
+    // 2. Entity filtering
+    if (selectedEntity !== "ALL") {
+      const logEntity = (log.entity || "").toUpperCase();
+      const target = selectedEntity.toUpperCase();
+      if (logEntity !== target && !logEntity.includes(target)) {
+        return false;
       }
+    }
 
-      // 3. Status filtering
-      if (selectedStatus !== "ALL") {
-        const logStatus = (log.status || "SUCCESS").toUpperCase();
-        const target = selectedStatus.toUpperCase();
-        if (
-          target === "SUCCESS" &&
-          !["SUCCESS", "OK", "200"].includes(logStatus)
-        ) {
-          return false;
-        }
-        if (
-          target === "FAILED" &&
-          !["FAILED", "ERROR", "FAILURE"].includes(logStatus)
-        ) {
-          return false;
-        }
-        if (target === "PENDING" && logStatus !== "PENDING") {
-          return false;
-        }
+    // 3. Status filtering
+    if (selectedStatus !== "ALL") {
+      const logStatus = (log.status || "SUCCESS").toUpperCase();
+      const target = selectedStatus.toUpperCase();
+      if (
+        target === "SUCCESS" &&
+        !["SUCCESS", "OK", "200"].includes(logStatus)
+      ) {
+        return false;
       }
-
-      // 4. Timeframe filtering
-      if (selectedDateRange !== "ALL") {
-        const logTime = new Date(log.createdAt).getTime();
-        const now = Date.now();
-        if (selectedDateRange === "TODAY") {
-          const todayStart = startOfDay(now).getTime();
-          if (logTime < todayStart) return false;
-        } else if (selectedDateRange === "7D") {
-          const sevenDaysAgo = subDays(now, 7).getTime();
-          if (logTime < sevenDaysAgo) return false;
-        } else if (selectedDateRange === "30D") {
-          const thirtyDaysAgo = subDays(now, 30).getTime();
-          if (logTime < thirtyDaysAgo) return false;
-        }
+      if (
+        target === "FAILED" &&
+        !["FAILED", "ERROR", "FAILURE"].includes(logStatus)
+      ) {
+        return false;
       }
+      if (target === "PENDING" && logStatus !== "PENDING") {
+        return false;
+      }
+    }
 
-      return true;
-    });
-  }, [
-    rawLogs,
-    selectedAction,
-    selectedEntity,
-    selectedStatus,
-    selectedDateRange,
-  ]);
+    // 4. Timeframe filtering
+    if (selectedDateRange !== "ALL") {
+      const logTime = new Date(log.createdAt).getTime();
+      const now = Date.now();
+      if (selectedDateRange === "TODAY") {
+        const todayStart = startOfDay(now).getTime();
+        if (logTime < todayStart) return false;
+      } else if (selectedDateRange === "7D") {
+        const sevenDaysAgo = subDays(now, 7).getTime();
+        if (logTime < sevenDaysAgo) return false;
+      } else if (selectedDateRange === "30D") {
+        const thirtyDaysAgo = subDays(now, 30).getTime();
+        if (logTime < thirtyDaysAgo) return false;
+      }
+    }
+
+    return true;
+  });
 
   const hasActiveFilters =
     selectedAction !== "ALL" ||
@@ -838,15 +824,9 @@ export function AuditLogsTable() {
                 <TableRow key={log.id} className="hover:bg-muted/30">
                   {/* Timestamp */}
                   <TableCell className="font-mono text-xs text-muted-foreground whitespace-nowrap">
-                    <div>
-                      {new Date(log.createdAt).toLocaleDateString(undefined, {
-                        month: "short",
-                        day: "numeric",
-                        year: "numeric",
-                      })}
-                    </div>
+                    <div>{formatDateSafe(log.createdAt)}</div>
                     <div className="text-[11px] text-muted-foreground/75">
-                      {new Date(log.createdAt).toLocaleTimeString(undefined, {
+                      {formatDateSafe(log.createdAt, {
                         hour: "2-digit",
                         minute: "2-digit",
                         second: "2-digit",

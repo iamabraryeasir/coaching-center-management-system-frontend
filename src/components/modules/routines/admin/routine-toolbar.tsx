@@ -1,7 +1,6 @@
 "use client";
 
 import { Calendar, Layers, Plus, Printer, Sparkles, Users } from "lucide-react";
-import { useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -44,24 +43,22 @@ export function RoutineToolbar({
   onPrint,
 }: RoutineToolbarProps) {
   // Pin authenticated user to top of teacher selector
-  const sortedTeachers = useMemo(() => {
-    const list = [...teachers];
-    if (currentUserId && !list.some((t) => t.id === currentUserId)) {
-      list.unshift({
-        id: currentUserId,
-        name: "My Timetable",
-        email: "",
-        role: "TEACHER",
-        status: "ACTIVE",
-        createdAt: "",
-      });
-    }
-    return list.sort((a, b) => {
-      if (a.id === currentUserId) return -1;
-      if (b.id === currentUserId) return 1;
-      return (a.name || "").localeCompare(b.name || "");
+  const teacherList = [...teachers];
+  if (currentUserId && !teacherList.some((t) => t.id === currentUserId)) {
+    teacherList.unshift({
+      id: currentUserId,
+      name: "My Timetable",
+      email: "",
+      role: "TEACHER",
+      status: "ACTIVE",
+      createdAt: "",
     });
-  }, [teachers, currentUserId]);
+  }
+  const sortedTeachers = teacherList.sort((a, b) => {
+    if (a.id === currentUserId) return -1;
+    if (b.id === currentUserId) return 1;
+    return (a.name || "").localeCompare(b.name || "");
+  });
   return (
     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between rounded-xl border border-border/70 bg-card/60 p-3 shadow-2xs">
       {/* Left: View Mode Select & Entity Selector */}

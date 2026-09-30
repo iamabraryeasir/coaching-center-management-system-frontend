@@ -2,7 +2,7 @@
 
 import { useQueryClient } from "@tanstack/react-query";
 import { Filter, RefreshCw, Search, SlidersHorizontal } from "lucide-react";
-import { useId, useMemo, useState } from "react";
+import { useId, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { examKeys } from "@/constants";
@@ -50,27 +50,22 @@ export function StudentExamsView() {
   const studentId = student?.id || "";
 
   // Normalize results to handle both backend { exam, result } items and flat models
-  const allResults = useMemo(() => {
-    const rawList = reportCard?.results || [];
-    return rawList.map(normalizeStudentExamResult);
-  }, [reportCard?.results]);
+  const rawList = reportCard?.results || [];
+  const allResults = rawList.map(normalizeStudentExamResult);
 
   // Statistics calculation
   const totalExams = reportCard?.totalExams ?? allResults.length;
-  const passedCount = useMemo(
-    () =>
-      reportCard?.passedExams ?? allResults.filter((r) => r.isPassed).length,
-    [reportCard?.passedExams, allResults],
-  );
+  const passedCount =
+    reportCard?.passedExams ?? allResults.filter((r) => r.isPassed).length;
 
-  const overallPassRate = useMemo(() => {
+  const overallPassRate = (() => {
     if (typeof reportCard?.overallPassRate === "number") {
       return reportCard.overallPassRate;
     }
     return totalExams > 0 ? (passedCount / totalExams) * 100 : 0;
-  }, [reportCard?.overallPassRate, totalExams, passedCount]);
+  })();
 
-  const gpaAverage = useMemo(() => {
+  const gpaAverage = (() => {
     if (typeof reportCard?.cumulativeStats?.gpaAverage === "number") {
       return reportCard.cumulativeStats.gpaAverage;
     }
@@ -82,58 +77,49 @@ export function StudentExamsView() {
     if (validGpas.length === 0) return 0;
     const sum = validGpas.reduce((acc, curr) => acc + curr, 0);
     return Number((sum / validGpas.length).toFixed(2));
-  }, [reportCard?.cumulativeStats?.gpaAverage, allResults]);
+  })();
 
   // Calculate best rank
-  const bestRank = useMemo(() => {
-    const ranks = allResults
-      .map((r) => r.rank)
-      .filter((r): r is number => typeof r === "number" && r > 0);
-    return ranks.length > 0 ? Math.min(...ranks) : null;
-  }, [allResults]);
+  const ranks = allResults
+    .map((r) => r.rank)
+    .filter((r): r is number => typeof r === "number" && r > 0);
+  const bestRank = ranks.length > 0 ? Math.min(...ranks) : null;
 
   // Extract unique batch names for filtering
-  const availableBatches = useMemo(() => {
-    const batchSet = new Set<string>();
-    for (const r of allResults) {
-      if (r.batchName) batchSet.add(r.batchName);
-    }
-    return Array.from(batchSet);
-  }, [allResults]);
+  const batchSet = new Set<string>();
+  for (const r of allResults) {
+    if (r.batchName) batchSet.add(r.batchName);
+  }
+  const availableBatches = Array.from(batchSet);
 
   // Client-side filtering
-  const filteredResults = useMemo(() => {
-    return allResults.filter((item) => {
-      // Status filter
-      if (selectedStatus === "PASSED" && !item.isPassed) return false;
-      if (selectedStatus === "FAILED" && item.isPassed) return false;
+  const filteredResults = allResults.filter((item) => {
+    // Status filter
+    if (selectedStatus === "PASSED" && !item.isPassed) return false;
+    if (selectedStatus === "FAILED" && item.isPassed) return false;
 
-      // Batch filter
-      if (selectedBatch !== "ALL" && item.batchName !== selectedBatch) {
-        return false;
-      }
+    // Batch filter
+    if (selectedBatch !== "ALL" && item.batchName !== selectedBatch) {
+      return false;
+    }
 
-      // Search query filter (exam title or batch)
-      if (searchQuery.trim()) {
-        const query = searchQuery.toLowerCase().trim();
-        const title = (item.examTitle || "").toLowerCase();
-        const batch = (item.batchName || "").toLowerCase();
-        return title.includes(query) || batch.includes(query);
-      }
+    // Search query filter (exam title or batch)
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase().trim();
+      const title = (item.examTitle || "").toLowerCase();
+      const batch = (item.batchName || "").toLowerCase();
+      return title.includes(query) || batch.includes(query);
+    }
 
-      return true;
-    });
-  }, [allResults, selectedStatus, selectedBatch, searchQuery]);
+    return true;
+  });
 
   // Pagination slice
   const totalRecords = filteredResults.length;
   const totalPages = Math.max(1, Math.ceil(totalRecords / pageSize));
   const safePage = Math.min(currentPage, totalPages);
-
-  const paginatedResults = useMemo(() => {
-    const start = (safePage - 1) * pageSize;
-    return filteredResults.slice(start, start + pageSize);
-  }, [filteredResults, safePage]);
+  const start = (safePage - 1) * pageSize;
+  const paginatedResults = filteredResults.slice(start, start + pageSize);
 
   // Quick refresh action
   const handleRefresh = async () => {

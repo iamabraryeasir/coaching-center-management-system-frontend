@@ -30,6 +30,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useTeacher, useUpdateTeacherStatusMutation } from "@/hooks";
+import { formatDateSafe } from "@/lib/utils";
 import {
   getTeacherPermissions,
   type TeacherPermission,
@@ -86,21 +87,13 @@ export function TeacherDetailsModal({
 
   const profile = activeTeacher.teacherProfile;
   const joinDate = profile?.joiningDate || activeTeacher.createdAt;
-  const formattedJoinDate = joinDate
-    ? new Date(joinDate).toLocaleDateString(undefined, {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      })
-    : "—";
+  const formattedJoinDate = formatDateSafe(joinDate, {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
 
-  const memberSince = activeTeacher.createdAt
-    ? new Date(activeTeacher.createdAt).toLocaleDateString(undefined, {
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-      })
-    : "—";
+  const memberSince = formatDateSafe(activeTeacher.createdAt);
 
   const initials = activeTeacher.name
     ? activeTeacher.name

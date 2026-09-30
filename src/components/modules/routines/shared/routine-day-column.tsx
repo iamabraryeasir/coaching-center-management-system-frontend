@@ -1,7 +1,6 @@
 "use client";
 
 import { Calendar, Plus } from "lucide-react";
-import { useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { DayOfWeek, RoutineSlot } from "@/types";
@@ -16,6 +15,16 @@ interface RoutineDayColumnProps {
   onDeleteSlot?: (slot: RoutineSlot) => void;
   className?: string;
 }
+
+const DAYS_MAP: Record<number, DayOfWeek> = {
+  0: "SUNDAY",
+  1: "MONDAY",
+  2: "TUESDAY",
+  3: "WEDNESDAY",
+  4: "THURSDAY",
+  5: "FRIDAY",
+  6: "SATURDAY",
+};
 
 const DAY_LABELS: Record<DayOfWeek, { full: string; short: string }> = {
   SATURDAY: { full: "Saturday", short: "Sat" },
@@ -37,23 +46,12 @@ export function RoutineDayColumn({
   className,
 }: RoutineDayColumnProps) {
   // Determine if this day is today
-  const isToday = useMemo(() => {
-    const daysMap: Record<number, DayOfWeek> = {
-      0: "SUNDAY",
-      1: "MONDAY",
-      2: "TUESDAY",
-      3: "WEDNESDAY",
-      4: "THURSDAY",
-      5: "FRIDAY",
-      6: "SATURDAY",
-    };
-    return daysMap[new Date().getDay()] === dayOfWeek;
-  }, [dayOfWeek]);
+  const isToday = DAYS_MAP[new Date().getDay()] === dayOfWeek;
 
   // Sort slots chronologically by startTime
-  const sortedSlots = useMemo(() => {
-    return [...slots].sort((a, b) => a.startTime.localeCompare(b.startTime));
-  }, [slots]);
+  const sortedSlots = [...slots].sort((a, b) =>
+    a.startTime.localeCompare(b.startTime),
+  );
 
   const label = DAY_LABELS[dayOfWeek];
 

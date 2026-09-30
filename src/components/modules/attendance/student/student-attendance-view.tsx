@@ -2,7 +2,7 @@
 
 import { useQueryClient } from "@tanstack/react-query";
 import { Filter, RefreshCw, Search, SlidersHorizontal } from "lucide-react";
-import { useId, useMemo, useState } from "react";
+import { useId, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { attendanceKeys } from "@/constants";
@@ -60,63 +60,55 @@ export function StudentAttendanceView() {
       (stats.leaveCount || 0);
 
   // Normalize history records
-  const allRecords: StudentAttendanceHistoryItem[] = useMemo(() => {
-    return summary?.records || summary?.history || summary?.recentRecords || [];
-  }, [summary]);
+  const allRecords: StudentAttendanceHistoryItem[] =
+    summary?.records || summary?.history || summary?.recentRecords || [];
 
   // Extract unique batches from records for filtering
-  const availableBatches = useMemo(() => {
-    const batchSet = new Set<string>();
-    for (const record of allRecords) {
-      const name = record.batchName || record.batch?.name;
-      if (name) batchSet.add(name);
-    }
-    return Array.from(batchSet);
-  }, [allRecords]);
+  const batchSet = new Set<string>();
+  for (const record of allRecords) {
+    const name = record.batchName || record.batch?.name;
+    if (name) batchSet.add(name);
+  }
+  const availableBatches = Array.from(batchSet);
 
   // Client-side filtering
-  const filteredRecords = useMemo(() => {
-    return allRecords.filter((record) => {
-      // Status filter
-      if (selectedStatus !== "ALL" && record.status !== selectedStatus) {
-        return false;
-      }
+  const filteredRecords = allRecords.filter((record) => {
+    // Status filter
+    if (selectedStatus !== "ALL" && record.status !== selectedStatus) {
+      return false;
+    }
 
-      // Batch filter
-      const batchName = record.batchName || record.batch?.name || "";
-      if (selectedBatch !== "ALL" && batchName !== selectedBatch) {
-        return false;
-      }
+    // Batch filter
+    const batchName = record.batchName || record.batch?.name || "";
+    if (selectedBatch !== "ALL" && batchName !== selectedBatch) {
+      return false;
+    }
 
-      // Search query filter (search across date, batch, teacher, remarks)
-      if (searchQuery.trim()) {
-        const query = searchQuery.toLowerCase().trim();
-        const remarks = (record.remarks || "").toLowerCase();
-        const teacher = (record.markedBy?.name || "").toLowerCase();
-        const date = (record.date || "").toLowerCase();
-        const batch = batchName.toLowerCase();
+    // Search query filter (search across date, batch, teacher, remarks)
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase().trim();
+      const remarks = (record.remarks || "").toLowerCase();
+      const teacher = (record.markedBy?.name || "").toLowerCase();
+      const date = (record.date || "").toLowerCase();
+      const batch = batchName.toLowerCase();
 
-        return (
-          remarks.includes(query) ||
-          teacher.includes(query) ||
-          date.includes(query) ||
-          batch.includes(query)
-        );
-      }
+      return (
+        remarks.includes(query) ||
+        teacher.includes(query) ||
+        date.includes(query) ||
+        batch.includes(query)
+      );
+    }
 
-      return true;
-    });
-  }, [allRecords, selectedStatus, selectedBatch, searchQuery]);
+    return true;
+  });
 
   // Pagination slice
   const totalRecords = filteredRecords.length;
   const totalPages = Math.max(1, Math.ceil(totalRecords / pageSize));
   const safePage = Math.min(currentPage, totalPages);
-
-  const paginatedRecords = useMemo(() => {
-    const start = (safePage - 1) * pageSize;
-    return filteredRecords.slice(start, start + pageSize);
-  }, [filteredRecords, safePage]);
+  const start = (safePage - 1) * pageSize;
+  const paginatedRecords = filteredRecords.slice(start, start + pageSize);
 
   // Quick refresh action
   const handleRefresh = async () => {

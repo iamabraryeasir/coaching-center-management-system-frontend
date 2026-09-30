@@ -13,7 +13,6 @@ import {
   Phone,
   XCircle,
 } from "lucide-react";
-import { useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -34,7 +33,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useStudentAttendanceHistory } from "@/hooks";
-import { cn } from "@/lib/utils";
+import { cn, formatDateSafe } from "@/lib/utils";
 import type {
   AttendanceStatus,
   StudentAttendanceHistoryItem,
@@ -107,7 +106,7 @@ export function StudentAttendanceHistoryModal({
   const summaryData = historyResponse?.data;
 
   // Extract history list supporting various backend API response formats (recentRecords, history, records)
-  const historyList: StudentAttendanceHistoryItem[] = useMemo(() => {
+  const historyList: StudentAttendanceHistoryItem[] = (() => {
     if (!summaryData) return [];
     if (Array.isArray(summaryData)) {
       return summaryData as unknown as StudentAttendanceHistoryItem[];
@@ -134,68 +133,65 @@ export function StudentAttendanceHistoryModal({
       rawObj.data ||
       []
     );
-  }, [summaryData]);
+  })();
 
   // Compute robust statistics with fallback calculation from history list
-  const stats = useMemo(() => {
-    const rawStats = summaryData?.stats;
+  const rawStats = summaryData?.stats;
 
-    const total =
-      rawStats?.totalSessions ??
-      rawStats?.totalClasses ??
-      (rawStats as unknown as { total?: number })?.total ??
-      (rawStats as unknown as { totalCount?: number })?.totalCount ??
-      (rawStats as unknown as { totalWorkingDays?: number })
-        ?.totalWorkingDays ??
-      historyList.length;
+  const total =
+    rawStats?.totalSessions ??
+    rawStats?.totalClasses ??
+    (rawStats as unknown as { total?: number })?.total ??
+    (rawStats as unknown as { totalCount?: number })?.totalCount ??
+    (rawStats as unknown as { totalWorkingDays?: number })?.totalWorkingDays ??
+    historyList.length;
 
-    const present =
-      rawStats?.presentCount ??
-      (rawStats as unknown as { present?: number })?.present ??
-      (rawStats as unknown as { presentDays?: number })?.presentDays ??
-      historyList.filter((h) => h.status === "PRESENT").length;
+  const present =
+    rawStats?.presentCount ??
+    (rawStats as unknown as { present?: number })?.present ??
+    (rawStats as unknown as { presentDays?: number })?.presentDays ??
+    historyList.filter((h) => h.status === "PRESENT").length;
 
-    const absent =
-      rawStats?.absentCount ??
-      (rawStats as unknown as { absent?: number })?.absent ??
-      (rawStats as unknown as { absentDays?: number })?.absentDays ??
-      historyList.filter((h) => h.status === "ABSENT").length;
+  const absent =
+    rawStats?.absentCount ??
+    (rawStats as unknown as { absent?: number })?.absent ??
+    (rawStats as unknown as { absentDays?: number })?.absentDays ??
+    historyList.filter((h) => h.status === "ABSENT").length;
 
-    const late =
-      rawStats?.lateCount ??
-      (rawStats as unknown as { late?: number })?.late ??
-      (rawStats as unknown as { lateDays?: number })?.lateDays ??
-      historyList.filter((h) => h.status === "LATE").length;
+  const late =
+    rawStats?.lateCount ??
+    (rawStats as unknown as { late?: number })?.late ??
+    (rawStats as unknown as { lateDays?: number })?.lateDays ??
+    historyList.filter((h) => h.status === "LATE").length;
 
-    const excused =
-      rawStats?.excusedCount ??
-      (rawStats as unknown as { excused?: number })?.excused ??
-      (rawStats as unknown as { excusedDays?: number })?.excusedDays ??
-      historyList.filter((h) => h.status === "EXCUSED").length;
+  const excused =
+    rawStats?.excusedCount ??
+    (rawStats as unknown as { excused?: number })?.excused ??
+    (rawStats as unknown as { excusedDays?: number })?.excusedDays ??
+    historyList.filter((h) => h.status === "EXCUSED").length;
 
-    const leave =
-      rawStats?.leaveCount ??
-      (rawStats as unknown as { leave?: number })?.leave ??
-      (rawStats as unknown as { leaveDays?: number })?.leaveDays ??
-      historyList.filter((h) => h.status === "LEAVE").length;
+  const leave =
+    rawStats?.leaveCount ??
+    (rawStats as unknown as { leave?: number })?.leave ??
+    (rawStats as unknown as { leaveDays?: number })?.leaveDays ??
+    historyList.filter((h) => h.status === "LEAVE").length;
 
-    const rate =
-      rawStats?.attendanceRate !== undefined
-        ? Number(rawStats.attendanceRate)
-        : total > 0
-          ? (present / total) * 100
-          : 0;
+  const rate =
+    rawStats?.attendanceRate !== undefined
+      ? Number(rawStats.attendanceRate)
+      : total > 0
+        ? (present / total) * 100
+        : 0;
 
-    return {
-      totalClasses: total,
-      presentCount: present,
-      absentCount: absent,
-      lateCount: late,
-      excusedCount: excused,
-      leaveCount: leave,
-      attendanceRate: rate,
-    };
-  }, [summaryData, historyList]);
+  const stats = {
+    totalClasses: total,
+    presentCount: present,
+    absentCount: absent,
+    lateCount: late,
+    excusedCount: excused,
+    leaveCount: leave,
+    attendanceRate: rate,
+  };
 
   const studentDisplayName =
     summaryData?.studentName || student?.name || "Student";
@@ -417,7 +413,7 @@ export function StudentAttendanceHistoryModal({
                       return (
                         <TableRow key={record.id}>
                           <TableCell className="font-mono text-xs text-foreground font-medium">
-                            {new Date(record.date).toLocaleDateString("en-US", {
+                            {formatDateSafe(record.date, {
                               weekday: "short",
                               year: "numeric",
                               month: "short",

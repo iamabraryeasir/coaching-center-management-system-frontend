@@ -46,6 +46,7 @@ import {
   useDebounce,
   useRemoveStudentFromBatchMutation,
 } from "@/hooks";
+import { formatDateSafe } from "@/lib/utils";
 import type { BatchEnrollment, User } from "@/types";
 import { DirectEnrollDialog } from "../admin/direct-enroll-dialog";
 
@@ -283,14 +284,9 @@ export function BatchStudentRoster({
                 enrollments.map((item) => {
                   const student = item.student;
                   const profile = student?.studentProfile;
-                  const dateRaw = item.enrolledAt || item.createdAt;
-                  const formattedDate = dateRaw
-                    ? new Date(dateRaw).toLocaleDateString(undefined, {
-                        year: "numeric",
-                        month: "short",
-                        day: "numeric",
-                      })
-                    : "—";
+                  const formattedDate = formatDateSafe(
+                    item.enrolledAt || item.createdAt,
+                  );
 
                   const isApproved =
                     item.status === "APPROVED" || item.status === "ENROLLED";

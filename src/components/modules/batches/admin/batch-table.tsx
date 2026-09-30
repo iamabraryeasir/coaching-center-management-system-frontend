@@ -39,6 +39,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useDeleteBatchMutation } from "@/hooks";
+import { formatCurrency, formatDateSafe } from "@/lib/utils";
 import type { Batch } from "@/types";
 import { BatchStatusBadge } from "../shared/batch-status-badge";
 
@@ -148,13 +149,7 @@ export function BatchTable({
               {/* Batches rows */}
               {!isLoading &&
                 batches.map((batch) => {
-                  const formattedDate = batch.createdAt
-                    ? new Date(batch.createdAt).toLocaleDateString(undefined, {
-                        year: "numeric",
-                        month: "short",
-                        day: "numeric",
-                      })
-                    : "—";
+                  const formattedDate = formatDateSafe(batch.createdAt);
 
                   const detailPath = `/dashboard/${portalRole.toLowerCase()}/batches/${batch.id}`;
 
@@ -192,7 +187,7 @@ export function BatchTable({
                       {/* Course Fee Column */}
                       <TableCell>
                         <span className="text-sm font-semibold text-foreground">
-                          ৳ {batch.fee.toLocaleString()}
+                          {formatCurrency(batch.fee)}
                         </span>
                       </TableCell>
 

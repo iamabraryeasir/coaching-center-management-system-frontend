@@ -22,6 +22,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useDebounce, usePaymentTransactions } from "@/hooks";
+import { formatCurrency, formatDateTime } from "@/lib/utils";
 import type { PaymentMethod, PaymentStatus } from "@/types";
 import { PaymentMethodBadge } from "./payment-method-badge";
 import { PaymentTransactionsTableSkeleton } from "./payment-skeletons";
@@ -218,16 +219,9 @@ export function PaymentTransactionsTable({
               </TableRow>
             ) : (
               transactions.map((trx) => {
-                const rawDate = trx.paidAt || trx.createdAt;
-                const formattedDate = rawDate
-                  ? new Date(rawDate).toLocaleDateString("en-US", {
-                      year: "numeric",
-                      month: "short",
-                      day: "numeric",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })
-                  : "—";
+                const formattedDate = formatDateTime(
+                  trx.paidAt || trx.createdAt,
+                );
 
                 const studentName =
                   trx.studentName || trx.student?.name || "Student";
@@ -276,7 +270,7 @@ export function PaymentTransactionsTable({
 
                     {/* Amount */}
                     <TableCell className="text-right text-xs font-bold text-foreground">
-                      ৳{trx.amount.toLocaleString()}
+                      {formatCurrency(trx.amount)}
                     </TableCell>
 
                     {/* Payment Channel */}

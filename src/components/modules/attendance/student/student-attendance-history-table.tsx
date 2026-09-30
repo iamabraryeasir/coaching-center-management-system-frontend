@@ -1,6 +1,5 @@
 "use client";
 
-import { format, parseISO } from "date-fns";
 import {
   CheckCircle2,
   ChevronLeft,
@@ -22,6 +21,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { formatDateSafe } from "@/lib/utils";
 import type { AttendanceStatus, StudentAttendanceHistoryItem } from "@/types";
 
 interface StudentAttendanceHistoryTableProps {
@@ -81,17 +81,6 @@ export function StudentAttendanceHistoryTable({
   pageSize,
   onPageChange,
 }: StudentAttendanceHistoryTableProps) {
-  const formatDateSafe = (dateStr: string) => {
-    try {
-      const date = dateStr.includes("T")
-        ? parseISO(dateStr)
-        : new Date(dateStr);
-      return format(date, "EEE, MMM d, yyyy");
-    } catch {
-      return dateStr;
-    }
-  };
-
   const startIndex = (currentPage - 1) * pageSize + 1;
   const endIndex = Math.min(currentPage * pageSize, totalRecords);
 

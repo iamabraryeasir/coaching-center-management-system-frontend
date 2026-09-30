@@ -20,7 +20,7 @@ import {
   X,
   XCircle,
 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { DatePicker } from "@/components/forms/date-picker";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -107,7 +107,7 @@ const TEACHER_STATUSES: TeacherAttendanceStatus[] = [
 ];
 
 export function TeacherAttendanceSheet() {
-  const todayStr = useMemo(() => new Date().toISOString().split("T")[0], []);
+  const todayStr = new Date().toISOString().split("T")[0];
   const [selectedDate, setSelectedDate] = useState<string>(todayStr);
   const [searchQuery, setSearchQuery] = useState("");
   const debouncedSearch = useDebounce(searchQuery, 500);
@@ -252,19 +252,19 @@ export function TeacherAttendanceSheet() {
   };
 
   // Filter rows
-  const filteredRows = useMemo(() => {
-    if (!debouncedSearch.trim()) return rows;
-    const q = debouncedSearch.toLowerCase();
-    return rows.filter(
-      (r) =>
-        r.teacher.name.toLowerCase().includes(q) ||
-        r.teacher.email.toLowerCase().includes(q) ||
-        r.teacher.teacherProfile?.designation?.toLowerCase().includes(q),
-    );
-  }, [rows, debouncedSearch]);
+  const filteredRows = !debouncedSearch.trim()
+    ? rows
+    : rows.filter((r) => {
+        const q = debouncedSearch.toLowerCase();
+        return (
+          r.teacher.name.toLowerCase().includes(q) ||
+          r.teacher.email.toLowerCase().includes(q) ||
+          r.teacher.teacherProfile?.designation?.toLowerCase().includes(q)
+        );
+      });
 
   // Real-time KPI statistics
-  const stats = useMemo(() => {
+  const stats = (() => {
     if (isReadOnly && !hasExistingRecords) {
       return {
         total: teachers.length,
@@ -283,7 +283,7 @@ export function TeacherAttendanceSheet() {
     const leave = rows.filter((r) => r.status === "LEAVE").length;
     const rate = total > 0 ? (present / total) * 100 : 0;
     return { total, present, absent, late, leave, rate };
-  }, [rows, isReadOnly, hasExistingRecords, teachers.length]);
+  })();
 
   const isLoading = isTeachersLoading || isSheetLoading;
 

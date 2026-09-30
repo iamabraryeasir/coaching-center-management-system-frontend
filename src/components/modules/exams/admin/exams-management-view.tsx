@@ -1,7 +1,7 @@
 "use client";
 
 import { Plus, Search } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -55,17 +55,15 @@ export function ExamsManagementView({
   const batches = batchesData?.data || [];
 
   // Query parameters for exams list
-  const queryParams = useMemo(() => {
-    return {
-      batchId: selectedBatchId || undefined,
-      status:
-        activeTab === "ALL" || activeTab === "DRAFT"
-          ? undefined
-          : (activeTab as ExamStatus),
-      search: debouncedSearch.trim() || undefined,
-      limit: 100,
-    };
-  }, [selectedBatchId, activeTab, debouncedSearch]);
+  const queryParams = {
+    batchId: selectedBatchId || undefined,
+    status:
+      activeTab === "ALL" || activeTab === "DRAFT"
+        ? undefined
+        : (activeTab as ExamStatus),
+    search: debouncedSearch.trim() || undefined,
+    limit: 100,
+  };
 
   const { data: examsResponse, isLoading } = useExams(queryParams);
 
@@ -77,12 +75,10 @@ export function ExamsManagementView({
       : [];
 
   // Filter for DRAFT results tab on client if activeTab === "DRAFT"
-  const filteredExams = useMemo(() => {
-    if (activeTab === "DRAFT") {
-      return allExams.filter((e) => e.resultStatus !== "PUBLISHED");
-    }
-    return allExams;
-  }, [allExams, activeTab]);
+  const filteredExams =
+    activeTab === "DRAFT"
+      ? allExams.filter((e) => e.resultStatus !== "PUBLISHED")
+      : allExams;
 
   const handleEditExam = (exam: Exam) => {
     setExamToEdit(exam);

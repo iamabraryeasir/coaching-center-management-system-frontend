@@ -75,7 +75,7 @@ export function DatePicker({
   toDate,
 }: DatePickerProps) {
   const [open, setOpen] = React.useState(false);
-  const selectedDate = React.useMemo(() => parseDateValue(value), [value]);
+  const selectedDate = parseDateValue(value);
 
   const handleSelect = (day?: Date) => {
     if (day) {
@@ -85,14 +85,11 @@ export function DatePicker({
     }
   };
 
-  const isDateDisabled = React.useCallback(
-    (date: Date) => {
-      if (fromDate && date < fromDate) return true;
-      if (toDate && date > toDate) return true;
-      return false;
-    },
-    [fromDate, toDate],
-  );
+  const isDateDisabled = (date: Date) => {
+    if (fromDate && date < fromDate) return true;
+    if (toDate && date > toDate) return true;
+    return false;
+  };
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
