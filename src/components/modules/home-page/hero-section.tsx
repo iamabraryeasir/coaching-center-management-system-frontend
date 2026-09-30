@@ -2,104 +2,79 @@
 
 import {
   ArrowRight,
+  Award,
   CalendarCheck,
-  CheckCircle2,
+  CalendarDays,
   CreditCard,
-  GraduationCap,
+  KeyRound,
   LayoutDashboard,
   LogIn,
   ShieldCheck,
-  UserCheck,
+  Sparkles,
   UserPlus,
 } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
 import { buttonVariants } from "@/components/ui/button";
-import { siteConfig } from "@/config/site";
 import { useAuth } from "@/hooks";
 import { cn } from "@/lib/utils";
 
-const CORE_CAPABILITIES = [
+const CORE_FEATURE_CARDS = [
+  {
+    icon: KeyRound,
+    title: "Student Google Auth & Onboarding Flow",
+    badge: "Auth Rule",
+    description:
+      "Google OAuth is strictly reserved for students. First-time Google sign-in automatically routes the student into onboarding, creating a Pending Student profile for administrative review and approval.",
+    tagline: "Student-only OAuth • Pending Review Queue",
+  },
   {
     icon: ShieldCheck,
-    title: "Role-Based Portals",
+    title: "Role-Based Portals & Permission Delegation",
+    badge: "Access Control",
     description:
-      "Dedicated portals for Admins, Teachers, and Students with granular delegation.",
+      "Dedicated portals for Admins, Teachers, and Students. Scoped teacher permissions (Manage Attendance, Manage Exams, Manage Routines) allow faculty to take classroom and fellow staff attendance safely.",
+    tagline: "3 Dedicated Portals • Faculty Delegation",
   },
   {
     icon: CalendarCheck,
-    title: "Daily Attendance Sheets",
+    title: "Daily Attendance & Once-Per-Day Lock",
+    badge: "Tamper-Proof",
     description:
-      "Batch-wise student tracking and verified once-per-day staff attendance.",
+      "Batch student sheets and faculty attendance with 5 status markers and duty remarks. A strict once-per-day lock secures records after submission, locking subsequent views into read-only audit mode.",
+    tagline: "Single Daily Submission • Locked Audit View",
   },
   {
-    icon: GraduationCap,
-    title: "Exams & Merit Lists",
+    icon: Award,
+    title: "Automated Exams, GPA & Email Delivery",
+    badge: "Grading Engine",
     description:
-      "Automated letter grading, GPA evaluation, batch rankings, and PDF report cards.",
+      "Bulk exam marks entry automatically calculates Letter Grades (A+ to F), GPA (5.00 to 0.00), and class rankings, with integrated server-side email report dispatch and branded PDF downloads.",
+    tagline: "Instant GPA Math • Automated Email Dispatch",
   },
   {
     icon: CreditCard,
-    title: "Tuition & Payment Ledger",
+    title: "Stripe Online Checkout & MFS Ledger",
+    badge: "Financial Billing",
     description:
-      "Stripe online checkout, manual cash/MFS collection, and automated fee sheets.",
-  },
-];
-
-const PORTAL_PREVIEWS = [
-  {
-    id: "admin",
-    role: "Admin Control",
-    badge: "Full Access",
-    tagline: "Total institutional visibility & financial oversight",
-    icon: ShieldCheck,
-    features: [
-      "Batch Lifecycle & Schedule Management",
-      "Teacher Permissions Delegation",
-      "Monthly Fee Sheets & Stripe Transactions",
-      "Student Admissions & Status Control",
-    ],
-    metric: { value: "100%", label: "System Automation" },
+      "Students pay tuition online via Stripe hosted checkout, while administrators manage an offline Cash/MFS ledger, calculate opening arrears, and generate signed PDF transaction receipts.",
+    tagline: "Stripe Webhooks • Offline Cash/MFS Receipts",
   },
   {
-    id: "teacher",
-    role: "Teacher Workspace",
-    badge: "Faculty Suite",
-    tagline: "Classroom instruction, attendance & grading tools",
-    icon: UserCheck,
-    features: [
-      "Daily Batch Student Attendance Sheets",
-      "Bulk Exam Marks & Grade Evaluation",
-      "Weekly Routine & Subject Scheduling",
-      "Staff Daily Attendance Check-In",
-    ],
-    metric: { value: "Zero", label: "Paper Attendance" },
-  },
-  {
-    id: "student",
-    role: "Student Portal",
-    badge: "Self-Service",
-    tagline: "Academic progress, schedules & instant fee clearance",
-    icon: GraduationCap,
-    features: [
-      "Enrolled Batches & Routine Schedules",
-      "Historical Attendance Analytics",
-      "Exam Merit Rank & Report Cards (PDF)",
-      "Instant Tuition Payment via Stripe",
-    ],
-    metric: { value: "24/7", label: "Mobile Access" },
+    icon: CalendarDays,
+    title: "Weekly Routines & Conflict-Free Timetable",
+    badge: "Smart Scheduling",
+    description:
+      "Organized Saturday–Friday weekly schedule grid preventing room overlaps and teacher double-booking, with instant batch, teacher, and student printable PDF routine exports.",
+    tagline: "7-Day Sat–Fri Cycle • Conflict Prevention",
   },
 ];
 
 export default function HeroSection() {
   const { isAuthenticated, user, isLoading } = useAuth();
-  const [activeTab, setActiveTab] = useState(0);
-  const activePortal = PORTAL_PREVIEWS[activeTab];
-  const ActiveIcon = activePortal.icon;
 
   return (
-    <section className="relative isolate overflow-hidden bg-background pt-10 pb-20 sm:pt-16 sm:pb-28 lg:pt-20 lg:pb-32">
-      {/* Ambient gradient glow */}
+    <div className="relative isolate overflow-hidden bg-background">
+      {/* Ambient background glow */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-x-0 -top-32 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-72"
@@ -113,205 +88,146 @@ export default function HeroSection() {
         />
       </div>
 
-      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-        {/* Main Hero Header */}
-        <div className="mx-auto max-w-3xl text-center space-y-6">
-          {/* Top Session Pill Badge */}
-          <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-xs font-semibold text-primary shadow-2xs backdrop-blur-xs">
-            <span className="flex size-2 rounded-full bg-primary animate-pulse" />
-            <span>Academic Session {siteConfig.academicYear}</span>
-            <span className="text-muted-foreground/60">•</span>
-            <span className="text-muted-foreground font-normal">
-              Admissions Open
-            </span>
-          </div>
-
-          {/* Punchy, Elegantly Styled Headline */}
-          <h1 className="font-heading text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-foreground leading-[1.08] text-balance">
-            Intelligent Academic Platform for{" "}
-            <span className="bg-linear-to-r from-primary via-primary/90 to-primary/70 bg-clip-text text-transparent">
-              Modern Coaching
-            </span>
-          </h1>
-
-          {/* Subtitle */}
-          <p className="text-base sm:text-lg text-muted-foreground leading-relaxed max-w-2xl mx-auto text-balance">
-            From student admissions and daily attendance verification to
-            automated grading, timetable routines, and tuition billing —
-            everything unified in one responsive portal.
-          </p>
-
-          {/* Call to Actions (CTAs) */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
-            {isLoading ? (
-              <div className="h-11 w-44 animate-pulse rounded-xl bg-muted" />
-            ) : isAuthenticated && user ? (
-              <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
-                <Link
-                  href="/dashboard"
-                  className={cn(
-                    buttonVariants({ variant: "default", size: "lg" }),
-                    "w-full sm:w-auto rounded-xl gap-2 font-semibold shadow-md shadow-primary/20 px-7 h-11 transition-transform active:scale-98",
-                  )}
-                >
-                  <LayoutDashboard className="size-4" />
-                  <span>Go to Dashboard</span>
-                  <ArrowRight className="size-4" />
-                </Link>
-
-                <Link
-                  href="/onboard-student"
-                  className={cn(
-                    buttonVariants({ variant: "outline", size: "lg" }),
-                    "w-full sm:w-auto rounded-xl gap-2 font-semibold border-border/80 px-6 h-11",
-                  )}
-                >
-                  <UserPlus className="size-4 text-primary" />
-                  <span>New Student Admission</span>
-                </Link>
-              </div>
-            ) : (
-              <>
-                <Link
-                  href="/login"
-                  className={cn(
-                    buttonVariants({ variant: "default", size: "lg" }),
-                    "w-full sm:w-auto rounded-xl gap-2 font-semibold shadow-md shadow-primary/20 px-7 h-11 transition-transform active:scale-98",
-                  )}
-                >
-                  <LogIn className="size-4" />
-                  <span>Sign In to Portal</span>
-                  <ArrowRight className="size-4" />
-                </Link>
-
-                <Link
-                  href="/onboard-student"
-                  className={cn(
-                    buttonVariants({ variant: "outline", size: "lg" }),
-                    "w-full sm:w-auto rounded-xl gap-2 font-semibold border-border/80 px-6 h-11",
-                  )}
-                >
-                  <UserPlus className="size-4 text-primary" />
-                  <span>Apply for Admission</span>
-                </Link>
-              </>
-            )}
-          </div>
+      {/* Hero Header Area */}
+      <div className="mx-auto max-w-5xl px-4 pt-12 pb-16 sm:pt-20 sm:pb-20 lg:pt-24 lg:pb-24 text-center">
+        {/* Status Pill Badge */}
+        <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-xs font-semibold text-primary shadow-2xs backdrop-blur-xs mb-6">
+          <Sparkles className="size-3.5" />
+          <span>Coaching Center Management System</span>
+          <span className="text-muted-foreground/60">•</span>
+          <span className="text-muted-foreground font-normal">
+            Intelligent Platform
+          </span>
         </div>
 
-        {/* Interactive Showcase Preview Window */}
-        <div className="mt-14 sm:mt-20 mx-auto max-w-4xl">
-          <div className="overflow-hidden rounded-2xl border border-border/80 bg-card/70 shadow-xl backdrop-blur-md">
-            {/* Top Mock Window Header */}
-            <div className="flex items-center justify-between border-b border-border/70 bg-muted/40 px-4 py-3">
-              <div className="flex items-center gap-1.5">
-                <div className="size-2.5 rounded-full bg-destructive/60" />
-                <div className="size-2.5 rounded-full bg-amber-500/60" />
-                <div className="size-2.5 rounded-full bg-emerald-500/60" />
-              </div>
+        {/* Main Headline */}
+        <h1 className="font-heading text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-foreground leading-[1.1] text-balance mb-6">
+          Unified Operations &amp; Academic Platform for{" "}
+          <span className="bg-linear-to-r from-primary via-primary/90 to-primary/70 bg-clip-text text-transparent">
+            Modern Coaching
+          </span>
+        </h1>
 
-              {/* Portal Selector Tabs */}
-              <div className="flex items-center gap-1 rounded-lg bg-background/80 p-0.5 border border-border/70 shadow-2xs">
-                {PORTAL_PREVIEWS.map((portal, idx) => (
-                  <button
-                    key={portal.id}
-                    type="button"
-                    onClick={() => setActiveTab(idx)}
-                    className={cn(
-                      "px-3 py-1 text-xs font-semibold rounded-md transition-all cursor-pointer",
-                      activeTab === idx
-                        ? "bg-primary text-primary-foreground shadow-2xs"
-                        : "text-muted-foreground hover:text-foreground",
-                    )}
-                  >
-                    {portal.role}
-                  </button>
-                ))}
-              </div>
+        {/* Subtitle */}
+        <p className="text-base sm:text-lg text-muted-foreground leading-relaxed max-w-2xl mx-auto text-balance mb-8">
+          Manage student admissions, daily attendance with once-per-day locks,
+          automated GPA merit lists, class routines, and Stripe tuition payments
+          with role-based precision.
+        </p>
 
-              <div className="hidden sm:flex items-center gap-1 text-[11px] text-muted-foreground font-mono">
-                <span>https://portal.cms</span>
-              </div>
-            </div>
-
-            {/* Window Interior Body */}
-            <div className="p-6 sm:p-8">
-              <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
-                {/* Left Description & Features */}
-                <div className="md:col-span-8 space-y-4">
-                  <div className="flex items-center gap-2.5">
-                    <div className="flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                      <ActiveIcon className="size-5" />
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <h3 className="font-heading font-bold text-base sm:text-lg text-foreground">
-                          {activePortal.role}
-                        </h3>
-                        <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">
-                          {activePortal.badge}
-                        </span>
-                      </div>
-                      <p className="text-xs text-muted-foreground">
-                        {activePortal.tagline}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Feature Checklist */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-2">
-                    {activePortal.features.map((feature) => (
-                      <div
-                        key={feature}
-                        className="flex items-start gap-2 text-xs text-foreground/90 bg-background/60 p-2 rounded-lg border border-border/60"
-                      >
-                        <CheckCircle2 className="size-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
-                        <span>{feature}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Right Mini Stat Card */}
-                <div className="md:col-span-4 rounded-xl border border-border/80 bg-linear-to-b from-primary/5 to-transparent p-5 text-center flex flex-col items-center justify-center space-y-1 shadow-2xs">
-                  <span className="font-heading text-3xl sm:text-4xl font-extrabold text-primary">
-                    {activePortal.metric.value}
-                  </span>
-                  <span className="text-xs font-semibold text-foreground">
-                    {activePortal.metric.label}
-                  </span>
-                  <p className="text-[11px] text-muted-foreground pt-1">
-                    Optimized for rapid workflows
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* 4 Minimal Capabilities Grid */}
-        <div className="mt-14 sm:mt-20 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {CORE_CAPABILITIES.map((cap) => {
-            const Icon = cap.icon;
-            return (
-              <div
-                key={cap.title}
-                className="group relative rounded-2xl border border-border/70 bg-card/60 p-5 shadow-2xs backdrop-blur-xs transition-all duration-200 hover:-translate-y-0.5 hover:border-border hover:shadow-xs"
+        {/* Call to Actions (CTAs) */}
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+          {isLoading ? (
+            <div className="h-11 w-44 animate-pulse rounded-xl bg-muted" />
+          ) : isAuthenticated && user ? (
+            <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
+              <Link
+                href="/dashboard"
+                className={cn(
+                  buttonVariants({ variant: "default", size: "lg" }),
+                  "w-full sm:w-auto rounded-xl gap-2 font-semibold shadow-md shadow-primary/20 px-7 h-11 transition-transform active:scale-98",
+                )}
               >
-                <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary shadow-2xs mb-3.5 group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
-                  <Icon className="size-5" />
-                </div>
-                <h3 className="font-heading font-semibold text-sm text-foreground mb-1.5">
-                  {cap.title}
-                </h3>
-                <p className="text-xs text-muted-foreground leading-relaxed">
-                  {cap.description}
-                </p>
-              </div>
-            );
-          })}
+                <LayoutDashboard className="size-4" />
+                <span>Go to Dashboard</span>
+                <ArrowRight className="size-4" />
+              </Link>
+
+              <Link
+                href="/onboard-student"
+                className={cn(
+                  buttonVariants({ variant: "outline", size: "lg" }),
+                  "w-full sm:w-auto rounded-xl gap-2 font-semibold border-border/80 px-6 h-11",
+                )}
+              >
+                <UserPlus className="size-4 text-primary" />
+                <span>New Student Onboarding</span>
+              </Link>
+            </div>
+          ) : (
+            <>
+              <Link
+                href="/login"
+                className={cn(
+                  buttonVariants({ variant: "default", size: "lg" }),
+                  "w-full sm:w-auto rounded-xl gap-2 font-semibold shadow-md shadow-primary/20 px-7 h-11 transition-transform active:scale-98",
+                )}
+              >
+                <LogIn className="size-4" />
+                <span>Sign In to Portal</span>
+              </Link>
+
+              <Link
+                href="/onboard-student"
+                className={cn(
+                  buttonVariants({ variant: "outline", size: "lg" }),
+                  "w-full sm:w-auto rounded-xl gap-2 font-semibold border-border/80 px-6 h-11",
+                )}
+              >
+                <UserPlus className="size-4 text-primary" />
+                <span>Student Self-Onboarding</span>
+              </Link>
+            </>
+          )}
         </div>
       </div>
-    </section>
+
+      {/* Feature & Business Logic Cards Section */}
+      <div className="border-t border-border/60 bg-muted/20 py-16 sm:py-24">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-2xl text-center mb-12 sm:mb-16 space-y-3">
+            <h2 className="font-heading text-2xl sm:text-3xl font-bold tracking-tight text-foreground text-balance">
+              Engineered Features &amp; Custom Business Logic
+            </h2>
+            <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed text-balance">
+              Every workflow is enforced by backend state machines, strict
+              validation rules, and role-based permissions.
+            </p>
+          </div>
+
+          {/* 6 Feature / Business Logic Cards Grid */}
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
+            {CORE_FEATURE_CARDS.map((card) => {
+              const Icon = card.icon;
+
+              return (
+                <div
+                  key={card.title}
+                  className="group relative flex flex-col justify-between rounded-2xl border border-border/80 bg-card p-6 shadow-2xs transition-all duration-200 hover:-translate-y-1 hover:border-border hover:shadow-md"
+                >
+                  <div className="space-y-3.5">
+                    {/* Icon & Badge */}
+                    <div className="flex items-center justify-between">
+                      <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary shadow-2xs group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+                        <Icon className="size-5" />
+                      </div>
+
+                      <span className="rounded-full border border-primary/20 bg-primary/5 px-2.5 py-0.5 text-[11px] font-semibold text-primary">
+                        {card.badge}
+                      </span>
+                    </div>
+
+                    {/* Title */}
+                    <h3 className="font-heading text-base font-bold text-foreground">
+                      {card.title}
+                    </h3>
+
+                    {/* Description */}
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      {card.description}
+                    </p>
+                  </div>
+
+                  {/* Footer Tagline */}
+                  <div className="mt-5 pt-3 border-t border-border/60 text-[11px] font-medium text-primary">
+                    {card.tagline}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }

@@ -131,7 +131,7 @@ export default function Header() {
                   "items-center gap-1.5 shadow-sm font-medium",
                 )}
               >
-                <LogIn className="size-4" />
+                <LogIn className="size-3.5" />
                 <span>Login</span>
               </Link>
             )}
