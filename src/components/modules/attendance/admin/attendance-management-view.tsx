@@ -58,9 +58,8 @@ export function AttendanceManagementView({
   const [selectedStudentForHistory, setSelectedStudentForHistory] =
     useState<User | null>(null);
 
-  // Compute date states
+  // Compute today string
   const isToday = selectedDate === todayStr;
-  const isReadOnly = !isToday;
 
   // Fetch batches
   const { data: batchesResponse, isLoading: isBatchesLoading } = useBatches({
@@ -85,10 +84,13 @@ export function AttendanceManagementView({
     );
   const existingSheet = sheetResponse?.data;
   const existingRecords = existingSheet?.records || [];
+  const hasExistingRecords = existingRecords.length > 0;
+
+  // Compute submission lock state (Batch attendance can be submitted only once per day)
+  const isAlreadySubmitted = isToday && hasExistingRecords;
+  const isReadOnly = !isToday || isAlreadySubmitted;
 
   const markBatchMutation = useMarkBatchAttendanceMutation();
-
-  const hasExistingRecords = existingRecords.length > 0;
 
   // Populate local rows whenever enrolled students or existing records change
   useEffect(() => {
@@ -338,6 +340,7 @@ export function AttendanceManagementView({
             hasUnsavedChanges={hasUnsavedChanges}
             disabled={isLoading || batches.length === 0}
             isReadOnly={isReadOnly}
+            isAlreadySubmitted={isAlreadySubmitted}
           />
 
           {/* 3. Student Attendance Table or Not Found Empty State */}

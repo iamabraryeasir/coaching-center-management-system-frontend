@@ -136,9 +136,6 @@ export function TeacherDashboardPageSkeleton() {
         <Skeleton className="h-9 w-40 rounded-lg" />
       </div>
 
-      {/* Check-in Banner Skeleton */}
-      <Skeleton className="h-12 w-full rounded-xl" />
-
       {/* KPI Cards Skeleton */}
       <TeacherKpiCardsSkeleton />
 

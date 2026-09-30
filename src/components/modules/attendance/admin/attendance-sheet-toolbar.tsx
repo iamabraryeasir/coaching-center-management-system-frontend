@@ -41,6 +41,7 @@ interface AttendanceSheetToolbarProps {
   hasUnsavedChanges: boolean;
   disabled?: boolean;
   isReadOnly?: boolean;
+  isAlreadySubmitted?: boolean;
 }
 
 export function AttendanceSheetToolbar({
@@ -59,6 +60,7 @@ export function AttendanceSheetToolbar({
   hasUnsavedChanges,
   disabled = false,
   isReadOnly = false,
+  isAlreadySubmitted = false,
 }: AttendanceSheetToolbarProps) {
   const todayStr = new Date().toISOString().split("T")[0];
   const isToday = selectedDate === todayStr;
@@ -189,9 +191,14 @@ export function AttendanceSheetToolbar({
           </div>
         </div>
 
-        {/* 3. Primary Action Button or Read-Only Status Indicator */}
+        {/* 3. Primary Action Button or Read-Only / Already Submitted Status Indicator */}
         <div className="flex items-center justify-end w-full sm:w-auto shrink-0">
-          {isReadOnly ? (
+          {isAlreadySubmitted ? (
+            <div className="inline-flex items-center justify-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 text-xs font-semibold w-full sm:w-auto">
+              <CheckCheck className="size-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+              <span>Attendance Recorded for Today</span>
+            </div>
+          ) : isReadOnly ? (
             <div className="inline-flex items-center justify-center gap-2 px-3 py-1.5 rounded-lg bg-muted/60 text-muted-foreground border border-border/80 text-xs font-semibold w-full sm:w-auto">
               <Lock className="size-3.5 text-muted-foreground shrink-0" />
               <span>Historical View (Read-Only)</span>
@@ -233,7 +240,7 @@ export function AttendanceSheetToolbar({
           />
         </div>
 
-        {/* Quick Bulk Actions (Only visible in Today edit mode) */}
+        {/* Quick Bulk Actions (Only visible in Today edit mode when not already submitted) */}
         {!isReadOnly ? (
           <div className="flex items-center gap-1.5 flex-wrap sm:flex-nowrap">
             <span className="text-[11px] text-muted-foreground font-medium mr-1 hidden md:inline">
@@ -275,6 +282,14 @@ export function AttendanceSheetToolbar({
               <RotateCcw className="size-3" />
               <span>Reset</span>
             </Button>
+          </div>
+        ) : isAlreadySubmitted ? (
+          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+            <CheckCheck className="size-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+            <span>
+              Batch attendance can only be submitted once per day. Today&apos;s
+              attendance is recorded.
+            </span>
           </div>
         ) : (
           <div className="flex items-center gap-1.5 text-xs text-muted-foreground">

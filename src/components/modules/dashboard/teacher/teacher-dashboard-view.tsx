@@ -1,7 +1,6 @@
 "use client";
 
 import { Suspense } from "react";
-import { TeacherSelfCheckInCard } from "@/components/modules/attendance";
 import { useAuth } from "@/hooks";
 import { TeacherAssignedBatchesCard } from "./teacher-assigned-batches-card";
 import { TeacherKpiCards } from "./teacher-kpi-cards";
@@ -37,9 +36,6 @@ export function TeacherDashboardView() {
 
         <TeacherQuickActionsBar />
       </div>
-
-      {/* Daily Campus Check-in */}
-      <TeacherSelfCheckInCard />
 
       {/* Real-time KPI Metric Summary */}
       <Suspense fallback={<TeacherKpiCardsSkeleton />}>

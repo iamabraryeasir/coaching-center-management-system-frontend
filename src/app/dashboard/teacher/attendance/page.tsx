@@ -55,11 +55,8 @@ export default function TeacherAttendancePage() {
 
   return (
     <Suspense fallback={<AttendancePageFallback />}>
-      {/* Teachers can record student attendance for their batches */}
-      <AttendanceManagementView
-        defaultView="student"
-        allowTeacherView={false}
-      />
+      {/* Teachers with MANAGE_ATTENDANCE can record student batch attendance and track teacher attendance */}
+      <AttendanceManagementView defaultView="student" allowTeacherView={true} />
     </Suspense>
   );
 }
