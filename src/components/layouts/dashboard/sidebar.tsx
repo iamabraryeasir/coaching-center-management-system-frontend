@@ -1,9 +1,10 @@
 "use client";
 
-import { Loader2, LogOut } from "lucide-react";
+import { LogOut } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import AppLogo from "@/assets/svg/logo";
+import { LogoutConfirmationDialog } from "@/components/modules/auth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Sidebar,
@@ -38,7 +39,7 @@ export default function DashboardSidebar({
   className,
 }: DashboardSidebarProps) {
   const pathname = usePathname();
-  const { user, hasPermission, logout, isLoggingOut } = useAuth();
+  const { user, hasPermission } = useAuth();
 
   const navGroups: readonly DashboardNavGroup[] =
     portalRole === "ADMIN"
@@ -163,20 +164,18 @@ export default function DashboardSidebar({
                 </span>
               </div>
 
-              <button
-                type="button"
-                onClick={() => logout()}
-                disabled={isLoggingOut}
-                title="Sign out session"
-                aria-label="Sign out"
-                className="inline-flex size-7 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive disabled:opacity-50 group-data-[collapsible=icon]:hidden"
-              >
-                {isLoggingOut ? (
-                  <Loader2 className="size-3.5 animate-spin" />
-                ) : (
-                  <LogOut className="size-3.5" />
-                )}
-              </button>
+              <LogoutConfirmationDialog
+                trigger={
+                  <button
+                    type="button"
+                    title="Sign out session"
+                    aria-label="Sign out"
+                    className="inline-flex size-7 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive disabled:opacity-50 group-data-[collapsible=icon]:hidden cursor-pointer"
+                  >
+                    <LogOut className="size-3.5" />
+                  </button>
+                }
+              />
             </div>
           </SidebarMenuItem>
         </SidebarMenu>

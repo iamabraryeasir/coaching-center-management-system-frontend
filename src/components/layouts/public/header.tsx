@@ -1,11 +1,11 @@
 "use client";
 
-import { LayoutDashboard, LogIn, LogOut, Menu, X } from "lucide-react";
+import { LayoutDashboard, LogIn, Menu, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import AppLogo from "@/assets/svg/logo";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { siteConfig } from "@/config/site";
 import { PUBLIC_NAV_ITEMS } from "@/constants";
 import { useAuth } from "@/hooks";
@@ -14,7 +14,7 @@ import { cn } from "@/lib/utils";
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const pathname = usePathname();
-  const { user, isAuthenticated, isLoading, logout, isLoggingOut } = useAuth();
+  const { user, isAuthenticated, isLoading } = useAuth();
 
   // Close mobile menu on route changes
   useEffect(() => {
@@ -234,32 +234,17 @@ export default function Header() {
               {isLoading ? (
                 <div className="h-10 w-full animate-pulse rounded-lg bg-muted" />
               ) : isAuthenticated && user ? (
-                <>
-                  <Link
-                    href="/dashboard"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className={cn(
-                      buttonVariants({ variant: "default", size: "lg" }),
-                      "w-full justify-center gap-2 shadow-sm font-semibold",
-                    )}
-                  >
-                    <LayoutDashboard className="size-4" />
-                    <span>Go to Dashboard</span>
-                  </Link>
-                  <Button
-                    variant="outline"
-                    size="lg"
-                    onClick={() => {
-                      setMobileMenuOpen(false);
-                      logout();
-                    }}
-                    disabled={isLoggingOut}
-                    className="w-full justify-center gap-2 text-destructive hover:bg-destructive/10"
-                  >
-                    <LogOut className="size-4" />
-                    <span>Sign Out</span>
-                  </Button>
-                </>
+                <Link
+                  href="/dashboard"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={cn(
+                    buttonVariants({ variant: "default", size: "lg" }),
+                    "w-full justify-center gap-2 shadow-sm font-semibold",
+                  )}
+                >
+                  <LayoutDashboard className="size-4" />
+                  <span>Go to Dashboard</span>
+                </Link>
               ) : (
                 <Link
                   href="/login"

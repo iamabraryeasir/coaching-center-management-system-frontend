@@ -246,8 +246,18 @@ export function useMarkBulkTeacherAttendanceMutation() {
         },
       );
     },
-    onError: (error: Error, _vars, toastId) => {
-      toast.error(error.message || "Failed to record teacher attendance", {
+    onError: (error: unknown, _vars, toastId) => {
+      const err = error as {
+        data?: { message?: string };
+        response?: { _data?: { message?: string } };
+        message?: string;
+      };
+      const serverMsg =
+        err?.data?.message ||
+        err?.response?._data?.message ||
+        err?.message ||
+        "Failed to record teacher attendance";
+      toast.error(serverMsg, {
         id: toastId,
       });
     },

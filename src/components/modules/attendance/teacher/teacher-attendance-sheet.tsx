@@ -114,7 +114,6 @@ export function TeacherAttendanceSheet() {
   const [rows, setRows] = useState<TeacherRowState[]>([]);
 
   const isToday = selectedDate === todayStr;
-  const isReadOnly = !isToday;
   const isNextDisabled = isToday || selectedDate >= todayStr;
 
   // 1. Fetch active teachers
@@ -129,6 +128,10 @@ export function TeacherAttendanceSheet() {
     useTeacherAttendanceSheet(selectedDate);
   const existingRecords = sheetResponse?.data?.records || [];
   const hasExistingRecords = existingRecords.length > 0;
+
+  // Teacher attendance can only be submitted once per day and cannot be edited once recorded
+  const isAlreadySubmitted = isToday && hasExistingRecords;
+  const isReadOnly = !isToday || isAlreadySubmitted;
 
   const markBulkMutation = useMarkBulkTeacherAttendanceMutation();
 
@@ -354,7 +357,12 @@ export function TeacherAttendanceSheet() {
 
           {/* Primary Save Button or Read-Only Status Indicator */}
           <div className="flex items-center justify-end w-full sm:w-auto shrink-0">
-            {isReadOnly ? (
+            {isAlreadySubmitted ? (
+              <div className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 text-xs font-semibold w-full sm:w-auto">
+                <Lock className="size-3.5 shrink-0" />
+                <span>Attendance Recorded for Today</span>
+              </div>
+            ) : isReadOnly ? (
               <div className="inline-flex items-center justify-center gap-2 px-3 py-1.5 rounded-lg bg-muted/60 text-muted-foreground border border-border/80 text-xs font-semibold w-full sm:w-auto">
                 <Lock className="size-3.5 text-muted-foreground shrink-0" />
                 <span>Historical View (Read-Only)</span>
@@ -436,6 +444,14 @@ export function TeacherAttendanceSheet() {
                 <RotateCcw className="size-3" />
                 <span>Reset</span>
               </Button>
+            </div>
+          ) : isAlreadySubmitted ? (
+            <div className="flex items-center gap-1.5 text-xs text-amber-700 dark:text-amber-300">
+              <ShieldAlert className="size-3.5 text-amber-500 shrink-0" />
+              <span>
+                Teacher attendance can only be submitted once per day.
+                Today&apos;s attendance is recorded.
+              </span>
             </div>
           ) : (
             <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
