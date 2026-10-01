@@ -118,8 +118,7 @@ export function StudentOnboardingForm() {
 
       try {
         const payload: GoogleOnboardDto = {
-          // googleId: backend derives this from its own OAuth/session state (C-1)
-          googleId: googleProfile?.googleId || "",
+          googleId: googleProfile?.googleId || value.googleId || undefined,
           email: (value.email || googleProfile?.email || "")
             .trim()
             .toLowerCase(),
@@ -352,7 +351,9 @@ export function StudentOnboardingForm() {
               <form.Field name="institutionName">
                 {(field) => {
                   const isInvalid =
-                    field.state.meta.isTouched && !field.state.meta.isValid;
+                    (field.state.meta.isTouched ||
+                      form.state.submissionAttempts > 0) &&
+                    !field.state.meta.isValid;
                   const firstError = field.state.meta.errors[0];
                   return (
                     <Field className="space-y-1 sm:col-span-2">
@@ -387,7 +388,9 @@ export function StudentOnboardingForm() {
               <form.Field name="classLevel">
                 {(field) => {
                   const isInvalid =
-                    field.state.meta.isTouched && !field.state.meta.isValid;
+                    (field.state.meta.isTouched ||
+                      form.state.submissionAttempts > 0) &&
+                    !field.state.meta.isValid;
                   const firstError = field.state.meta.errors[0];
                   return (
                     <Field className="space-y-1">
@@ -422,7 +425,9 @@ export function StudentOnboardingForm() {
               <form.Field name="rollNumber">
                 {(field) => {
                   const isInvalid =
-                    field.state.meta.isTouched && !field.state.meta.isValid;
+                    (field.state.meta.isTouched ||
+                      form.state.submissionAttempts > 0) &&
+                    !field.state.meta.isValid;
                   const firstError = field.state.meta.errors[0];
                   return (
                     <Field className="space-y-1">
@@ -467,7 +472,9 @@ export function StudentOnboardingForm() {
               <form.Field name="name">
                 {(field) => {
                   const isInvalid =
-                    field.state.meta.isTouched && !field.state.meta.isValid;
+                    (field.state.meta.isTouched ||
+                      form.state.submissionAttempts > 0) &&
+                    !field.state.meta.isValid;
                   const firstError = field.state.meta.errors[0];
                   return (
                     <Field className="space-y-1">
@@ -524,7 +531,9 @@ export function StudentOnboardingForm() {
               <form.Field name="phone">
                 {(field) => {
                   const isInvalid =
-                    field.state.meta.isTouched && !field.state.meta.isValid;
+                    (field.state.meta.isTouched ||
+                      form.state.submissionAttempts > 0) &&
+                    !field.state.meta.isValid;
                   const firstError = field.state.meta.errors[0];
                   return (
                     <Field className="space-y-1">
@@ -598,7 +607,9 @@ export function StudentOnboardingForm() {
               <form.Field name="guardianName">
                 {(field) => {
                   const isInvalid =
-                    field.state.meta.isTouched && !field.state.meta.isValid;
+                    (field.state.meta.isTouched ||
+                      form.state.submissionAttempts > 0) &&
+                    !field.state.meta.isValid;
                   const firstError = field.state.meta.errors[0];
                   return (
                     <Field className="space-y-1">
@@ -633,7 +644,9 @@ export function StudentOnboardingForm() {
               <form.Field name="guardianPhone">
                 {(field) => {
                   const isInvalid =
-                    field.state.meta.isTouched && !field.state.meta.isValid;
+                    (field.state.meta.isTouched ||
+                      form.state.submissionAttempts > 0) &&
+                    !field.state.meta.isValid;
                   const firstError = field.state.meta.errors[0];
                   return (
                     <Field className="space-y-1">

@@ -44,10 +44,8 @@ export function GoogleLoginButton({
           // TODO(security): Backend should issue a short-lived HttpOnly
           // `onboarding_session` cookie on `isNewUser` responses so this
           // sessionStorage usage can be removed entirely (Security Review C-1).
-          // When the backend is updated, remove this block and rely on the cookie.
           const onboardingData = {
-            // googleId intentionally NOT stored here — minimise PII in sessionStorage.
-            // The backend must derive identity from its own session on form submit.
+            googleId: data.googleId || "",
             email: data.email || "",
             name: data.name || "",
             avatarUrl: data.avatarUrl || null,

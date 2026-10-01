@@ -70,7 +70,7 @@ export const updateStudentStatusSchema = z.object({
 });
 
 export const googleOnboardSchema = z.object({
-  googleId: z.string().min(1, "Google ID is required."),
+  googleId: z.string().optional(),
   email: z
     .string()
     .trim()

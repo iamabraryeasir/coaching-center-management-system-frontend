@@ -122,7 +122,7 @@ export interface GoogleAuthResponseData {
 }
 
 export interface GoogleOnboardDto {
-  googleId: string;
+  googleId?: string;
   email: string;
   name: string;
   phone: string;
