@@ -8,6 +8,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { loginUser } from "@/api";
+import { DemoLoginSection } from "@/components/forms/demo-login-section";
 import { GoogleLoginButton } from "@/components/forms/google-login-button";
 import { Button } from "@/components/ui/button";
 import {
@@ -32,7 +33,7 @@ import { authChannel } from "@/lib/auth-channel";
 import { getSafeRedirect } from "@/lib/safe-redirect";
 import { setClientSessionFlag } from "@/lib/session-cookie";
 import { cn } from "@/lib/utils";
-import { loginSchema } from "@/validators";
+import { type LoginInput, loginSchema } from "@/validators";
 
 export function LoginForm({
   className,
@@ -43,6 +44,40 @@ export function LoginForm({
   const queryClient = useQueryClient();
   const [serverError, setServerError] = useState<string | null>(null);
 
+  const executeLogin = async (credentials: LoginInput) => {
+    setServerError(null);
+    const toastId = toast.loading("Logging in to your account...");
+
+    try {
+      const response = await loginUser(credentials);
+      if (response?.data?.user) {
+        queryClient.setQueryData(authKeys.currentUser(), response.data.user);
+      }
+
+      // Notify other browser tabs that a session has started
+      authChannel.postMessage({ type: "LOGIN" });
+      setClientSessionFlag();
+
+      toast.success(response?.message || "Login successful! Redirecting...", {
+        id: toastId,
+      });
+
+      // Determine destination URL — validate against same-origin to prevent open redirect
+      const safeDestination = getSafeRedirect(searchParams.get("redirect"));
+
+      router.push(safeDestination);
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Failed to log in. Please check your credentials and try again.";
+      setServerError(message);
+      toast.error(message, {
+        id: toastId,
+      });
+    }
+  };
+
   const form = useForm({
     defaultValues: {
       email: "",
@@ -52,37 +87,7 @@ export function LoginForm({
       onSubmit: loginSchema,
     },
     onSubmit: async ({ value }) => {
-      setServerError(null);
-      const toastId = toast.loading("Logging in to your account...");
-
-      try {
-        const response = await loginUser(value);
-        if (response?.data?.user) {
-          queryClient.setQueryData(authKeys.currentUser(), response.data.user);
-        }
-
-        // Notify other browser tabs that a session has started
-        authChannel.postMessage({ type: "LOGIN" });
-        setClientSessionFlag();
-
-        toast.success(response?.message || "Login successful! Redirecting...", {
-          id: toastId,
-        });
-
-        // Determine destination URL — validate against same-origin to prevent open redirect
-        const safeDestination = getSafeRedirect(searchParams.get("redirect"));
-
-        router.push(safeDestination);
-      } catch (error: unknown) {
-        const message =
-          error instanceof Error
-            ? error.message
-            : "Failed to log in. Please check your credentials and try again.";
-        setServerError(message);
-        toast.error(message, {
-          id: toastId,
-        });
-      }
+      await executeLogin(value);
     },
   });
 
@@ -206,6 +211,16 @@ export function LoginForm({
               <Field>
                 <GoogleLoginButton label="Login with Google" />
               </Field>
+
+              {/* Quick 1-Click Demo Login (Visible only when NEXT_PUBLIC_ENABLE_DEMO_LOGIN="true") */}
+              <DemoLoginSection
+                disabled={form.state.isSubmitting}
+                onSelectPersona={(credentials) => {
+                  form.setFieldValue("email", credentials.email);
+                  form.setFieldValue("password", credentials.password);
+                  executeLogin(credentials);
+                }}
+              />
             </FieldGroup>
           </form>
         </CardContent>
