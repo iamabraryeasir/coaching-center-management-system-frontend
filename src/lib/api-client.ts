@@ -1,7 +1,9 @@
 import { type FetchOptions, ofetch } from "ofetch";
 
-const BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000/api/v1";
+export const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_BASE_URL ||
+  process.env.NEXT_PUBLIC_API_URL ||
+  "http://localhost:5000/api/v1";
 
 interface QueuedRequest {
   resolve: () => void;
@@ -30,7 +32,7 @@ const processQueue = (error: unknown = null) => {
  * Underlying un-intercepted HTTP client instance
  */
 const rawApiClient = ofetch.create({
-  baseURL: BASE_URL,
+  baseURL: API_BASE_URL,
   credentials: "include",
 });
 
@@ -77,7 +79,7 @@ async function apiClient<T = unknown>(
 ): Promise<T> {
   const mergedOptions: FetchOptions<"json"> = {
     ...options,
-    baseURL: BASE_URL,
+    baseURL: API_BASE_URL,
     credentials: "include",
   };
 
