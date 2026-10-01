@@ -20,7 +20,7 @@ export const siteConfig = {
     src: process.env.NEXT_PUBLIC_LOGO_URL || "/branding/logo.svg",
     alt: process.env.NEXT_PUBLIC_APP_NAME || "Coaching Management System Logo",
   },
-  favicon: "/favicon.ico",
+  favicon: "/favicon.svg",
 
   // Support & Contact
   supportEmail: process.env.NEXT_PUBLIC_SUPPORT_EMAIL || "support@coaching.com",
