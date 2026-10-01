@@ -17,14 +17,14 @@ const apiOrigin = (() => {
 // Build production-hardened CSP directives
 const cspDirectives = [
   "default-src 'self'",
-  // Next.js App Router hydration & Google OAuth ('unsafe-eval' only in development)
+  // Next.js App Router hydration, Google OAuth & Microsoft Clarity ('unsafe-eval' only in development)
   isProd
-    ? "script-src 'self' 'unsafe-inline' https://accounts.google.com https://apis.google.com"
-    : "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://accounts.google.com https://apis.google.com",
+    ? "script-src 'self' 'unsafe-inline' https://accounts.google.com https://apis.google.com https://www.clarity.ms https://scripts.clarity.ms"
+    : "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://accounts.google.com https://apis.google.com https://www.clarity.ms https://scripts.clarity.ms",
   "frame-src 'self' https://accounts.google.com",
-  // Avatars, profile images, data URIs, Cloudinary CDN
-  "img-src 'self' data: blob: https://lh3.googleusercontent.com https://res.cloudinary.com https://*.googleusercontent.com https://*.cloudinary.com",
-  // Connect-src: strictly scoped to same-origin + configured API + Google APIs (local ports only in dev)
+  // Avatars, profile images, data URIs, Cloudinary CDN, Clarity beacons
+  "img-src 'self' data: blob: https://lh3.googleusercontent.com https://res.cloudinary.com https://*.googleusercontent.com https://*.cloudinary.com https://*.clarity.ms https://c.bing.com",
+  // Connect-src: strictly scoped to same-origin + configured API + Google APIs + Microsoft Clarity telemetry (local ports only in dev)
   [
     "connect-src 'self'",
     apiOrigin,
@@ -35,6 +35,8 @@ const cspDirectives = [
       : "",
     "https://accounts.google.com",
     "https://*.googleapis.com",
+    "https://*.clarity.ms",
+    "https://c.bing.com",
   ]
     .filter(Boolean)
     .join(" "),

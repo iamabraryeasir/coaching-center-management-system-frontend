@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { MicrosoftClarity } from "@/components/analytics/microsoft-clarity";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import AuthListener from "./auth-listener";
 import GoogleAuthProvider from "./google-auth-provider";
@@ -12,6 +13,7 @@ export default function AppProviders({ children }: { children: ReactNode }) {
         <TooltipProvider>{children}</TooltipProvider>
         <AuthListener />
         <ToastProvider />
+        <MicrosoftClarity />
       </GoogleAuthProvider>
     </QueryProvider>
   );
