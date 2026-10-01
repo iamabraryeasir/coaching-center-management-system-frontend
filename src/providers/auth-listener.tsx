@@ -6,6 +6,10 @@ import { useEffect } from "react";
 import toast from "react-hot-toast";
 import { authKeys } from "@/constants/query-keys";
 import { authChannel } from "@/lib/auth-channel";
+import {
+  clearClientSessionFlag,
+  setClientSessionFlag,
+} from "@/lib/session-cookie";
 
 /**
  * Global Authentication Session & Multi-Tab Listener
@@ -22,6 +26,7 @@ export default function AuthListener() {
   useEffect(() => {
     // 1. Handle local session expiration event from apiClient
     const handleSessionExpired = () => {
+      clearClientSessionFlag();
       // Purge local cache
       queryClient.setQueryData(authKeys.currentUser(), null);
       queryClient.removeQueries({ queryKey: authKeys.all });
@@ -44,6 +49,7 @@ export default function AuthListener() {
     // 2. Handle cross-tab messages from other tabs
     const unsubscribeChannel = authChannel.subscribe((msg) => {
       if (msg.type === "LOGOUT") {
+        clearClientSessionFlag();
         queryClient.setQueryData(authKeys.currentUser(), null);
         queryClient.removeQueries({ queryKey: authKeys.all });
         if (pathname.startsWith("/dashboard")) {
@@ -53,9 +59,11 @@ export default function AuthListener() {
           router.push("/");
         }
       } else if (msg.type === "LOGIN") {
+        setClientSessionFlag();
         // Another tab logged in: revalidate user query
         queryClient.invalidateQueries({ queryKey: authKeys.currentUser() });
       } else if (msg.type === "SESSION_EXPIRED") {
+        clearClientSessionFlag();
         queryClient.setQueryData(authKeys.currentUser(), null);
         queryClient.removeQueries({ queryKey: authKeys.all });
         if (pathname.startsWith("/dashboard")) {

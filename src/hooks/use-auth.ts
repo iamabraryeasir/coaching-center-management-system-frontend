@@ -17,6 +17,10 @@ import {
 import { authKeys } from "@/constants/query-keys";
 import { authChannel } from "@/lib/auth-channel";
 import {
+  clearClientSessionFlag,
+  setClientSessionFlag,
+} from "@/lib/session-cookie";
+import {
   type ChangePasswordDto,
   type GoogleAuthPayload,
   type GoogleOnboardDto,
@@ -46,7 +50,13 @@ export function useAuth() {
     refetch,
   } = useQuery({
     queryKey: authKeys.currentUser(),
-    queryFn: getCurrentUser,
+    queryFn: async () => {
+      const u = await getCurrentUser();
+      if (u && u.status === "ACTIVE") {
+        setClientSessionFlag();
+      }
+      return u;
+    },
     staleTime: 60 * 1000, // 1 minute fresh
     gcTime: 15 * 60 * 1000, // 15 minutes garbage collection
     retry: false,
@@ -58,18 +68,21 @@ export function useAuth() {
   const logoutMutation = useMutation({
     mutationFn: logoutUser,
     onMutate: async () => {
+      clearClientSessionFlag();
       // Optimistically clear current user from cache
       queryClient.setQueryData(authKeys.currentUser(), null);
       // Synchronize logout across all open browser tabs
       authChannel.postMessage({ type: "LOGOUT" });
     },
     onSuccess: () => {
+      clearClientSessionFlag();
       // Invalidate and purge all auth-related cache tags
       queryClient.removeQueries({ queryKey: authKeys.all });
       toast.success("Logged out successfully");
       router.push("/");
     },
     onError: (err: unknown) => {
+      clearClientSessionFlag();
       const message =
         err instanceof Error ? err.message : "Failed to logout cleanly";
       // Even if network fails, purge local session cache and redirect
@@ -83,15 +96,18 @@ export function useAuth() {
   const logoutAllMutation = useMutation({
     mutationFn: logoutAllDevices,
     onMutate: async () => {
+      clearClientSessionFlag();
       queryClient.setQueryData(authKeys.currentUser(), null);
       authChannel.postMessage({ type: "LOGOUT" });
     },
     onSuccess: () => {
+      clearClientSessionFlag();
       queryClient.removeQueries({ queryKey: authKeys.all });
       toast.success("Logged out from all devices");
       router.push("/");
     },
     onError: (err: unknown) => {
+      clearClientSessionFlag();
       const message =
         err instanceof Error
           ? err.message

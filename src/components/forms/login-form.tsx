@@ -30,6 +30,7 @@ import { PasswordInput } from "@/components/ui/password-input";
 import { authKeys } from "@/constants/query-keys";
 import { authChannel } from "@/lib/auth-channel";
 import { getSafeRedirect } from "@/lib/safe-redirect";
+import { setClientSessionFlag } from "@/lib/session-cookie";
 import { cn } from "@/lib/utils";
 import { loginSchema } from "@/validators";
 
@@ -62,6 +63,7 @@ export function LoginForm({
 
         // Notify other browser tabs that a session has started
         authChannel.postMessage({ type: "LOGIN" });
+        setClientSessionFlag();
 
         toast.success(response?.message || "Login successful! Redirecting...", {
           id: toastId,

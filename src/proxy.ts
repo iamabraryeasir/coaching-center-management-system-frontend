@@ -11,7 +11,10 @@ export function proxy(request: NextRequest) {
 
   const accessToken = request.cookies.get("accessToken")?.value?.trim();
   const refreshToken = request.cookies.get("refreshToken")?.value?.trim();
-  const hasAuthCookie = Boolean(accessToken || refreshToken);
+  const cmsSession = request.cookies.get("cms_session")?.value?.trim();
+  const hasAuthCookie = Boolean(
+    accessToken || refreshToken || cmsSession === "1",
+  );
 
   // Protected Route Guard (/dashboard/*)
   if (pathname.startsWith("/dashboard")) {

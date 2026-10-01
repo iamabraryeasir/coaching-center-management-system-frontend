@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 
 import { useGoogleAuthMutation } from "@/hooks/use-auth";
 import { getSafeRedirect } from "@/lib/safe-redirect";
+import { setClientSessionFlag } from "@/lib/session-cookie";
 import { cn } from "@/lib/utils";
 import type { GoogleAuthResponseData } from "@/types";
 
@@ -59,6 +60,7 @@ export function GoogleLoginButton({
           router.push("/onboard-student");
         } else {
           // Case 2: Existing approved student logged in directly
+          setClientSessionFlag();
           toast.success("Welcome back! Redirecting to student dashboard...", {
             id: toastId,
           });
