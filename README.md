@@ -6,12 +6,33 @@
 [![TanStack Query](https://img.shields.io/badge/TanStack_Query-v5-ff4154?style=flat-square&logo=react-query)](https://tanstack.com/query)
 [![Biome](https://img.shields.io/badge/Biome-2.4.2-60a5fa?style=flat-square&logo=biome)](https://biomejs.dev/)
 [![Package Manager](https://img.shields.io/badge/Bun-1.4.2-fbf0df?style=flat-square&logo=bun)](https://bun.sh/)
+[![Live Deployment](https://img.shields.io/badge/Vercel-Live_Demo-000000?style=flat-square&logo=vercel)](https://coaching-system-frontend.vercel.app)
 
 An enterprise-grade, multi-tenant/multi-instance frontend application built with **Next.js 16 (App Router)** and **React 19** for managing coaching centers, academic institutions, and tutoring academies.
 
 Designed for high-concurrency environments, multi-branch scalability, white-label branding, and modern role-based educational workflows.
 
 ---
+
+## 🌐 Live Deployment & Demo Credentials
+
+🔗 **Live Application URL**: [https://coaching-system-frontend.vercel.app](https://coaching-system-frontend.vercel.app)
+
+### 👥 Pre-Seeded Demo Credentials
+
+| Role                  | Name          | Email                 | Password         | Assigned Permissions / Meta                            |
+| :-------------------- | :------------ | :-------------------- | :--------------- | :----------------------------------------------------- |
+| **System Admin**      | Abrar Yeasir  | `admin@gmail.com`     | `Admin@123456`   | Full System Governance                                 |
+| **Teacher (Lead)**    | Sarah Khan    | `teacher1@gmail.com`  | `Teacher@123456` | `MANAGE_ATTENDANCE`, `MANAGE_EXAMS`, `MANAGE_ROUTINES` |
+| **Teacher**           | Tanvir Ahmed  | `teacher2@gmail.com`  | `Teacher@123456` | `MANAGE_ATTENDANCE`, `MANAGE_EXAMS` (Physics)          |
+| **Teacher**           | Ayesha Rahman | `teacher3@gmail.com`  | `Teacher@123456` | `MANAGE_ATTENDANCE` (Chemistry)                        |
+| **Teacher**           | Kamal Hossain | `teacher4@gmail.com`  | `Teacher@123456` | `MANAGE_EXAMS` (English)                               |
+| **Student**           | Rahim Ali     | `student1@gmail.com`  | `Student@123456` | HSC (Active, Enrolled in `HSC 2026`)                   |
+| **Student**           | Nusrat Jahan  | `student2@gmail.com`  | `Student@123456` | HSC (Active, Enrolled in `HSC 2026`)                   |
+| **Student**           | Tanvir Hasan  | `student3@gmail.com`  | `Student@123456` | Class 10 (Active, Enrolled in `SSC 2026`)              |
+| **Student**           | Sabbir Ahmed  | `student4@gmail.com`  | `Student@123456` | HSC (Active, Enrolled in `SSC 2026`)                   |
+| **Student**           | Mehedi Hasan  | `student5@gmail.com`  | `Student@123456` | Class 9 (Active, Enrolled in `Class 10`)               |
+| **Student (Pending)** | Sadia Afrin   | `student6@gmail.com`  | `Student@123456` | Awaiting Admin Approval (`PENDING_ACTIVATION`)         |
 
 ## 🌟 Executive Overview & Business Value
 
@@ -74,7 +95,6 @@ flowchart TD
 - **Application Review & Approval Pipeline**: Administrators review pending applications from a centralized queue, with one-click actions to `APPROVE` (activating the account) or `REJECT` (with custom rejection reasoning).
 - **Status State Machine**: Students progress through lifecycle states: `PENDING_ACTIVATION` $\rightarrow$ `ACTIVE` $\leftrightarrow$ `INACTIVE` / `BLOCKED`.
 - **Dossier & Academic Record**: Complete student profile includes guardian contacts, institutional enrollment, batch histories, attendance ratios, exam report cards, and balance ledgers.
-- **Dossier & Academic Record**: Complete student profile includes guardian contacts, institutional enrollment, batch histories, attendance ratios, and exam report cards.
 
 ---
 
@@ -93,7 +113,6 @@ flowchart TD
 ### 4. 📚 Academic Batches & Enrollment Streams
 
 - **Batch Hierarchy & Capacity**: Batches represent specific classroom groups with custom monthly fee schedules, target grade levels, and status tracking (`UPCOMING`, `ONGOING`, `COMPLETED`, `CANCELLED`).
-- **Batch Hierarchy & Capacity**: Batches represent specific classroom groups with target grade levels, curriculum details, and status tracking (`UPCOMING`, `ONGOING`, `COMPLETED`, `CANCELLED`).
 - **Dual Enrollment Architecture**:
   - _Student Self-Enrollment Request_: Students browse open batches and apply for enrollment, entering the admin `PendingEnrollments` approval queue.
   - _Administrative Direct Enrollment_: Administrators assign any active student directly to batches with immediate roster enrollment.
@@ -215,10 +234,8 @@ coaching-management-system-frontend/
 │   │   │   └── (marketing)/     # Landing page, public presentation, hero section
 │   │   ├── dashboard/           # Protected dashboard layout and smart gateway
 │   │   │   ├── admin/           # Admin portal (students, teachers, batches, routines, exams, payments)
-│   │   │   ├── admin/           # Admin portal (students, teachers, batches, routines, exams)
 │   │   │   ├── teacher/         # Teacher workspace (batches, routines, attendance, exams)
 │   │   │   └── student/         # Student mobile-first portal (routines, attendance, exams, payments)
-│   │   │   └── student/         # Student mobile-first portal (routines, attendance, exams)
 │   │   ├── globals.css          # Tailwind CSS v4 @theme inline and semantic OKLCH tokens
 │   │   └── layout.tsx           # Root layout with fonts, metadata, and AppProviders
 │   ├── assets/                  # Scalable vector graphics and static assets
@@ -235,7 +252,6 @@ coaching-management-system-frontend/
 │   ├── proxy.ts                 # Next.js 16 server routing proxy (replaces legacy middleware)
 │   ├── types/                   # TypeScript domain models, DTOs, and API responses
 │   └── validators/              # Zod validation schemas (auth, student, teacher, batch, exam, payment, routine)
-│   └── validators/              # Zod validation schemas (auth, student, teacher, batch, exam, routine)
 ├── AGENTS.md                    # Persistent memory, architectural blueprint, and agent engineering standard
 ├── DESIGN.md                    # Design system specification, OKLCH tokens, and component hierarchy
 ├── package.json                 # Dependency definitions and scripts
