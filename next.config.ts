@@ -19,8 +19,8 @@ const cspDirectives = [
   "default-src 'self'",
   // Next.js App Router hydration & Google OAuth ('unsafe-eval' only in development)
   isProd
-    ? "script-src 'self' 'unsafe-inline' https://accounts.google.com"
-    : "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://accounts.google.com",
+    ? "script-src 'self' 'unsafe-inline' https://accounts.google.com https://apis.google.com"
+    : "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://accounts.google.com https://apis.google.com",
   "frame-src 'self' https://accounts.google.com",
   // Avatars, profile images, data URIs, Cloudinary CDN
   "img-src 'self' data: blob: https://lh3.googleusercontent.com https://res.cloudinary.com https://*.googleusercontent.com https://*.cloudinary.com",
@@ -38,8 +38,8 @@ const cspDirectives = [
   ]
     .filter(Boolean)
     .join(" "),
-  // Tailwind CSS v4 & Google Fonts
-  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+  // Tailwind CSS v4, Google Fonts & Google Identity Services (GSI)
+  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com",
   "font-src 'self' data: https://fonts.gstatic.com",
 ].join("; ");
 
