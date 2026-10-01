@@ -14,25 +14,9 @@ Designed for high-concurrency environments, multi-branch scalability, white-labe
 
 ---
 
-## 🌐 Live Deployment & Demo Credentials
+## 🌐 Live Deployment
 
 🔗 **Live Application URL**: [https://coaching-system-frontend.vercel.app](https://coaching-system-frontend.vercel.app)
-
-### 👥 Pre-Seeded Demo Credentials
-
-| Role                  | Name          | Email                 | Password         | Assigned Permissions / Meta                            |
-| :-------------------- | :------------ | :-------------------- | :--------------- | :----------------------------------------------------- |
-| **System Admin**      | Abrar Yeasir  | `admin@gmail.com`     | `Admin@123456`   | Full System Governance                                 |
-| **Teacher (Lead)**    | Sarah Khan    | `teacher1@gmail.com`  | `Teacher@123456` | `MANAGE_ATTENDANCE`, `MANAGE_EXAMS`, `MANAGE_ROUTINES` |
-| **Teacher**           | Tanvir Ahmed  | `teacher2@gmail.com`  | `Teacher@123456` | `MANAGE_ATTENDANCE`, `MANAGE_EXAMS` (Physics)          |
-| **Teacher**           | Ayesha Rahman | `teacher3@gmail.com`  | `Teacher@123456` | `MANAGE_ATTENDANCE` (Chemistry)                        |
-| **Teacher**           | Kamal Hossain | `teacher4@gmail.com`  | `Teacher@123456` | `MANAGE_EXAMS` (English)                               |
-| **Student**           | Rahim Ali     | `student1@gmail.com`  | `Student@123456` | HSC (Active, Enrolled in `HSC 2026`)                   |
-| **Student**           | Nusrat Jahan  | `student2@gmail.com`  | `Student@123456` | HSC (Active, Enrolled in `HSC 2026`)                   |
-| **Student**           | Tanvir Hasan  | `student3@gmail.com`  | `Student@123456` | Class 10 (Active, Enrolled in `SSC 2026`)              |
-| **Student**           | Sabbir Ahmed  | `student4@gmail.com`  | `Student@123456` | HSC (Active, Enrolled in `SSC 2026`)                   |
-| **Student**           | Mehedi Hasan  | `student5@gmail.com`  | `Student@123456` | Class 9 (Active, Enrolled in `Class 10`)               |
-| **Student (Pending)** | Sadia Afrin   | `student6@gmail.com`  | `Student@123456` | Awaiting Admin Approval (`PENDING_ACTIVATION`)         |
 
 ## 🌟 Executive Overview & Business Value
 
