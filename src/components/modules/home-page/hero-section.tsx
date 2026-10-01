@@ -13,6 +13,7 @@ import {
   Sparkles,
   UserPlus,
 } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
 import { useAuth } from "@/hooks";
@@ -89,7 +90,7 @@ export default function HeroSection() {
       </div>
 
       {/* Hero Header Area */}
-      <div className="mx-auto max-w-5xl px-4 pt-12 pb-16 sm:pt-20 sm:pb-20 lg:pt-24 lg:pb-24 text-center">
+      <div className="mx-auto max-w-6xl px-4 pt-12 pb-16 sm:pt-20 sm:pb-20 lg:pt-24 lg:pb-24 text-center">
         {/* Status Pill Badge */}
         <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-xs font-semibold text-primary shadow-2xs backdrop-blur-xs mb-6">
           <Sparkles className="size-3.5" />
@@ -169,6 +170,28 @@ export default function HeroSection() {
               </Link>
             </>
           )}
+        </div>
+
+        {/* Admin Dashboard UI Preview Showcase */}
+        <div className="mt-14 sm:mt-18 relative">
+          {/* Ambient Glow */}
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute -inset-x-8 top-10 -z-10 h-72 bg-linear-to-b from-primary/20 via-primary/5 to-transparent blur-3xl opacity-70"
+          />
+
+          <div className="rounded-2xl border border-border/80 bg-card/60 p-2 sm:p-3 shadow-2xl shadow-primary/10 ring-1 ring-border/50 backdrop-blur-xs">
+            <div className="overflow-hidden rounded-xl border border-border/60 bg-muted/20">
+              <Image
+                src="/admin-dashboard-ui.png"
+                alt="Coaching Management System - Admin Console & Analytics Dashboard Preview"
+                width={1920}
+                height={1080}
+                priority
+                className="w-full h-auto rounded-lg object-cover shadow-xs transition-transform duration-500 hover:scale-[1.008]"
+              />
+            </div>
+          </div>
         </div>
       </div>
 
