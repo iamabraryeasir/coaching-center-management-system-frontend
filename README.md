@@ -18,6 +18,14 @@ Designed for high-concurrency environments, multi-branch scalability, white-labe
 
 🔗 **Live Application URL**: [https://coaching-system-frontend.vercel.app](https://coaching-system-frontend.vercel.app)
 
+<br />
+
+<p align="center">
+  <img src="./public/admin-dashboard-ui.png" alt="Coaching Management System - Admin Console & Analytics Dashboard Preview" width="100%" />
+</p>
+
+---
+
 ## 🌟 Executive Overview & Business Value
 
 Running a modern coaching center demands synchronization across disparate operational domains: student admissions, teacher scheduling, batch enrollments, daily physical presence verification, exam grading, merit list publishing, and monthly fee collections.
